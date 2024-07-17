@@ -1,4 +1,4 @@
-import { ServerConfigService } from '@core';
+import { ErrorFilter, ServerConfigService } from '@core';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
@@ -8,6 +8,7 @@ async function bootstrap() {
   const serverConfigService = app.get(ServerConfigService);
 
   app.enableCors(serverConfigService.corsOptions);
+  app.useGlobalFilters(app.get(ErrorFilter));
 
   await app.listen(serverConfigService.port, serverConfigService.host);
 }

@@ -1,0 +1,63 @@
+import { ErrorCode } from '@common/constants';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { AxiosError } from 'axios';
+
+import { ExceptionErrorProps, ExceptionProps } from './interfaces';
+
+export class ExceptionError<D = any> implements ExceptionErrorProps<D> {
+  name: string;
+  message: string;
+  details?: D;
+
+  constructor(name?: string, message?: string, details?: D) {
+    this.name = name;
+    this.message = message;
+    this.details = details;
+  }
+}
+
+export class Exception<D = any> implements ExceptionProps<D> {
+  errorCode: string;
+  statusCode: HttpStatus;
+  error?: ExceptionErrorProps<D>;
+
+  constructor(errorCode: string, statusCode: HttpStatus, errorOrDetails?: Error | HttpException | D) {
+    this.errorCode = errorCode;
+    this.statusCode = statusCode;
+
+    if (errorOrDetails == null) {
+      return;
+    }
+
+    switch (true) {
+      case errorOrDetails instanceof HttpException:
+      case errorOrDetails instanceof Error:
+        this.error = new ExceptionError(errorOrDetails.name, errorOrDetails.message);
+        break;
+
+      default:
+        this.error = new ExceptionError(Error.name, '', errorOrDetails);
+        break;
+    }
+  }
+}
+
+export class ServiceException<D = any> extends Exception<D> {}
+
+export class RequestException extends Exception {
+  constructor(e: HttpException) {
+    super(ErrorCode.RequestError, e.getStatus(), e);
+  }
+}
+
+export class SystemException<D = any> extends Exception<D> {
+  constructor(e?: Error) {
+    super(ErrorCode.SysemError, HttpStatus.INTERNAL_SERVER_ERROR, e);
+  }
+}
+
+export class AxiosException extends Exception<unknown> {
+  constructor(e: AxiosError) {
+    super(ErrorCode.AxiosError, HttpStatus.FAILED_DEPENDENCY, e.response?.data);
+  }
+}
