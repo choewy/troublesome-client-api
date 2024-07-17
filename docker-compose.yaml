@@ -1,0 +1,35 @@
+name: newbox
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: newbox-mysql
+    environment:
+      MYSQL_USER: newbox
+      MYSQL_PASSWORD: newbox
+      MYSQL_ROOT_PASSWORD: newbox
+      TZ: Asia/Seoul
+    volumes:
+      - .docker/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - .docker/mysql/data:/var/lib/mysql
+    ports:
+      - 33063:3306
+    restart: unless-stopped
+    networks:
+      - newbox
+
+  redis:
+    image: redis/redis-stack-server:7.2.0-v10
+    container_name: newbox-redis
+    volumes:
+      - .docker/redis/redis.conf/:/redis-stack.conf
+      - .docker/redis/data/:/data
+    ports:
+      - 6383:6379
+    restart: unless-stopped
+    networks:
+      - newbox
+
+networks:
+  newbox:
+    driver: bridge
