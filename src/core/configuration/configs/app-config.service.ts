@@ -7,8 +7,18 @@ import { NodeEnv } from '../constants';
 export class AppConfigService {
   constructor(private readonly configService: ConfigService) {}
 
-  public get nodeEnv() {
+  public get env() {
     return this.configService.get('NODE_ENV') ?? NodeEnv.Local;
+  }
+
+  public get name() {
+    const name = this.configService.get('npm_package_name');
+
+    if (this.isProduction) {
+      return name;
+    }
+
+    return [name, this.env].join('_');
   }
 
   public get version() {
@@ -16,18 +26,18 @@ export class AppConfigService {
   }
 
   public get isLocal() {
-    return this.nodeEnv === NodeEnv.Local;
+    return this.env === NodeEnv.Local;
   }
 
   public get isTest() {
-    return this.nodeEnv === NodeEnv.Test;
+    return this.env === NodeEnv.Test;
   }
 
   public get isDevelopment() {
-    return this.nodeEnv === NodeEnv.Development;
+    return this.env === NodeEnv.Development;
   }
 
   public get isProduction() {
-    return this.nodeEnv === NodeEnv.Production;
+    return this.env === NodeEnv.Production;
   }
 }

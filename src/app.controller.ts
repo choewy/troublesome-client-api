@@ -1,4 +1,3 @@
-import { VersionDTO } from '@common';
 import { Controller, Get } from '@nestjs/common';
 
 import { AppService } from './app.service';
@@ -9,6 +8,6 @@ export class AppController {
 
   @Get()
   getVersion() {
-    return new VersionDTO(this.appService.getVersion());
+    return this.appService.getVersion();
   }
 }

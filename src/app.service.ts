@@ -1,3 +1,4 @@
+import { VersionDTO } from '@common';
 import { AppConfigService } from '@core';
 import { Injectable } from '@nestjs/common';
 
@@ -6,6 +7,6 @@ export class AppService {
   constructor(private readonly appConfigService: AppConfigService) {}
 
   getVersion() {
-    return this.appConfigService.version;
+    return new VersionDTO(this.appConfigService.name, this.appConfigService.version);
   }
 }
