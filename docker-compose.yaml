@@ -12,6 +12,7 @@ services:
     volumes:
       - .docker/mysql/initdb.d:/docker-entrypoint-initdb.d
       - .docker/mysql/data:/var/lib/mysql
+      - .docker/mysql/log:/var/log
     ports:
       - 33063:3306
     restart: unless-stopped
@@ -24,6 +25,7 @@ services:
     volumes:
       - .docker/redis/redis.conf/:/redis-stack.conf
       - .docker/redis/data/:/data
+      - .docker/redis/log:/var/log/redis
     ports:
       - 6383:6379
     restart: unless-stopped
