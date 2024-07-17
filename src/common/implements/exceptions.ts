@@ -1,5 +1,5 @@
 import { ErrorCode } from '@common/constants';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, ValidationError } from '@nestjs/common';
 import { AxiosError } from 'axios';
 
 import { ExceptionErrorProps, ExceptionProps } from './interfaces';
@@ -59,5 +59,11 @@ export class SystemException<D = any> extends Exception<D> {
 export class AxiosException extends Exception<unknown> {
   constructor(e: AxiosError) {
     super(ErrorCode.AxiosError, HttpStatus.FAILED_DEPENDENCY, e.response?.data);
+  }
+}
+
+export class ValidationException extends Exception {
+  constructor(errors: ValidationError[]) {
+    super(ErrorCode.ValidationError, HttpStatus.BAD_REQUEST, errors.pop());
   }
 }
