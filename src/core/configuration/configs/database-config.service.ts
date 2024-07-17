@@ -7,24 +7,24 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppConfigService } from './app-config.service';
 
 @Injectable()
-export class MariaDBConfigService {
+export class DatabaseConfigService {
   constructor(
     private readonly configService: ConfigService,
     private readonly appConfigService: AppConfigService,
   ) {}
 
-  public get typeormModuleOptions(): TypeOrmModuleOptions {
+  public get newboxOptions(): TypeOrmModuleOptions {
     return {
-      type: 'mariadb',
-      host: this.configService.getOrThrow('MARIADB_HOST'),
-      port: +this.configService.getOrThrow('MARIADB_PORT'),
-      username: this.configService.getOrThrow('MARIADB_USERNAME'),
-      password: this.configService.getOrThrow('MARIADB_PASSWORD'),
-      database: this.configService.getOrThrow('MARIADB_DATABASE'),
+      type: 'mysql',
+      host: this.configService.getOrThrow('NEWBOX_DB_HOST'),
+      port: +this.configService.getOrThrow('NEWBOX_DB_PORT'),
+      username: this.configService.getOrThrow('NEWBOX_DB_USERNAME'),
+      password: this.configService.getOrThrow('NEWBOX_DB_PASSWORD'),
+      database: this.configService.getOrThrow('NEWBOX_DB_DATABASE'),
       entities: ['./dist/**/*.{js,ts}'],
+      namingStrategy: new SnakeNamingStrategy(),
       logging: this.loggerOptions,
       synchronize: this.isSynchronize,
-      namingStrategy: new SnakeNamingStrategy(),
     };
   }
 
