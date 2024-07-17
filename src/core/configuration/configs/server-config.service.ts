@@ -7,11 +7,11 @@ export class ServerConfigService {
   constructor(private readonly configService: ConfigService) {}
 
   public get host() {
-    return +this.configService.getOrThrow('PORT');
+    return this.configService.getOrThrow('HOST');
   }
 
   public get port() {
-    return this.configService.getOrThrow('HOST');
+    return +this.configService.getOrThrow('PORT');
   }
 
   public get corsOptions(): CorsOptions {

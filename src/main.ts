@@ -9,6 +9,6 @@ async function bootstrap() {
 
   app.enableCors(serverConfigService.corsOptions);
 
-  await app.listen(serverConfigService.host, serverConfigService.port);
+  await app.listen(serverConfigService.port, serverConfigService.host);
 }
 bootstrap();

@@ -11,6 +11,10 @@ export class AppConfigService {
     return this.configService.get('NODE_ENV') ?? NodeEnv.Local;
   }
 
+  public get version() {
+    return this.configService.get('npm_package_version');
+  }
+
   public get isLocal() {
     return this.nodeEnv === NodeEnv.Local;
   }
