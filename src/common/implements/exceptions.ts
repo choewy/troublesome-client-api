@@ -42,23 +42,21 @@ export class Exception<D = any> implements ExceptionProps<D> {
   }
 }
 
-export class ServiceException<D = any> extends Exception<D> {}
-
 export class RequestException extends Exception {
   constructor(e: HttpException) {
     super(ErrorCode.RequestError, e.getStatus(), e);
   }
 }
 
-export class SystemException<D = any> extends Exception<D> {
+export class SystemException extends Exception {
   constructor(e?: Error) {
     super(ErrorCode.SysemError, HttpStatus.INTERNAL_SERVER_ERROR, e);
   }
 }
 
-export class AxiosException extends Exception<unknown> {
+export class AxiosException extends Exception {
   constructor(e: AxiosError) {
-    super(ErrorCode.AxiosError, HttpStatus.FAILED_DEPENDENCY, e.response?.data);
+    super(ErrorCode.AxiosError, HttpStatus.FAILED_DEPENDENCY, e.response?.data ?? e.response ?? e);
   }
 }
 
@@ -67,3 +65,5 @@ export class ValidationException extends Exception {
     super(ErrorCode.ValidationError, HttpStatus.BAD_REQUEST, errors.pop());
   }
 }
+
+export class ServiceException<D = any> extends Exception<D> {}
