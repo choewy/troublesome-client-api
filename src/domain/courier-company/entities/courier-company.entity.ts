@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { DepotEntity } from '@domain/depot';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinTable,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({
   name: 'courier_company',
@@ -19,4 +29,10 @@ export class CourierCompanyEntity {
 
   @DeleteDateColumn()
   deletedAt: Date | null;
+
+  @OneToMany(() => DepotEntity, (e) => e.courierCompany, {
+    cascade: ['remove', 'soft-remove'],
+  })
+  @JoinTable()
+  depots: DepotEntity[];
 }

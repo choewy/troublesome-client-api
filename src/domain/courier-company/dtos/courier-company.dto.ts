@@ -1,5 +1,5 @@
+import { DateToISOString } from '@common';
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { DateTime } from 'luxon';
 
 import { CourierCompanyEntity } from '../entities';
 
@@ -11,11 +11,17 @@ export class CourierCompanyDTO {
   name: string;
 
   @ApiResponseProperty({ type: Date })
-  createdAt: string;
+  @DateToISOString()
+  createdAt: Date;
+
+  @ApiResponseProperty({ type: Date })
+  @DateToISOString()
+  updatedAt: Date;
 
   constructor(courierCompany: CourierCompanyEntity) {
     this.id = courierCompany.id;
     this.name = courierCompany.name;
-    this.createdAt = DateTime.fromJSDate(courierCompany.createdAt).toSQL({ includeOffset: false });
+    this.createdAt = courierCompany.createdAt;
+    this.updatedAt = courierCompany.updatedAt;
   }
 }

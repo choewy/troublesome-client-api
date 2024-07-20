@@ -1,8 +1,9 @@
+import { NumberPKParamDTO } from '@common';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CourierCompanyService } from './courier-company.service';
-import { CourierCompanyDTO, CourierCompanyListDTO, CourierCompanyParamDTO, SetCourierCompanyDTO } from './dtos';
+import { CourierCompanyDTO, CourierCompanyListDTO, SetCourierCompanyDTO } from './dtos';
 
 @ApiTags('택배사')
 @Controller('courier-company')
@@ -26,7 +27,7 @@ export class CourierCompanyController {
   @Get(':id(\\d+)')
   @ApiOperation({ summary: '택배사 단일 조회' })
   @ApiOkResponse({ type: CourierCompanyDTO })
-  async getById(@Param() param: CourierCompanyParamDTO) {
+  async getById(@Param() param: NumberPKParamDTO) {
     return new CourierCompanyDTO(await this.courierCompanyService.getById(param.id));
   }
 
@@ -34,7 +35,7 @@ export class CourierCompanyController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '택배사 수정' })
   @ApiNoContentResponse()
-  async update(@Param() param: CourierCompanyParamDTO, @Body() body: SetCourierCompanyDTO) {
+  async update(@Param() param: NumberPKParamDTO, @Body() body: SetCourierCompanyDTO) {
     return this.courierCompanyService.update(param.id, body);
   }
 
@@ -42,7 +43,7 @@ export class CourierCompanyController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '택배사 삭제' })
   @ApiNoContentResponse()
-  async delete(@Param() param: CourierCompanyParamDTO) {
+  async delete(@Param() param: NumberPKParamDTO) {
     return this.courierCompanyService.delete(param.id);
   }
 }
