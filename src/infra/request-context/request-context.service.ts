@@ -4,7 +4,7 @@ import { ClsService } from 'nestjs-cls';
 import { RequestContextKey } from './constants';
 
 @Injectable()
-export class RequestService {
+export class RequestContextService {
   constructor(private readonly clsService: ClsService) {}
 
   public get requestId() {

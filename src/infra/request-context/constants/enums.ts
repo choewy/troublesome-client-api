@@ -1,4 +1,4 @@
-export enum RequestHeader {
+export enum RequestContextHeader {
   ID = 'X_REQUEST_ID',
 }
 
