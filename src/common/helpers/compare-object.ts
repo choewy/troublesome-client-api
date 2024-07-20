@@ -22,15 +22,12 @@ export const compareObjectValues = (target: object, origin: object) => {
     if (typeof targetValue === 'object' && typeof originValue === 'object') {
       isSame = compareObjectValues(targetValue, originValue);
 
-      if (isSame === false) {
-        break;
+      if (isSame === true) {
+        continue;
       }
     }
 
-    if (targetValue !== originValue) {
-      isSame = false;
-      break;
-    }
+    isSame = false;
   }
 
   return isSame;
