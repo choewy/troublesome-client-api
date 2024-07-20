@@ -1,2 +1,1 @@
-// TODO logger
-export {};
+export * from './logger.module';
