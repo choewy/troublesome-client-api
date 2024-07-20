@@ -39,7 +39,7 @@ export class DepotService {
       contact: body.contact,
       zip: body.zip,
       address: body.address,
-      addressDetails: body.addressDetails,
+      addressDetail: body.addressDetail,
       plantCode: body.plantCode,
       courierCompany: body.courierCompanyId ? await this.courierCompanyService.getById(body.courierCompanyId) : null,
     });
@@ -48,17 +48,19 @@ export class DepotService {
   async update(id: number, body: SetDepotDTO) {
     const depot = await this.getById(id);
 
-    if (compareObjectValues(body, depot) === false) {
-      await this.depotRepository.update(id, {
-        name: body.name,
-        contact: body.contact,
-        zip: body.zip,
-        address: body.address,
-        addressDetails: body.addressDetails,
-        plantCode: body.plantCode,
-        courierCompany: body.courierCompanyId ? await this.courierCompanyService.getById(body.courierCompanyId) : null,
-      });
+    if (compareObjectValues(body, depot)) {
+      return;
     }
+
+    await this.depotRepository.update(id, {
+      name: body.name,
+      contact: body.contact,
+      zip: body.zip,
+      address: body.address,
+      addressDetail: body.addressDetail,
+      plantCode: body.plantCode,
+      courierCompany: body.courierCompanyId ? await this.courierCompanyService.getById(body.courierCompanyId) : null,
+    });
   }
 
   async delete(id: number) {

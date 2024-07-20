@@ -21,14 +21,11 @@ export class PartnerEntity {
   @Column({ type: 'varchar', length: 50, comment: '업체명' })
   name: string;
 
-  /** @deprecated 화주사 코드 */
-  rs_id: string;
-
   @Column({ type: 'varchar', length: 20, default: null, comment: 'CEO' })
   ceo: string | null;
 
-  @Column({ type: 'varchar', length: 320, comment: '이메일' })
-  email: string;
+  @Column({ type: 'varchar', length: 320, default: null, comment: '이메일' })
+  email: string | null;
 
   @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })
   contact: string | null;
@@ -43,7 +40,7 @@ export class PartnerEntity {
   address: string | null;
 
   @Column({ type: 'varchar', length: 300, default: null, comment: '상세주소' })
-  addressDetails: string | null;
+  addressDetail: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

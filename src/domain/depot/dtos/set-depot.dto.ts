@@ -32,7 +32,7 @@ export class SetDepotDTO {
   @IsString()
   @IsOptional()
   @EmptyStringToNull()
-  addressDetails?: string | null;
+  addressDetail?: string | null;
 
   @ApiProperty({ type: String })
   @IsString()

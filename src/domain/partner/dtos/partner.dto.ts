@@ -1,9 +1,9 @@
 import { DateToISOString, NullToEmptyString } from '@common';
 import { ApiResponseProperty } from '@nestjs/swagger';
 
-import { DepotEntity } from '../entities';
+import { PartnerEntity } from '../entities';
 
-export class DepotDTO {
+export class PartnerDTO {
   @ApiResponseProperty({ type: Number })
   id: number;
 
@@ -12,7 +12,19 @@ export class DepotDTO {
 
   @ApiResponseProperty({ type: String })
   @NullToEmptyString()
+  ceo: string;
+
+  @ApiResponseProperty({ type: String })
+  @NullToEmptyString()
+  email: string;
+
+  @ApiResponseProperty({ type: String })
+  @NullToEmptyString()
   contact: string;
+
+  @ApiResponseProperty({ type: String })
+  @NullToEmptyString()
+  fax: string;
 
   @ApiResponseProperty({ type: String })
   @NullToEmptyString()
@@ -26,10 +38,6 @@ export class DepotDTO {
   @NullToEmptyString()
   addressDetail: string;
 
-  @ApiResponseProperty({ type: String })
-  @NullToEmptyString()
-  plantCode: string;
-
   @ApiResponseProperty({ type: Date })
   @DateToISOString()
   createdAt: Date;
@@ -38,15 +46,17 @@ export class DepotDTO {
   @DateToISOString()
   updatedAt: Date;
 
-  constructor(depot: DepotEntity) {
-    this.id = depot.id;
-    this.name = depot.name;
-    this.contact = depot.contact;
-    this.zip = depot.zip;
-    this.address = depot.address;
-    this.addressDetail = depot.addressDetail;
-    this.plantCode = depot.plantCode;
-    this.createdAt = depot.createdAt;
-    this.updatedAt = depot.updatedAt;
+  constructor(partner: PartnerEntity) {
+    this.id = partner.id;
+    this.name = partner.name;
+    this.ceo = partner.ceo;
+    this.email = partner.email;
+    this.contact = partner.contact;
+    this.fax = partner.fax;
+    this.zip = partner.zip;
+    this.address = partner.address;
+    this.addressDetail = partner.addressDetail;
+    this.createdAt = partner.createdAt;
+    this.updatedAt = partner.updatedAt;
   }
 }

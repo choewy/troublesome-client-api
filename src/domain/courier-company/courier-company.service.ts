@@ -1,4 +1,4 @@
-import { ServiceException } from '@common';
+import { compareObjectValues, ServiceException } from '@common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -35,7 +35,7 @@ export class CourierCompanyService {
   async update(id: number, body: SetCourierCompanyDTO) {
     const courierCompany = await this.getById(id);
 
-    if (courierCompany.name === body.name) {
+    if (compareObjectValues(body, courierCompany)) {
       return;
     }
 

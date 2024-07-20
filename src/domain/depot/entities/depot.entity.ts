@@ -34,7 +34,7 @@ export class DepotEntity {
   address: string | null;
 
   @Column({ type: 'varchar', length: 300, default: null, comment: '상세주소' })
-  addressDetails: string | null;
+  addressDetail: string | null;
 
   @Column({ type: 'varchar', length: 10, default: null, comment: '플랜트 코드' })
   plantCode: string;
