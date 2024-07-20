@@ -11,12 +11,12 @@ export class WinstonMiddleware implements NestMiddleware {
 
     res.json = (data) => {
       switch (true) {
-        case res.statusCode >= 400:
-          res.locals.exception = data;
-          break;
-
         case res.statusCode >= 500:
           res.locals.error = data;
+          break;
+
+        case res.statusCode >= 400:
+          res.locals.exception = data;
           break;
       }
 

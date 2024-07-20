@@ -1,3 +1,4 @@
+import { RequestContextService } from '@infra/request-context';
 import { Logger as NestLogger } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import { LogLevel, Logger as TypeOrmLoggerInterface, LoggerOptions as TypeOrmLoggerOptions } from 'typeorm';
@@ -6,13 +7,8 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
   constructor(
     private readonly logger: NestLogger,
     private readonly options: TypeOrmLoggerOptions,
+    private readonly requestContextService: RequestContextService,
   ) {}
-
-  static create(options: TypeOrmLoggerOptions, name?: string) {
-    const logger = new NestLogger(name ? `TypeORM[${name}]` : 'TypeORM');
-
-    return new DatabaseLogger(logger, options);
-  }
 
   protected stringifyParams(parameters: unknown[]) {
     try {
@@ -45,7 +41,7 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
     const end = ' */ ';
     const endIndex = originQuery.indexOf(end);
 
-    let comment = null;
+    let comment = undefined;
     let query = originQuery;
 
     if (startIndex > -1 && endIndex > -1) {
@@ -53,7 +49,7 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
       query = originQuery.slice(endIndex + end.length);
     }
 
-    return { comment, query };
+    return { requestId: this.requestContextService.requestId ?? undefined, comment, query };
   }
 
   logQuery(query: string, parameters?: unknown[]) {
@@ -62,7 +58,7 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
       this.logger.debug({
         message: 'Query',
         ...this.extractContextAndQuery(`${query}${params}`),
-        executionDateTime: DateTime.local().toSQL(),
+        executedAt: DateTime.local().toSQL(),
       });
     }
   }
@@ -74,7 +70,7 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
       this.logger.error({
         message: 'Error',
         ...this.extractContextAndQuery(`${query}${params}`),
-        executionDateTime: DateTime.local().toSQL(),
+        executedAt: DateTime.local().toSQL(),
         error,
       });
     }
@@ -87,7 +83,7 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
       this.logger.warn({
         message: 'Warning',
         ...this.extractContextAndQuery(`${query}${params}`),
-        executionDateTime: DateTime.local().toSQL(),
+        executedAt: DateTime.local().toSQL(),
         latency,
       });
     }

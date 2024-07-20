@@ -1,5 +1,6 @@
 import { AppConfigService, DatabaseConfigService } from '@core/configuration';
-import { DynamicModule, Module } from '@nestjs/common';
+import { RequestContextService } from '@infra/request-context';
+import { DynamicModule, Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DatabaseLogger } from './database.logger';
@@ -12,11 +13,11 @@ export class DatabaseModule {
       module: DatabaseModule,
       imports: [
         TypeOrmModule.forRootAsync({
-          inject: [AppConfigService, DatabaseConfigService],
-          useFactory(appConfig: AppConfigService, databaseConfig: DatabaseConfigService) {
+          inject: [AppConfigService, DatabaseConfigService, RequestContextService],
+          useFactory(appConfig: AppConfigService, databaseConfig: DatabaseConfigService, requestContextService: RequestContextService) {
             return {
               ...databaseConfig.newboxOptions,
-              logger: DatabaseLogger.create(databaseConfig.newboxOptions.logging, appConfig.name),
+              logger: new DatabaseLogger(new Logger(appConfig.name), databaseConfig.newboxOptions.logging, requestContextService),
             };
           },
         }),
