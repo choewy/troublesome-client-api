@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -15,6 +16,7 @@ import {
   name: 'user',
   comment: '사용자',
 })
+@Index('USER_ACCOUNT_IDX', ['account'])
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK' })
   id: number;
@@ -22,13 +24,13 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 50, comment: '이름' })
   name: string;
 
-  @Column({ type: 'varchar', length: 50, comment: '계정' })
+  @Column({ type: 'varchar', length: 50, unique: true, comment: '계정' })
   account: string;
 
   @Column({ type: 'varchar', length: 255, comment: '비밀번호' })
   password: string;
 
-  @Column({ type: 'varchar', length: 320, comment: '이메일' })
+  @Column({ type: 'varchar', length: 320, default: null, comment: '이메일' })
   email: string | null;
 
   @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })

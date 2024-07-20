@@ -60,9 +60,18 @@ export class AxiosException extends Exception {
   }
 }
 
+export class ValidationFailedError extends Error {
+  constructor(errors: ValidationError[]) {
+    super();
+
+    this.name = ValidationFailedError.name.replace('Error', '');
+    this.message = Object.values(errors.pop()?.constraints ?? {}).pop() ?? '';
+  }
+}
+
 export class ValidationException extends Exception {
   constructor(errors: ValidationError[]) {
-    super(ErrorCode.ValidationError, HttpStatus.BAD_REQUEST, errors.pop());
+    super(ErrorCode.ValidationError, HttpStatus.BAD_REQUEST, new ValidationFailedError(errors));
   }
 }
 
