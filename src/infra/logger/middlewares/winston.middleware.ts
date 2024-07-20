@@ -24,20 +24,24 @@ export class WinstonMiddleware implements NestMiddleware {
     };
 
     res.on('finish', () => {
-      Logger.verbose({
+      const log = {
         request: new RequestLog(req),
         response: new ResponseLog(res),
         latency: latency.finish(),
-      });
-    });
+      };
 
-    res.on('error', (error) => {
-      Logger.error({
-        request: new RequestLog(req),
-        response: new ResponseLog(res),
-        latency: latency.finish(),
-        error,
-      });
+      switch (true) {
+        case !!res.locals.exception:
+          Logger.warn(log);
+          break;
+
+        case !!res.locals.error:
+          Logger.error(log);
+          break;
+
+        default:
+          Logger.verbose(log);
+      }
     });
 
     next();

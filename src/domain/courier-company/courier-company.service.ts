@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ServiceException } from '@common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CourierCompanyListDTO } from './dtos';
+import { CourierCompanyErrorCode } from './constants';
+import { SetCourierCompanyDTO } from './dtos';
 import { CourierCompanyEntity } from './entities';
 
 @Injectable()
@@ -13,7 +15,34 @@ export class CourierCompanyService {
   ) {}
 
   async getList() {
-    const [rows, total] = await this.courierCompanyRepository.findAndCount();
-    return new CourierCompanyListDTO(rows, total);
+    return this.courierCompanyRepository.findAndCount();
+  }
+
+  async getById(id: number) {
+    const courierCompany = await this.courierCompanyRepository.findOne({ where: { id } });
+
+    if (courierCompany === null) {
+      throw new ServiceException(CourierCompanyErrorCode.NotFound, HttpStatus.BAD_REQUEST);
+    }
+
+    return courierCompany;
+  }
+
+  async create(body: SetCourierCompanyDTO) {
+    await this.courierCompanyRepository.insert({ name: body.name });
+  }
+
+  async update(id: number, body: SetCourierCompanyDTO) {
+    const courierCompany = await this.getById(id);
+
+    if (courierCompany.name === body.name) {
+      return;
+    }
+
+    await this.courierCompanyRepository.update(id, { name: body.name });
+  }
+
+  async delete(id: number) {
+    await this.courierCompanyRepository.softRemove(await this.getById(id));
   }
 }
