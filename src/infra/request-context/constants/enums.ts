@@ -4,6 +4,6 @@ export enum RequestContextHeader {
 
 export enum RequestContextKey {
   RequestID = 'request-id',
-  UserID = 'user-id',
-  UserName = 'user-name',
+  UserID = 'userId',
+  User = 'user',
 }

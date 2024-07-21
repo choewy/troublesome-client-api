@@ -22,6 +22,10 @@ export class UserService {
   async getById(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
+      relations: {
+        partner: true,
+        depot: true,
+      },
     });
 
     if (user === null) {
@@ -31,10 +35,29 @@ export class UserService {
     return user;
   }
 
+  async getByAccount(account: string) {
+    return this.userRepository.findOne({
+      select: {
+        id: true,
+        account: true,
+        password: true,
+        isActive: true,
+        partner: { id: true },
+        depot: { id: true },
+      },
+      where: { account },
+      relations: {
+        partner: true,
+        depot: true,
+      },
+    });
+  }
+
   async hasByAccount(account: string) {
     return (await this.userRepository.countBy({ account })) > 0;
   }
 
+  // TODO 특정 화주사 또는 데포 계정 매핑
   async create(body: CreateUserDTO) {
     if (body.password !== body.confirmPassword) {
       throw new ServiceException(UserErrorCode.PasswordMisMatch, HttpStatus.BAD_REQUEST);
@@ -54,6 +77,7 @@ export class UserService {
     });
   }
 
+  // TODO 특정 화주사 또는 데포 계정 매핑
   async update(id: number, body: UpdateUserDTO) {
     const user = await this.getById(id);
 
