@@ -1,11 +1,12 @@
 import { ServiceException } from '@common';
+import { UserEntity } from '@domain/user';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
 import { RoleErrorCode } from './constants';
-import { RoleListQueryDTO, SetRoleDTO } from './dtos';
-import { RoleEntity, RolePermissionEntity } from './entities';
+import { RoleListQueryDTO, SetRoleDTO, SetRoleUserMapDTO } from './dtos';
+import { RoleAndUserEntity, RoleEntity, RolePermissionEntity } from './entities';
 
 @Injectable()
 export class RoleService {
@@ -68,5 +69,28 @@ export class RoleService {
 
   async delete(id: number) {
     await this.roleRepository.softRemove(await this.getById(id));
+  }
+
+  async insertOrRemoveUsers(body: SetRoleUserMapDTO) {
+    await this.dataSource.transaction(async (em) => {
+      const roleAndUserRepository = em.getRepository(RoleAndUserEntity);
+
+      for (const removeRow of body.remove) {
+        await roleAndUserRepository.delete({
+          userId: removeRow.userId,
+          roleId: removeRow.roleId,
+        });
+      }
+
+      const userRepository = em.getRepository(UserEntity);
+
+      for (const insertRow of body.insert) {
+        if ((await userRepository.countBy({ id: insertRow.userId })) === 0) {
+          continue;
+        }
+
+        await roleAndUserRepository.insert(insertRow);
+      }
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { DepotEntity } from '@domain/depot';
 import { PartnerEntity } from '@domain/partner';
+import { RoleAndUser } from '@domain/role';
 import { DatabaseConstraint } from '@infra';
 import {
   Column,
@@ -8,7 +9,9 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -70,4 +73,8 @@ export class UserEntity {
   })
   @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('depot') })
   depot: DepotEntity | null;
+
+  @OneToMany(() => RoleAndUser, (e) => e.user, { cascade: ['remove', 'soft-remove'] })
+  @JoinTable()
+  userRoles: RoleAndUser[];
 }

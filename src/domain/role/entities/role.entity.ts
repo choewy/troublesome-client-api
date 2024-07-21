@@ -1,19 +1,16 @@
-import { DepotEntity } from '@domain/depot';
-import { PartnerEntity } from '@domain/partner';
 import { DatabaseConstraint } from '@infra';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   JoinTable,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { RoleAndUserEntity } from './role-and-user.entity';
 import { RolePermissionEntity } from './role-permission.entity';
 
 const constraint = new DatabaseConstraint('role');
@@ -35,15 +32,11 @@ export class RoleEntity {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @ManyToOne(() => PartnerEntity, (e) => e.roles, { nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('partner') })
-  partner: PartnerEntity | null;
-
-  @ManyToOne(() => DepotEntity, (e) => e.roles, { nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('depot') })
-  depot: DepotEntity | null;
-
   @OneToMany(() => RolePermissionEntity, (e) => e.role, { cascade: true })
   @JoinTable()
   permissions: RolePermissionEntity[];
+
+  @OneToMany(() => RoleAndUserEntity, (e) => e.role, { cascade: ['remove', 'soft-remove'] })
+  @JoinTable()
+  roleUsers: RoleAndUserEntity[];
 }

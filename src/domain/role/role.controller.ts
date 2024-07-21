@@ -1,9 +1,9 @@
 import { NumberPKParamDTO } from '@common';
 import { ApiAuthHeaders } from '@core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { RoleDTO, RoleListDTO, RoleListQueryDTO, SetRoleDTO } from './dtos';
+import { RoleDTO, RoleListDTO, RoleListQueryDTO, SetRoleDTO, SetRoleUserMapDTO } from './dtos';
 import { RoleService } from './role.service';
 
 @ApiTags('역할')
@@ -47,5 +47,13 @@ export class RoleController {
   @ApiNoContentResponse()
   async delete(@Param() param: NumberPKParamDTO) {
     return this.roleService.delete(param.id);
+  }
+
+  @Put()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '역할 사용자 추가/삭제' })
+  @ApiNoContentResponse()
+  async insertOrRemoveUsers(@Body() body: SetRoleUserMapDTO) {
+    return this.roleService.insertOrRemoveUsers(body);
   }
 }

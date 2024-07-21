@@ -1,5 +1,4 @@
 import { CourierCompanyEntity } from '@domain/courier-company';
-import { RoleEntity } from '@domain/role';
 import { UserEntity } from '@domain/user';
 import { DatabaseConstraint } from '@infra';
 import {
@@ -59,8 +58,4 @@ export class DepotEntity {
   @OneToMany(() => UserEntity, (e) => e.depot, { cascade: ['remove', 'soft-remove'] })
   @JoinTable()
   users: UserEntity[];
-
-  @OneToMany(() => RoleEntity, (e) => e.depot, { cascade: ['remove', 'soft-remove'] })
-  @JoinTable()
-  roles: RoleEntity[];
 }

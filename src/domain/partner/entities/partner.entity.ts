@@ -1,4 +1,3 @@
-import { RoleEntity } from '@domain/role';
 import { UserEntity } from '@domain/user';
 import { DatabaseConstraint } from '@infra';
 import {
@@ -55,8 +54,4 @@ export class PartnerEntity {
   @OneToMany(() => UserEntity, (e) => e.partner, { cascade: ['remove', 'soft-remove'] })
   @JoinTable()
   users: UserEntity[];
-
-  @OneToMany(() => RoleEntity, (e) => e.partner, { cascade: ['remove', 'soft-remove'] })
-  @JoinTable()
-  roles: RoleEntity[];
 }
