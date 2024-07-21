@@ -1,7 +1,9 @@
+import { ServiceException } from '@common';
 import { RequestContextService } from '@infra';
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
+import { UserErrorCode } from './constants';
 import { isSkipBindUser } from './decorators';
 import { UserService } from './user.service';
 
@@ -24,7 +26,13 @@ export class UserInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    this.requestContextService.setUser(await this.userService.getById(userId).catch(() => null));
+    const user = await this.userService.getById(userId).catch(() => null);
+
+    if (user === null) {
+      throw new ServiceException(UserErrorCode.NotFound, HttpStatus.UNAUTHORIZED);
+    }
+
+    this.requestContextService.setUser(user);
 
     return next.handle();
   }

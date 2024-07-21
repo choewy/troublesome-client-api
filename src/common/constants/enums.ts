@@ -6,11 +6,13 @@ export enum ErrorCode {
 }
 
 export enum RequestHeader {
+  RequestID = 'x-request-id',
   AccessToken = 'authorization',
-  RefreshToken = 'x_refresh_token',
+  RefreshToken = 'x-refresh-token',
 }
 
 export enum ResponseHeader {
-  AccessToken = 'X_ACCESS_TOKEN',
-  RefreshToken = 'X_REFRESH_TOKEN',
+  RequestID = 'X-REQUEST-ID',
+  AccessToken = 'X-ACCESS-TOKEN',
+  RefreshToken = 'X-REFRESH-TOKEN',
 }

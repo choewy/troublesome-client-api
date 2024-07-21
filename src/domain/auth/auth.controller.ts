@@ -3,7 +3,7 @@ import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { SkipAuthCheck } from './decorators';
-import { LoginDTO } from './dtos';
+import { AuthTokensDTO, LoginDTO } from './dtos';
 
 @ApiTags('인증/인가')
 @Controller('auth')
@@ -13,8 +13,8 @@ export class AuthController {
   @Post('login')
   @SkipAuthCheck()
   @ApiOperation({ summary: '로그인' })
-  @ApiCreatedResponse()
+  @ApiCreatedResponse({ type: AuthTokensDTO })
   async login(@Body() body: LoginDTO) {
-    return this.authService.login(body);
+    return new AuthTokensDTO(...(await this.authService.login(body)));
   }
 }

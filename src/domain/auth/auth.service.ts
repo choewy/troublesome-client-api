@@ -90,5 +90,10 @@ export class AuthService {
     if (user.isActive === false) {
       throw new ServiceException(AuthErrorCode.NotAvailable, HttpStatus.UNAUTHORIZED);
     }
+
+    return [AuthTokenType.AccessToken, AuthTokenType.RefreshToken].map((authTokenType) => this.issueToken(authTokenType, user.id)) as [
+      string,
+      string,
+    ];
   }
 }

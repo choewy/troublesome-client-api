@@ -1,8 +1,9 @@
+import { RequestHeader, ResponseHeader } from '@common';
 import { DynamicModule, Module } from '@nestjs/common';
 import { ClsModule } from 'nestjs-cls';
 import { v4 } from 'uuid';
 
-import { RequestContextKey, RequestContextHeader } from './constants';
+import { RequestContextKey } from './constants';
 import { RequestContextService } from './request-context.service';
 
 @Module({})
@@ -16,8 +17,8 @@ export class RequestContextModule {
           middleware: {
             mount: true,
             setup(cls, req, res) {
-              req.id = req.get(RequestContextHeader.ID) ?? v4();
-              res.set(RequestContextHeader.ID, req.id);
+              req.id = req.get(RequestHeader.RequestID) ?? v4();
+              res.set(ResponseHeader.RequestID, req.id);
               cls.set(RequestContextKey.RequestID, req.id);
             },
           },
