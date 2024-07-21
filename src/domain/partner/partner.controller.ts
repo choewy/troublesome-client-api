@@ -1,4 +1,5 @@
 import { NumberPKParamDTO } from '@common';
+import { ApiAuthHeaders } from '@core';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +7,7 @@ import { PartnerDTO, PartnerListDTO, SetPartnerDTO } from './dtos';
 import { PartnerService } from './partner.service';
 
 @ApiTags('화주사')
+@ApiAuthHeaders()
 @Controller('partners')
 export class PartnerController {
   constructor(private readonly partnerService: PartnerService) {}

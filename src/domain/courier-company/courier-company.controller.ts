@@ -1,4 +1,5 @@
 import { NumberPKParamDTO } from '@common';
+import { ApiAuthHeaders } from '@core';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +7,7 @@ import { CourierCompanyService } from './courier-company.service';
 import { CourierCompanyDTO, CourierCompanyListDTO, SetCourierCompanyDTO } from './dtos';
 
 @ApiTags('택배사')
+@ApiAuthHeaders()
 @Controller('courier-company')
 export class CourierCompanyController {
   constructor(private readonly courierCompanyService: CourierCompanyService) {}

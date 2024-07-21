@@ -1,4 +1,5 @@
 import { NumberPKParamDTO } from '@common';
+import { ApiAuthHeaders } from '@core';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +7,7 @@ import { CreateUserDTO, UpdateUserDTO, UserDTO, UserListDTO } from './dtos';
 import { UserService } from './user.service';
 
 @ApiTags('사용자')
+@ApiAuthHeaders()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

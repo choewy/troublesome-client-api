@@ -1,4 +1,5 @@
 import { NumberPKParamDTO } from '@common';
+import { ApiAuthHeaders } from '@core';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +7,7 @@ import { DepotService } from './depot.service';
 import { DepotDTO, DepotListDTO, SetDepotDTO } from './dtos';
 
 @ApiTags('데포')
+@ApiAuthHeaders()
 @Controller('depots')
 export class DepotController {
   constructor(private readonly depotService: DepotService) {}
