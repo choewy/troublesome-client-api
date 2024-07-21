@@ -1,5 +1,5 @@
 import { ConfigurationModule, GloablSerializeInterceptor, GlobalValidationPipe, GlobalExceptionFilter } from '@core';
-import { CourierCompanyModule, DepotModule, PartnerModule, UserModule } from '@domain';
+import { CourierCompanyModule, DepotModule, PartnerModule, UserModule, AuthModule } from '@domain';
 import { DatabaseModule, LoggerModule, RedisModule, RequestContextModule } from '@infra';
 import { Module } from '@nestjs/common';
 
@@ -17,6 +17,7 @@ import { AppService } from './app.service';
     DepotModule,
     PartnerModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [GloablSerializeInterceptor, GlobalValidationPipe, GlobalExceptionFilter, AppService],
