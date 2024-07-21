@@ -12,13 +12,7 @@ export class AppConfigService {
   }
 
   public get name() {
-    const name = this.configService.get('npm_package_name');
-
-    if (this.isProduction) {
-      return name;
-    }
-
-    return [name, this.env].join('_');
+    return this.configService.get('npm_package_name');
   }
 
   public get version() {

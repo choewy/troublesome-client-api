@@ -35,23 +35,21 @@ export class ServerConfigService {
     return 's';
   }
 
-  public get httpUrl() {
-    let url = this.configService.getOrThrow('DOMAIN');
+  public get domain() {
+    let domain = this.configService.getOrThrow('DOMAIN');
 
     if (this.appConfigService.isLocal || this.appConfigService.isTest) {
-      url += `:${this.port}`;
+      domain += `:${this.port}`;
     }
 
-    return `http${this.protocolSuffix}://${url}`;
+    return domain;
+  }
+
+  public get httpUrl() {
+    return `http${this.protocolSuffix}://${this.domain}`;
   }
 
   public get wsUrl() {
-    let url = this.configService.getOrThrow('DOMAIN');
-
-    if (this.appConfigService.isLocal || this.appConfigService.isTest) {
-      url += `:${this.port}`;
-    }
-
-    return `ws${this.protocolSuffix}://${url}`;
+    return `ws${this.protocolSuffix}://${this.domain}`;
   }
 }
