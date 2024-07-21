@@ -38,24 +38,6 @@ export class UserService {
     return user;
   }
 
-  async getByAccount(account: string) {
-    return this.userRepository.findOne({
-      select: {
-        id: true,
-        account: true,
-        password: true,
-        isActive: true,
-        partner: { id: true },
-        depot: { id: true },
-      },
-      where: { account },
-      relations: {
-        partner: true,
-        depot: true,
-      },
-    });
-  }
-
   async hasByAccount(account: string) {
     return (await this.userRepository.countBy({ account })) > 0;
   }

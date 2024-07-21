@@ -1,21 +1,25 @@
 import { ServiceException, SystemException } from '@common';
 import { JwtConfigService } from '@core';
-import { UserService } from '@domain/user';
-import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { UserEntity } from '@domain/user';
+import { RequestContextService } from '@infra';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService, JwtVerifyOptions, TokenExpiredError } from '@nestjs/jwt';
-import { verify } from 'argon2';
+import { InjectRepository } from '@nestjs/typeorm';
+import { verify, hash } from 'argon2';
+import { Repository } from 'typeorm';
 
 import { AuthErrorCode, AuthTokenType } from './constants';
-import { AuthTokenDTOArgs, LoginDTO } from './dtos';
+import { AuthTokenDTOArgs, LoginDTO, UpdatePasswordDTO } from './dtos';
 import { AuthTokenPayload, AuthTokenVerifyResult } from './implements';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly requestContextService: RequestContextService,
     private readonly jwtConfigService: JwtConfigService,
     private readonly jwtService: JwtService,
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
   ) {}
 
   private getSignOptions(type: AuthTokenType) {
@@ -74,12 +78,32 @@ export class AuthService {
     return result;
   }
 
-  async login(body: LoginDTO) {
-    const user = await this.userService.getByAccount(body.account);
+  async getByAccount(account: string) {
+    const user = await this.userRepository.findOne({
+      select: {
+        id: true,
+        account: true,
+        password: true,
+        isActive: true,
+        partner: { id: true },
+        depot: { id: true },
+      },
+      where: { account },
+      relations: {
+        partner: true,
+        depot: true,
+      },
+    });
 
     if (user === null) {
       throw new ServiceException(AuthErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);
     }
+
+    return user;
+  }
+
+  async login(body: LoginDTO) {
+    const user = await this.getByAccount(body.account);
 
     if ((await verify(user.password, body.password)) === false) {
       throw new ServiceException(AuthErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);
@@ -92,5 +116,19 @@ export class AuthService {
     return [AuthTokenType.AccessToken, AuthTokenType.RefreshToken].map((authTokenType) =>
       this.issueToken(authTokenType, user.id),
     ) as AuthTokenDTOArgs;
+  }
+
+  async updatePassword(body: UpdatePasswordDTO) {
+    const user = this.requestContextService.getUser();
+
+    if ((await verify(user.password, body.currentPassword)) === false) {
+      throw new ServiceException(AuthErrorCode.WrongPassword, HttpStatus.BAD_REQUEST);
+    }
+
+    if (body.newPassword !== body.confirmPassword) {
+      throw new ServiceException(AuthErrorCode.PasswordMismatch, HttpStatus.BAD_REQUEST);
+    }
+
+    await this.userRepository.update(user.id, { password: await hash(body.newPassword) });
   }
 }

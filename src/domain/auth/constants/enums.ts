@@ -3,6 +3,8 @@ export enum AuthErrorCode {
   NotAvailable = 'AUTH_NOT_AVAILABLE',
   TokenExpired = 'AUTH_TOKEN_EXPIRED',
   InvalidToken = 'AUTH_INVALID_TOKEN',
+  WrongPassword = 'AUTH_WRONG_PASSWORD',
+  PasswordMismatch = 'AUTH_PASSWORD_MISMATCH',
 }
 
 export enum AuthTokenType {
