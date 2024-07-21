@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CourierCompanyErrorCode } from './constants';
-import { SetCourierCompanyDTO } from './dtos';
+import { CourierCompanyListQueryDTO, SetCourierCompanyDTO } from './dtos';
 import { CourierCompanyEntity } from './entities';
 
 @Injectable()
@@ -14,8 +14,8 @@ export class CourierCompanyService {
     private readonly courierCompanyRepository: Repository<CourierCompanyEntity>,
   ) {}
 
-  async getList() {
-    return this.courierCompanyRepository.findAndCount();
+  async getList(query: CourierCompanyListQueryDTO) {
+    return this.courierCompanyRepository.findAndCount(query);
   }
 
   async getById(id: number) {

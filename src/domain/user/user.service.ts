@@ -5,7 +5,7 @@ import { hash } from 'argon2';
 import { Repository } from 'typeorm';
 
 import { UserErrorCode } from './constants';
-import { CreateUserDTO, UpdateUserDTO } from './dtos';
+import { CreateUserDTO, UpdateUserDTO, UserListQueryDTO } from './dtos';
 import { UserEntity } from './entities';
 
 @Injectable()
@@ -15,8 +15,11 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async getList() {
-    return this.userRepository.findAndCount();
+  async getList(query: UserListQueryDTO) {
+    return this.userRepository.findAndCount({
+      skip: query.skip,
+      take: query.take,
+    });
   }
 
   async getById(id: number) {

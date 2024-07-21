@@ -39,6 +39,6 @@ export class RequestContextService {
   }
 
   public getContext() {
-    return this.clsService.get(RequestContextKey.Context) ?? '';
+    return this.clsService.get(RequestContextKey.Context) ?? null;
   }
 }

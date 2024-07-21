@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { DepotErrorCode } from './constants';
-import { SetDepotDTO } from './dtos';
+import { DepotListQueryDTO, SetDepotDTO } from './dtos';
 import { DepotEntity } from './entities';
 
 @Injectable()
@@ -17,8 +17,11 @@ export class DepotService {
     private readonly courierCompanyService: CourierCompanyService,
   ) {}
 
-  async getList() {
-    return this.depotRepository.findAndCount();
+  async getList(query: DepotListQueryDTO) {
+    return this.depotRepository.findAndCount({
+      skip: query.skip,
+      take: query.take,
+    });
   }
 
   async getById(id: number) {

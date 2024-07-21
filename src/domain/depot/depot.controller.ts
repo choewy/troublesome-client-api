@@ -1,10 +1,10 @@
 import { NumberPKParamDTO } from '@common';
 import { ApiAuthHeaders } from '@core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { DepotService } from './depot.service';
-import { DepotDTO, DepotListDTO, SetDepotDTO } from './dtos';
+import { DepotDTO, DepotListDTO, DepotListQueryDTO, SetDepotDTO } from './dtos';
 
 @ApiTags('데포')
 @ApiAuthHeaders()
@@ -15,8 +15,8 @@ export class DepotController {
   @Get()
   @ApiOperation({ summary: '데포 목록 조회' })
   @ApiOkResponse({ type: DepotListDTO })
-  async getList() {
-    return new DepotListDTO(await this.depotService.getList());
+  async getList(@Query() query: DepotListQueryDTO) {
+    return new DepotListDTO(await this.depotService.getList(query));
   }
 
   @Get(':id(\\d+)')

@@ -1,10 +1,10 @@
 import { NumberPKParamDTO } from '@common';
 import { ApiAuthHeaders } from '@core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CourierCompanyService } from './courier-company.service';
-import { CourierCompanyDTO, CourierCompanyListDTO, SetCourierCompanyDTO } from './dtos';
+import { CourierCompanyDTO, CourierCompanyListDTO, CourierCompanyListQueryDTO, SetCourierCompanyDTO } from './dtos';
 
 @ApiTags('택배사')
 @ApiAuthHeaders()
@@ -15,8 +15,8 @@ export class CourierCompanyController {
   @Get()
   @ApiOperation({ summary: '택배사 목록 조회' })
   @ApiOkResponse({ type: CourierCompanyListDTO })
-  async getList() {
-    return new CourierCompanyListDTO(await this.courierCompanyService.getList());
+  async getList(@Query() query: CourierCompanyListQueryDTO) {
+    return new CourierCompanyListDTO(await this.courierCompanyService.getList(query));
   }
 
   @Post()

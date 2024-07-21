@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { PartnerErrorCode } from './constants';
-import { SetPartnerDTO } from './dtos';
+import { PartnerListQueryDTO, SetPartnerDTO } from './dtos';
 import { PartnerEntity } from './entities';
 
 @Injectable()
@@ -14,8 +14,11 @@ export class PartnerService {
     private readonly partnerRepository: Repository<PartnerEntity>,
   ) {}
 
-  async getList() {
-    return this.partnerRepository.findAndCount();
+  async getList(query: PartnerListQueryDTO) {
+    return this.partnerRepository.findAndCount({
+      skip: query.skip,
+      take: query.take,
+    });
   }
 
   async getById(id: number) {

@@ -13,17 +13,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-const userTableConstraint = new DatabaseConstraint('user');
+const constraint = new DatabaseConstraint('user');
 
 @Entity({ name: 'user', comment: '사용자' })
-@Index(userTableConstraint.index('account'), ['account'], { unique: true })
+@Index(constraint.index('account'), ['account'], { unique: true })
 export class UserEntity {
-  @PrimaryGeneratedColumn({
-    type: 'int',
-    unsigned: true,
-    comment: 'PK',
-    primaryKeyConstraintName: userTableConstraint.primaryKey('id'),
-  })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK', primaryKeyConstraintName: constraint.primaryKey('id') })
   id: number;
 
   @Column({ type: 'varchar', length: 50, comment: '이름' })
@@ -66,13 +61,13 @@ export class UserEntity {
     onDelete: 'SET NULL',
     nullable: true,
   })
-  @JoinColumn({ foreignKeyConstraintName: userTableConstraint.foreignKey('partner') })
+  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('partner') })
   partner: PartnerEntity | null;
 
   @ManyToOne(() => DepotEntity, (e) => e.users, {
     onDelete: 'SET NULL',
     nullable: true,
   })
-  @JoinColumn({ foreignKeyConstraintName: userTableConstraint.foreignKey('depot') })
+  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('depot') })
   depot: DepotEntity | null;
 }

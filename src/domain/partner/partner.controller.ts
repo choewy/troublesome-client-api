@@ -1,9 +1,9 @@
 import { NumberPKParamDTO } from '@common';
 import { ApiAuthHeaders } from '@core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { PartnerDTO, PartnerListDTO, SetPartnerDTO } from './dtos';
+import { PartnerDTO, PartnerListDTO, PartnerListQueryDTO, SetPartnerDTO } from './dtos';
 import { PartnerService } from './partner.service';
 
 @ApiTags('화주사')
@@ -15,8 +15,8 @@ export class PartnerController {
   @Get()
   @ApiOperation({ summary: '화주사 목록 조회' })
   @ApiOkResponse({ type: PartnerListDTO })
-  async getList() {
-    return new PartnerListDTO(await this.partnerService.getList());
+  async getList(@Query() query: PartnerListQueryDTO) {
+    return new PartnerListDTO(await this.partnerService.getList(query));
   }
 
   @Post()
