@@ -1,4 +1,5 @@
 import { UserEntity } from '@domain/user';
+import { DatabaseConstraint } from '@infra';
 import {
   Column,
   CreateDateColumn,
@@ -10,12 +11,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({
-  name: 'partner',
-  comment: '화주사',
-})
+const constraint = new DatabaseConstraint('partner');
+
+@Entity({ name: 'partner', comment: '화주사' })
 export class PartnerEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK' })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK', primaryKeyConstraintName: constraint.primaryKey('id') })
   id: number;
 
   @Column({ type: 'varchar', length: 50, comment: '업체명' })
@@ -51,9 +51,7 @@ export class PartnerEntity {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => UserEntity, (e) => e.partner, {
-    cascade: ['remove', 'soft-remove'],
-  })
+  @OneToMany(() => UserEntity, (e) => e.partner, { cascade: ['remove', 'soft-remove'] })
   @JoinTable()
   users: UserEntity[];
 }

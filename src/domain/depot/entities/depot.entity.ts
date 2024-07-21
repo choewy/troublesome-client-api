@@ -1,5 +1,6 @@
 import { CourierCompanyEntity } from '@domain/courier-company';
 import { UserEntity } from '@domain/user';
+import { DatabaseConstraint } from '@infra';
 import {
   Column,
   CreateDateColumn,
@@ -13,12 +14,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({
-  name: 'depot',
-  comment: '데포',
-})
+const constraint = new DatabaseConstraint('depot');
+
+@Entity({ name: 'depot', comment: '데포' })
 export class DepotEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK' })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK', primaryKeyConstraintName: constraint.primaryKey('id') })
   id: number;
 
   @Column({ type: 'varchar', length: 50, comment: '이름' })
@@ -52,12 +52,10 @@ export class DepotEntity {
     onDelete: 'SET NULL',
     nullable: true,
   })
-  @JoinColumn()
+  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('courier_company') })
   courierCompany: CourierCompanyEntity | null;
 
-  @OneToMany(() => UserEntity, (e) => e.depot, {
-    cascade: ['remove', 'soft-remove'],
-  })
+  @OneToMany(() => UserEntity, (e) => e.depot, { cascade: ['remove', 'soft-remove'] })
   @JoinTable()
   users: UserEntity[];
 }
