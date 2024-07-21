@@ -4,6 +4,7 @@ import { ClsModule } from 'nestjs-cls';
 import { v4 } from 'uuid';
 
 import { RequestContextKey } from './constants';
+import { RequestContextInterceptor } from './request-context.interceptor';
 import { RequestContextService } from './request-context.service';
 
 @Module({})
@@ -24,7 +25,7 @@ export class RequestContextModule {
           },
         }),
       ],
-      providers: [RequestContextService],
+      providers: [RequestContextService, RequestContextInterceptor],
       exports: [RequestContextService],
     };
   }

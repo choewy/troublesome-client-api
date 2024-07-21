@@ -49,7 +49,12 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
       query = originQuery.slice(endIndex + end.length);
     }
 
-    return { requestId: this.requestContextService.getRequestID() ?? undefined, comment, query };
+    return {
+      id: this.requestContextService.getRequestID() ?? undefined,
+      in: this.requestContextService.getContext() ?? undefined,
+      comment,
+      query,
+    };
   }
 
   logQuery(query: string, parameters?: unknown[]) {

@@ -7,6 +7,7 @@ import {
   Swagger,
 } from '@core';
 import { AuthGuard, UserInterceptor } from '@domain';
+import { RequestContextInterceptor } from '@infra';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
@@ -25,7 +26,7 @@ async function bootstrap() {
   }
 
   app.enableCors(serverConfigService.corsOptions);
-  app.useGlobalInterceptors(app.get(GloablSerializeInterceptor), app.get(UserInterceptor));
+  app.useGlobalInterceptors(app.get(GloablSerializeInterceptor), app.get(RequestContextInterceptor), app.get(UserInterceptor));
   app.useGlobalPipes(app.get(GlobalValidationPipe));
   app.useGlobalFilters(app.get(GlobalExceptionFilter));
   app.useGlobalGuards(app.get(AuthGuard));

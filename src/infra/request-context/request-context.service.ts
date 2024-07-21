@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 
 import { RequestContextKey } from './constants';
@@ -26,5 +26,19 @@ export class RequestContextService {
 
   public getUser(): UserEntity | null {
     return this.clsService.get(RequestContextKey.User) ?? null;
+  }
+
+  public setConext(context: ExecutionContext) {
+    this.clsService.set(
+      RequestContextKey.Context,
+      [
+        typeof context.getClass === 'function' ? context.getClass()?.name : '',
+        typeof context.getHandler === 'function' ? context.getHandler()?.name : '',
+      ].join('.'),
+    );
+  }
+
+  public getContext() {
+    return this.clsService.get(RequestContextKey.Context) ?? '';
   }
 }
