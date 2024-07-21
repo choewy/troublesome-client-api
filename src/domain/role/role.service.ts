@@ -52,11 +52,17 @@ export class RoleService {
     }
 
     await this.dataSource.transaction(async (em) => {
-      const rolePermissionRepository = em.getRepository(RolePermissionEntity);
-      await rolePermissionRepository.delete({ role: { id } });
-
       const roleRepository = em.getRepository(RoleEntity);
       await roleRepository.update(id, { name: body.name });
+
+      const rolePermissionRepository = em.getRepository(RolePermissionEntity);
+      await rolePermissionRepository.delete({ role: { id } });
+      await rolePermissionRepository.insert(
+        body.permissions.map((permission) => ({
+          role: { id },
+          scope: permission,
+        })),
+      );
     });
   }
 
