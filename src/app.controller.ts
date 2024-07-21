@@ -15,6 +15,6 @@ export class AppController {
   @ApiOperation({ summary: '버전 확인' })
   @ApiOkResponse({ type: VersionDTO })
   getVersion() {
-    return this.appService.getVersion();
+    return new VersionDTO(this.appService.getVersion());
   }
 }

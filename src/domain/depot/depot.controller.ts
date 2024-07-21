@@ -16,7 +16,7 @@ export class DepotController {
   @ApiOperation({ summary: '데포 목록 조회' })
   @ApiOkResponse({ type: DepotListDTO })
   async getList() {
-    return new DepotListDTO(...(await this.depotService.getList()));
+    return new DepotListDTO(await this.depotService.getList());
   }
 
   @Get(':id(\\d+)')

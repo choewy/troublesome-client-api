@@ -15,6 +15,6 @@ export class AuthController {
   @ApiOperation({ summary: '로그인' })
   @ApiCreatedResponse({ type: AuthTokensDTO })
   async login(@Body() body: LoginDTO) {
-    return new AuthTokensDTO(...(await this.authService.login(body)));
+    return new AuthTokensDTO(await this.authService.login(body));
   }
 }

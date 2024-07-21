@@ -6,7 +6,7 @@ import { JwtService, JwtVerifyOptions, TokenExpiredError } from '@nestjs/jwt';
 import { verify } from 'argon2';
 
 import { AuthErrorCode, AuthTokenType } from './constants';
-import { LoginDTO } from './dtos';
+import { AuthTokenDTOArgs, LoginDTO } from './dtos';
 import { AuthTokenPayload, AuthTokenVerifyResult } from './implements';
 
 @Injectable()
@@ -16,9 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-  ) {
-    console.log(this.verifyToken(AuthTokenType.AccessToken, this.issueToken(AuthTokenType.AccessToken, 1)));
-  }
+  ) {}
 
   private getSignOptions(type: AuthTokenType) {
     switch (type) {
@@ -91,9 +89,8 @@ export class AuthService {
       throw new ServiceException(AuthErrorCode.NotAvailable, HttpStatus.UNAUTHORIZED);
     }
 
-    return [AuthTokenType.AccessToken, AuthTokenType.RefreshToken].map((authTokenType) => this.issueToken(authTokenType, user.id)) as [
-      string,
-      string,
-    ];
+    return [AuthTokenType.AccessToken, AuthTokenType.RefreshToken].map((authTokenType) =>
+      this.issueToken(authTokenType, user.id),
+    ) as AuthTokenDTOArgs;
   }
 }

@@ -1,6 +1,8 @@
 import { NodeEnv } from '@core';
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+export type VersionDTOArgs = [string, NodeEnv, string];
+
 export class VersionDTO {
   @ApiResponseProperty({ type: String })
   name: string;
@@ -11,7 +13,7 @@ export class VersionDTO {
   @ApiResponseProperty({ type: String })
   version: string;
 
-  constructor(name: string, env: NodeEnv, version: string) {
+  constructor([name, env, version]: VersionDTOArgs) {
     this.name = name;
     this.env = env;
     this.version = version;

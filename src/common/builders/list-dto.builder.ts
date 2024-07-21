@@ -1,6 +1,8 @@
 import { Type } from '@nestjs/common';
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+export type ListDTOArgs<Entity> = [Entity[], number];
+
 export const ListDTOBuilder = <Entity, D = any>(DTO: Type<D>) => {
   class ListDTO {
     @ApiResponseProperty({ type: Number })
@@ -9,7 +11,7 @@ export const ListDTOBuilder = <Entity, D = any>(DTO: Type<D>) => {
     @ApiResponseProperty({ type: [DTO] })
     rows: D[];
 
-    constructor(entities: Entity[], total: number) {
+    constructor([entities, total]: ListDTOArgs<Entity>) {
       this.total = total;
       this.rows = entities.map((entity) => new DTO(entity));
     }

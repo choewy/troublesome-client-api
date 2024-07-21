@@ -16,7 +16,7 @@ export class UserController {
   @ApiOperation({ summary: '사용자 목록 조회' })
   @ApiOkResponse({ type: UserListDTO })
   async getList() {
-    return new UserListDTO(...(await this.userService.getList()));
+    return new UserListDTO(await this.userService.getList());
   }
 
   @Post()

@@ -16,7 +16,7 @@ export class CourierCompanyController {
   @ApiOperation({ summary: '택배사 목록 조회' })
   @ApiOkResponse({ type: CourierCompanyListDTO })
   async getList() {
-    return new CourierCompanyListDTO(...(await this.courierCompanyService.getList()));
+    return new CourierCompanyListDTO(await this.courierCompanyService.getList());
   }
 
   @Post()

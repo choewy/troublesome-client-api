@@ -16,7 +16,7 @@ export class PartnerController {
   @ApiOperation({ summary: '화주사 목록 조회' })
   @ApiOkResponse({ type: PartnerListDTO })
   async getList() {
-    return new PartnerListDTO(...(await this.partnerService.getList()));
+    return new PartnerListDTO(await this.partnerService.getList());
   }
 
   @Post()
