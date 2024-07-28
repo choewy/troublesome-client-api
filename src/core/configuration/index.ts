@@ -1,4 +1,4 @@
 export * from './constants';
-export * from './configs';
+export * from './services';
 
 export * from './configuration.module';

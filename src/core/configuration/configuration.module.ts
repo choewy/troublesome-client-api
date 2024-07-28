@@ -1,7 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import * as configs from './configs';
+import * as configs from './services';
 
 const ConfigProviders = Object.values(configs);
 
