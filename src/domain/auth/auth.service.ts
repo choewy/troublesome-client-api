@@ -86,12 +86,12 @@ export class AuthService {
         password: true,
         isActive: true,
         partner: { id: true },
-        depot: { id: true },
+        center: { id: true },
       },
       where: { account },
       relations: {
         partner: true,
-        depot: true,
+        center: true,
       },
     });
 
