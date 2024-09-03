@@ -1,4 +1,4 @@
-import { DepotModule } from '@domain/depot';
+import { CenterModule } from '@domain/center';
 import { PartnerModule } from '@domain/partner';
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,7 +9,7 @@ import { UserInterceptor } from './user.interceptor';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), forwardRef(() => PartnerModule), forwardRef(() => DepotModule)],
+  imports: [TypeOrmModule.forFeature([UserEntity]), forwardRef(() => PartnerModule), forwardRef(() => CenterModule)],
   controllers: [UserController],
   providers: [UserService, UserInterceptor],
   exports: [UserService],

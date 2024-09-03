@@ -1,5 +1,5 @@
 import { ConfigurationModule, GloablSerializeInterceptor, GlobalValidationPipe, GlobalExceptionFilter } from '@core';
-import { CourierCompanyModule, DepotModule, PartnerModule, UserModule, AuthModule, RoleModule } from '@domain';
+import { DeliveryCompanyModule, CenterModule, PartnerModule, UserModule, AuthModule, RoleModule } from '@domain';
 import { DatabaseModule, LoggerModule, RedisModule, RequestContextModule } from '@infra';
 import { Module } from '@nestjs/common';
 
@@ -13,8 +13,8 @@ import { AppService } from './app.service';
     LoggerModule.forRoot(),
     DatabaseModule.forRoot(),
     RedisModule.forRoot(),
-    CourierCompanyModule,
-    DepotModule,
+    DeliveryCompanyModule,
+    CenterModule,
     PartnerModule,
     UserModule,
     AuthModule,

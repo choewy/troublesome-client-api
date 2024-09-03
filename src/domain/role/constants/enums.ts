@@ -15,10 +15,10 @@ export enum RolePermissionScopePartial {
   UserReadList = 'user.read.list',
   UserReadProfile = 'user.read.profile',
   UserCreatePartner = 'user.create.partner',
-  UserCreateDepot = 'user.create.depot',
+  UserCreateCenter = 'user.create.center',
   UserUpdateCredential = 'user.update.credential',
   UserUpdateProfile = 'user.update.profile',
   UserUpdateDetail = 'user.update.detail',
   UserDeletePartner = 'user.delete.partner',
-  UserDeleteDepot = 'user.delete.depot',
+  UserDeleteCenter = 'user.delete.center',
 }

@@ -27,7 +27,7 @@ export class UserService {
       where: { id },
       relations: {
         partner: true,
-        depot: true,
+        center: true,
       },
     });
 

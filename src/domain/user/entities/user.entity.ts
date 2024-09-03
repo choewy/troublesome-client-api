@@ -1,4 +1,4 @@
-import { DepotEntity } from '@domain/depot';
+import { CenterEntity } from '@domain/center';
 import { PartnerEntity } from '@domain/partner';
 import { RoleAndUserEntity } from '@domain/role';
 import { DatabaseConstraint } from '@infra';
@@ -67,12 +67,12 @@ export class UserEntity {
   @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('partner') })
   partner: PartnerEntity | null;
 
-  @ManyToOne(() => DepotEntity, (e) => e.users, {
+  @ManyToOne(() => CenterEntity, (e) => e.users, {
     onDelete: 'SET NULL',
     nullable: true,
   })
-  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('depot') })
-  depot: DepotEntity | null;
+  @JoinColumn({ foreignKeyConstraintName: constraint.foreignKey('center') })
+  center: CenterEntity | null;
 
   @OneToMany(() => RoleAndUserEntity, (e) => e.user, { cascade: ['remove', 'soft-remove'] })
   @JoinTable()
