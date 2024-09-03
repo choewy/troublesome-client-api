@@ -1,20 +1,23 @@
-import { Body, Controller, Head, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
+import { ApiAuthHeaders } from '@core';
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { SkipAuthCheck } from './decorators';
-import { AuthTokensDTO, LoginDTO, UpdatePasswordDTO } from './dtos';
+import { AuthDTO, AuthTokensDTO, LoginDTO, UpdatePasswordDTO } from './dtos';
 
 @ApiTags('인증/인가')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Head()
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  @ApiAuthHeaders()
   @ApiOperation({ summary: '인가 확인' })
-  @ApiOkResponse()
-  async check() {
-    return;
+  @ApiOkResponse({ type: AuthDTO })
+  async authCheck() {
+    return this.authService.authCheck();
   }
 
   @Post('login')

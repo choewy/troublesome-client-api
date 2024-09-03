@@ -9,7 +9,7 @@ import { verify, hash } from 'argon2';
 import { Repository } from 'typeorm';
 
 import { AuthErrorCode, AuthTokenType } from './constants';
-import { AuthTokenDTOArgs, LoginDTO, UpdatePasswordDTO } from './dtos';
+import { AuthDTO, AuthTokenDTOArgs, LoginDTO, UpdatePasswordDTO } from './dtos';
 import { AuthTokenPayload, AuthTokenVerifyResult } from './implements';
 
 @Injectable()
@@ -78,7 +78,12 @@ export class AuthService {
     return result;
   }
 
+  async authCheck() {
+    return new AuthDTO(this.requestContextService.getUser());
+  }
+
   async getByAccount(account: string) {
+    // TODO move to user service
     const user = await this.userRepository.findOne({
       select: {
         id: true,

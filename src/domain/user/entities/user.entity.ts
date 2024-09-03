@@ -39,15 +39,6 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })
   contact: string | null;
 
-  /** @deprecated 권한레벨 */
-  level: number;
-
-  /** @deprecated 유형(관리자, 화주사, 데포) */
-  type: number;
-
-  /** @deprecated 통합관리자 여부 */
-  kind: boolean;
-
   @Column({ type: 'boolean', default: true, comment: '활성여부' })
   isActive: boolean;
 

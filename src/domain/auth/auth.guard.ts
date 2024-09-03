@@ -1,4 +1,5 @@
 import { RequestHeader, ResponseHeader, ServiceException } from '@common';
+import { RequestContextService } from '@infra';
 import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
@@ -12,6 +13,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly authService: AuthService,
+    private readonly requestContextService: RequestContextService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,6 +28,7 @@ export class AuthGuard implements CanActivate {
     const accessTokenVerifyResult = this.authService.verifyToken(AuthTokenType.AccessToken, this.getAccessToken(request));
 
     if (accessTokenVerifyResult.errorCode === null) {
+      this.requestContextService.setUserID(accessTokenVerifyResult.payload.id);
       return true;
     }
 
@@ -43,6 +46,7 @@ export class AuthGuard implements CanActivate {
       throw new ServiceException(AuthErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
     }
 
+    this.requestContextService.setUserID(accessTokenVerifyResult.payload.id);
     this.setTokensInHeaders(
       response,
       this.authService.issueToken(AuthTokenType.AccessToken, accessTokenVerifyResult.payload.id),
