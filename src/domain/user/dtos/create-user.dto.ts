@@ -3,11 +3,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDTO {
-  @ApiProperty({ type: String, description: '아이디' })
+  @ApiProperty({ type: String, description: '이메일' })
   @IsNotEmpty()
-  @IsString()
-  @MinLength(1)
-  account: string;
+  @IsEmail()
+  email: string;
 
   @ApiProperty({ type: String, description: '비밀번호', format: 'password' })
   @IsNotEmpty()
@@ -26,12 +25,6 @@ export class CreateUserDTO {
   @IsString()
   @MinLength(1)
   name: string;
-
-  @ApiPropertyOptional({ type: String, description: '이메일' })
-  @IsOptional()
-  @IsEmail()
-  @EmptyStringToNull()
-  email?: string | null;
 
   @ApiPropertyOptional({ type: String, description: '연락처' })
   @IsOptional()

@@ -82,18 +82,18 @@ export class AuthService {
     return new AuthDTO(this.requestContextService.getUser());
   }
 
-  async getByAccount(account: string) {
+  async getByEmail(email: string) {
     // TODO move to user service
     const user = await this.userRepository.findOne({
       select: {
         id: true,
-        account: true,
+        email: true,
         password: true,
         isActive: true,
         partner: { id: true },
         center: { id: true },
       },
-      where: { account },
+      where: { email },
       relations: {
         partner: true,
         center: true,
@@ -108,7 +108,7 @@ export class AuthService {
   }
 
   async login(body: LoginDTO) {
-    const user = await this.getByAccount(body.account);
+    const user = await this.getByEmail(body.email);
 
     if ((await verify(user.password, body.password)) === false) {
       throw new ServiceException(AuthErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);

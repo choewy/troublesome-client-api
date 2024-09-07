@@ -11,10 +11,6 @@ export class UserDTO {
   name: string;
 
   @ApiResponseProperty({ type: String })
-  account: string;
-
-  @ApiResponseProperty({ type: String })
-  @NullToEmptyString()
   email: string;
 
   @ApiResponseProperty({ type: String })
@@ -35,7 +31,6 @@ export class UserDTO {
   constructor(user: UserEntity) {
     this.id = user.id;
     this.name = user.name;
-    this.account = user.account;
     this.email = user.email;
     this.contact = user.contact;
     this.isActive = user.isActive;

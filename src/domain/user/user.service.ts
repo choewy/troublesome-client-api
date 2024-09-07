@@ -38,8 +38,8 @@ export class UserService {
     return user;
   }
 
-  async hasByAccount(account: string) {
-    return (await this.userRepository.countBy({ account })) > 0;
+  async hasByEmail(email: string) {
+    return (await this.userRepository.countBy({ email })) > 0;
   }
 
   // TODO 특정 화주사 또는 데포 계정 매핑
@@ -48,15 +48,14 @@ export class UserService {
       throw new ServiceException(UserErrorCode.PasswordMisMatch, HttpStatus.BAD_REQUEST);
     }
 
-    if (await this.hasByAccount(body.account)) {
+    if (await this.hasByEmail(body.email)) {
       throw new ServiceException(UserErrorCode.Duplicated, HttpStatus.CONFLICT);
     }
 
     await this.userRepository.insert({
       name: body.name,
-      account: body.account,
-      password: await hash(body.password),
       email: body.email,
+      password: await hash(body.password),
       contact: body.contact,
       isActive: body.isActive,
     });

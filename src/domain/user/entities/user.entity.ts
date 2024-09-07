@@ -19,7 +19,7 @@ import {
 const constraint = new DatabaseConstraint('user');
 
 @Entity({ name: 'user', comment: '사용자' })
-@Index(constraint.index('account'), ['account'], { unique: true })
+@Index(constraint.index('email'), ['email'], { unique: true })
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: 'PK', primaryKeyConstraintName: constraint.primaryKey('id') })
   id: number;
@@ -27,14 +27,11 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 50, comment: '이름' })
   name: string;
 
-  @Column({ type: 'varchar', length: 50, comment: '계정' })
-  account: string;
+  @Column({ type: 'varchar', length: 320, comment: '이메일' })
+  email: string;
 
   @Column({ type: 'varchar', length: 255, comment: '비밀번호' })
   password: string;
-
-  @Column({ type: 'varchar', length: 320, default: null, comment: '이메일' })
-  email: string | null;
 
   @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })
   contact: string | null;
