@@ -9,7 +9,7 @@ import { UserInterceptor } from './user.interceptor';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), forwardRef(() => PartnerModule), forwardRef(() => CenterModule)],
+  imports: [forwardRef(() => PartnerModule), forwardRef(() => CenterModule), TypeOrmModule.forFeature([UserEntity])],
   controllers: [UserController],
   providers: [UserService, UserInterceptor],
   exports: [UserService],

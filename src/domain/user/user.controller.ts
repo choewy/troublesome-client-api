@@ -1,9 +1,9 @@
 import { NumberPKParamDTO } from '@common';
 import { ApiAuthHeaders } from '@core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Query } from '@nestjs/common';
+import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { CreateUserDTO, UpdateUserDTO, UserDTO, UserListDTO, UserListQueryDTO } from './dtos';
+import { UpdateUserDTO, UserDTO, UserListDTO, UserListQueryDTO } from './dtos';
 import { UserService } from './user.service';
 
 @ApiTags('사용자')
@@ -17,13 +17,6 @@ export class UserController {
   @ApiOkResponse({ type: UserListDTO })
   async getList(@Query() query: UserListQueryDTO) {
     return new UserListDTO(await this.userService.getList(query));
-  }
-
-  @Post()
-  @ApiOperation({ summary: '사용자 등록' })
-  @ApiCreatedResponse()
-  async create(@Body() body: CreateUserDTO) {
-    return this.userService.create(body);
   }
 
   @Get(':id(\\d+)')

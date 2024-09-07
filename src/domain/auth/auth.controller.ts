@@ -4,7 +4,7 @@ import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, 
 
 import { AuthService } from './auth.service';
 import { SkipAuthCheck } from './decorators';
-import { AuthDTO, AuthTokensDTO, LoginDTO, UpdatePasswordDTO } from './dtos';
+import { AuthDTO, AuthTokensDTO, SignInDTO, SignUpDTO, UpdatePasswordDTO } from './dtos';
 
 @ApiTags('인증/인가')
 @Controller('auth')
@@ -20,12 +20,20 @@ export class AuthController {
     return this.authService.authCheck();
   }
 
-  @Post('login')
+  @Post('signin')
   @SkipAuthCheck()
   @ApiOperation({ summary: '로그인' })
   @ApiCreatedResponse({ type: AuthTokensDTO })
-  async login(@Body() body: LoginDTO) {
-    return new AuthTokensDTO(await this.authService.login(body));
+  async signin(@Body() body: SignInDTO) {
+    return new AuthTokensDTO(await this.authService.signin(body));
+  }
+
+  @Post('signup')
+  @SkipAuthCheck()
+  @ApiOperation({ summary: '회원가입' })
+  @ApiCreatedResponse({ type: AuthTokensDTO })
+  async signup(@Body() body: SignUpDTO) {
+    return new AuthTokensDTO(await this.authService.signup(body));
   }
 
   @Patch('password')

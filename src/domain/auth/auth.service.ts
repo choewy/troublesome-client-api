@@ -1,22 +1,20 @@
 import { ServiceException, SystemException } from '@common';
 import { JwtConfigService } from '@core';
-import { UserEntity } from '@domain/user';
+import { UserService } from '@domain/user';
 import { RequestContextService } from '@infra';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService, JwtVerifyOptions, TokenExpiredError } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { verify, hash } from 'argon2';
-import { Repository } from 'typeorm';
+import { verify } from 'argon2';
 
 import { AuthErrorCode, AuthTokenType } from './constants';
-import { AuthDTO, AuthTokenDTOArgs, LoginDTO, UpdatePasswordDTO } from './dtos';
+import { AuthDTO, AuthTokenDTOArgs, SignInDTO, SignUpDTO, UpdatePasswordDTO } from './dtos';
 import { AuthTokenPayload, AuthTokenVerifyResult } from './implements';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
     private readonly requestContextService: RequestContextService,
     private readonly jwtConfigService: JwtConfigService,
     private readonly jwtService: JwtService,
@@ -82,33 +80,12 @@ export class AuthService {
     return new AuthDTO(this.requestContextService.getUser());
   }
 
-  async getByEmail(email: string) {
-    // TODO move to user service
-    const user = await this.userRepository.findOne({
-      select: {
-        id: true,
-        email: true,
-        password: true,
-        isActive: true,
-        partner: { id: true },
-        center: { id: true },
-      },
-      where: { email },
-      relations: {
-        partner: true,
-        center: true,
-      },
-    });
+  async signin(body: SignInDTO) {
+    const user = await this.userService.getByEmail(body.email);
 
     if (user === null) {
       throw new ServiceException(AuthErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);
     }
-
-    return user;
-  }
-
-  async login(body: LoginDTO) {
-    const user = await this.getByEmail(body.email);
 
     if ((await verify(user.password, body.password)) === false) {
       throw new ServiceException(AuthErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);
@@ -117,6 +94,22 @@ export class AuthService {
     if (user.isActive === false) {
       throw new ServiceException(AuthErrorCode.NotAvailable, HttpStatus.UNAUTHORIZED);
     }
+
+    return [AuthTokenType.AccessToken, AuthTokenType.RefreshToken].map((authTokenType) =>
+      this.issueToken(authTokenType, user.id),
+    ) as AuthTokenDTOArgs;
+  }
+
+  async signup(body: SignUpDTO) {
+    if (await this.userService.hasByEmail(body.email)) {
+      throw new ServiceException(AuthErrorCode.AlreadyExists, HttpStatus.CONFLICT);
+    }
+
+    if (body.password !== body.confirmPassword) {
+      throw new ServiceException(AuthErrorCode.PasswordMismatch, HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userService.create(body.email, body.name, body.password);
 
     return [AuthTokenType.AccessToken, AuthTokenType.RefreshToken].map((authTokenType) =>
       this.issueToken(authTokenType, user.id),
@@ -134,6 +127,6 @@ export class AuthService {
       throw new ServiceException(AuthErrorCode.PasswordMismatch, HttpStatus.BAD_REQUEST);
     }
 
-    await this.userRepository.update(user.id, { password: await hash(body.newPassword) });
+    await this.userService.updatePassword(user.id, body.newPassword);
   }
 }

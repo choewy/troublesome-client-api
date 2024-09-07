@@ -5,7 +5,7 @@ import { hash } from 'argon2';
 import { Repository } from 'typeorm';
 
 import { UserErrorCode } from './constants';
-import { CreateUserDTO, UpdateUserDTO, UserListQueryDTO } from './dtos';
+import { UpdateUserDTO, UserListQueryDTO } from './dtos';
 import { UserEntity } from './entities';
 
 @Injectable()
@@ -38,27 +38,43 @@ export class UserService {
     return user;
   }
 
+  async getByEmail(email: string) {
+    return this.userRepository.findOne({
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        isActive: true,
+        partner: { id: true },
+        center: { id: true },
+      },
+      where: { email },
+      relations: {
+        partner: true,
+        center: true,
+      },
+    });
+  }
+
+  async updatePassword(id: number, password: string) {
+    await this.userRepository.update(id, { password: await hash(password) });
+  }
+
   async hasByEmail(email: string) {
     return (await this.userRepository.countBy({ email })) > 0;
   }
 
-  // TODO 특정 화주사 또는 데포 계정 매핑
-  async create(body: CreateUserDTO) {
-    if (body.password !== body.confirmPassword) {
-      throw new ServiceException(UserErrorCode.PasswordMisMatch, HttpStatus.BAD_REQUEST);
-    }
-
-    if (await this.hasByEmail(body.email)) {
-      throw new ServiceException(UserErrorCode.Duplicated, HttpStatus.CONFLICT);
-    }
-
-    await this.userRepository.insert({
-      name: body.name,
-      email: body.email,
-      password: await hash(body.password),
-      contact: body.contact,
-      isActive: body.isActive,
+  async create(email: string, name: string, password: string) {
+    const user = this.userRepository.create({
+      email,
+      name,
+      password,
+      isActive: false,
     });
+
+    await this.userRepository.insert(user);
+
+    return user;
   }
 
   // TODO 특정 화주사 또는 데포 계정 매핑
