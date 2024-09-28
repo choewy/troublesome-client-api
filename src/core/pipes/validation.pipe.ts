@@ -1,8 +1,7 @@
-import { ValidationException } from '@common';
-import { Injectable, ValidationPipe } from '@nestjs/common';
+import { Injectable, ValidationPipe as NestValidationPipe } from '@nestjs/common';
 
 @Injectable()
-export class GlobalValidationPipe extends ValidationPipe {
+export class ValidationPipe extends NestValidationPipe {
   constructor() {
     super({
       transform: true,
@@ -12,7 +11,7 @@ export class GlobalValidationPipe extends ValidationPipe {
       },
       stopAtFirstError: true,
       exceptionFactory(errors) {
-        return new ValidationException(errors);
+        return errors[0];
       },
     });
   }

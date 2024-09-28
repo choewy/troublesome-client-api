@@ -1,8 +1,9 @@
-import { RequestHeader } from '@common';
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { SwaggerDocumentOptions } from './types';
+
+import { RequestHeader } from '@/common';
 
 export class Swagger {
   public static setup(app: INestApplication, options: SwaggerDocumentOptions) {

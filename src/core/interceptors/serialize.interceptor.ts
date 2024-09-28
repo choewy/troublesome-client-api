@@ -2,7 +2,7 @@ import { ClassSerializerInterceptor, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
-export class GloablSerializeInterceptor extends ClassSerializerInterceptor {
+export class SerializeInterceptor extends ClassSerializerInterceptor {
   constructor(reflector: Reflector) {
     super(reflector, {
       enableCircularCheck: true,
