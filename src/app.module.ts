@@ -1,26 +1,11 @@
-import { ConfigurationModule, GloablSerializeInterceptor, GlobalValidationPipe, GlobalExceptionFilter } from '@core';
-import { DeliveryCompanyModule, CenterModule, PartnerModule, UserModule, AuthModule, RoleModule } from '@domain';
-import { DatabaseModule, LoggerModule, RedisModule, RequestContextModule } from '@infra';
 import { Module } from '@nestjs/common';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { SerializeInterceptor, ValidationPipe, ExceptionFilter } from '@/core';
+import { DomainModule } from '@/domain';
+import { ConfigFactoryModule, ContextModule, LoggerModule, DatabaseModule } from '@/global';
 
 @Module({
-  imports: [
-    ConfigurationModule.forRoot(),
-    RequestContextModule.forRoot(),
-    LoggerModule.forRoot(),
-    DatabaseModule.forRoot(),
-    RedisModule.forRoot(),
-    DeliveryCompanyModule,
-    CenterModule,
-    PartnerModule,
-    UserModule,
-    AuthModule,
-    RoleModule,
-  ],
-  controllers: [AppController],
-  providers: [GloablSerializeInterceptor, GlobalValidationPipe, GlobalExceptionFilter, AppService],
+  imports: [ConfigFactoryModule, ContextModule, LoggerModule, DatabaseModule, DomainModule],
+  providers: [SerializeInterceptor, ExceptionFilter, ValidationPipe],
 })
 export class AppModule {}

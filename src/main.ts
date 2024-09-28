@@ -1,36 +1,28 @@
-import {
-  GloablSerializeInterceptor,
-  GlobalValidationPipe,
-  GlobalExceptionFilter,
-  ServerConfigService,
-  AppConfigService,
-  Swagger,
-} from '@core';
-import { AuthGuard, UserInterceptor } from '@domain';
-import { RequestContextInterceptor } from '@infra';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 
+import { ExceptionFilter, SerializeInterceptor, ValidationPipe, Swagger } from '@/core';
+import { AppConfigService, ContextInterceptor } from '@/global';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const appConfigService = app.get(AppConfigService);
-  const serverConfigService = app.get(ServerConfigService);
 
   if (appConfigService.isProduction === false) {
     Swagger.setup(app, {
       title: appConfigService.name,
       version: appConfigService.version,
-      server: { url: serverConfigService.httpUrl },
+      server: { url: appConfigService.httpUrl },
     });
   }
 
-  app.enableCors(serverConfigService.corsOptions);
-  app.useGlobalInterceptors(app.get(GloablSerializeInterceptor), app.get(RequestContextInterceptor), app.get(UserInterceptor));
-  app.useGlobalPipes(app.get(GlobalValidationPipe));
-  app.useGlobalFilters(app.get(GlobalExceptionFilter));
-  app.useGlobalGuards(app.get(AuthGuard));
+  app.enableShutdownHooks();
+  app.enableCors(appConfigService.corsOptions);
+  app.useGlobalInterceptors(app.get(SerializeInterceptor), app.get(ContextInterceptor));
+  app.useGlobalPipes(app.get(ValidationPipe));
+  app.useGlobalFilters(app.get(ExceptionFilter));
 
-  await app.listen(serverConfigService.port, serverConfigService.host);
+  await app.listen(appConfigService.port, appConfigService.host);
 }
 bootstrap();
