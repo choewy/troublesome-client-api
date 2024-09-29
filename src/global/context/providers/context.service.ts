@@ -1,11 +1,11 @@
-import { TroublesomeDatabaseLoggerContextService, UserEntity } from '@choewy/troublesome-entity';
+import { UserEntity } from '@choewy/troublesome-entity';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 
 import { ContextKey } from '../enums';
 
 @Injectable()
-export class ContextService implements TroublesomeDatabaseLoggerContextService {
+export class ContextService {
   constructor(private readonly clsService: ClsService) {}
 
   getRequestId(): string {
