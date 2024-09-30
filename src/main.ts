@@ -3,7 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AuthGuard } from './domain/auth/auth.guard';
 
-import { ExceptionFilter, SerializeInterceptor, ValidationPipe, Swagger } from '@/core';
+import { ExceptionFilter, SerializeInterceptor, ValidationPipe } from '@/core';
+import { Swagger } from '@/document';
 import { AppConfigService, ContextInterceptor } from '@/global';
 
 async function bootstrap() {
