@@ -18,7 +18,7 @@ export class UserService {
   async getForContext(id: number) {
     return this.userRepository.findOne({
       relations: {
-        partnerGroup: true,
+        partnerGroup: { partners: true },
         partner: true,
         fulfillment: true,
       },
