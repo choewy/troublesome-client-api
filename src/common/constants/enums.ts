@@ -1,3 +1,7 @@
+export enum SetMetadataKey {
+  AccessModifier = '__ACCESS_MODIFIER__',
+}
+
 export enum RequestHeader {
   RequestID = 'x-request-id',
   AccessToken = 'authorization',
