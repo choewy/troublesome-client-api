@@ -4,6 +4,9 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VersionDTO } from './dtos';
 import { VersionService } from './version.service';
 
+import { Public } from '@/common';
+
+@Public()
 @ApiTags('버전')
 @Controller()
 export class VersionController {
