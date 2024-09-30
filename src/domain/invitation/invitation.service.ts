@@ -1,12 +1,15 @@
 import { InvitationEntity } from '@choewy/troublesome-entity';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DateTime } from 'luxon';
 import { EntityManager, Repository } from 'typeorm';
 
+import { InvitationModuleErrorCode } from './constants';
 import { InvitationDTO, IssueInvitationDTO } from './dtos';
+import { UserService } from '../user/user.service';
 
+import { Exception } from '@/core';
 import { ContextService } from '@/global';
 
 @Injectable()
@@ -15,6 +18,7 @@ export class InvitationService {
     @InjectRepository(InvitationEntity)
     private readonly invitationRepository: Repository<InvitationEntity>,
     private readonly contextService: ContextService,
+    private readonly userService: UserService,
   ) {}
 
   protected getRepository(em?: EntityManager) {
@@ -33,6 +37,18 @@ export class InvitationService {
   }
 
   async issueInvitation(body: IssueInvitationDTO) {
+    const user = this.contextService.getUser();
+
+    if (body.email === user.email) {
+      throw new Exception(InvitationModuleErrorCode.CANNOT_SELF, HttpStatus.CONFLICT);
+    }
+
+    const hasEmail = await this.userService.hasByEmail(body.email);
+
+    if (hasEmail) {
+      throw new Exception(InvitationModuleErrorCode.ALREADY_SIGNED_EMAIL, HttpStatus.CONFLICT);
+    }
+
     const invitation = plainToInstance(InvitationEntity, {
       email: body.email,
       expiredAt: DateTime.local().plus({ minutes: 5 }).toJSDate(),

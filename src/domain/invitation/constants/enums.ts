@@ -1,1 +1,4 @@
-export enum InvitationModuleErrorCode {}
+export enum InvitationModuleErrorCode {
+  CANNOT_SELF = 'INVITAION_CANNOT_SELF',
+  ALREADY_SIGNED_EMAIL = 'INVITATION_ALREADY_SIGNED_EMAIL',
+}
