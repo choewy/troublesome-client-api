@@ -1,5 +1,7 @@
 export enum SetMetadataKey {
   AccessModifier = '__ACCESS_MODIFIER__',
+  Privilige = '__PRIVILIGE__',
+  UserType = '__USER_TYPE__',
 }
 
 export enum RequestHeader {

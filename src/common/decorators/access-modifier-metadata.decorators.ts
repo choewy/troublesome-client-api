@@ -4,6 +4,11 @@ import { ApiBearerAuth, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 
 import { RequestHeader, ResponseHeader, SetMetadataKey } from '../constants';
 
+export const Public = () => SetMetadata(SetMetadataKey.AccessModifier, true);
+
+export const isPublic = (reflector: Reflector, context: ExecutionContext) =>
+  reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === true;
+
 export const Private = () =>
   applyDecorators(
     SetMetadata(SetMetadataKey.AccessModifier, false),
