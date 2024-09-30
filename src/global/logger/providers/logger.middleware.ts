@@ -1,10 +1,14 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 
-import { LatencyLog, RequestLog, ResponseLog } from '../implements';
+import { LatencyLog, RequestLog, RequestUserLog, ResponseLog } from '../implements';
+
+import { ContextService } from '@/global/context';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
+  constructor(private readonly contextService: ContextService) {}
+
   use(req: Request, res: Response, next: NextFunction) {
     const latency = new LatencyLog();
     const json = res.json;
@@ -24,9 +28,11 @@ export class LoggerMiddleware implements NestMiddleware {
     };
 
     res.on('finish', () => {
+      const user = this.contextService.getUser();
       const log = {
         request: new RequestLog(req),
         response: new ResponseLog(res),
+        user: user ? new RequestUserLog(user) : null,
         latency: latency.finish(),
       };
 
