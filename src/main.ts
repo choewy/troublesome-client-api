@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { AuthGuard } from './domain/auth/auth.guard';
 
 import { ExceptionFilter, SerializeInterceptor, ValidationPipe, Swagger } from '@/core';
 import { AppConfigService, ContextInterceptor } from '@/global';
@@ -22,6 +23,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(app.get(SerializeInterceptor), app.get(ContextInterceptor));
   app.useGlobalPipes(app.get(ValidationPipe));
   app.useGlobalFilters(app.get(ExceptionFilter));
+  app.useGlobalGuards(app.get(AuthGuard));
 
   await app.listen(appConfigService.port, appConfigService.host);
 }

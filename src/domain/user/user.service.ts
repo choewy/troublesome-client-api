@@ -15,6 +15,17 @@ export class UserService {
     return em instanceof EntityManager ? em.getRepository(UserEntity) : this.userRepository;
   }
 
+  async getUserContext(id: number) {
+    return this.userRepository.findOne({
+      relations: {
+        partnerGroup: true,
+        partner: true,
+        fulfillment: true,
+      },
+      where: { id },
+    });
+  }
+
   async getByEmail(email: string) {
     return this.userRepository.findOneBy({ email });
   }
@@ -23,7 +34,7 @@ export class UserService {
     return this.userRepository.existsBy({ email });
   }
 
-  async insert(args: Partial<Pick<UserEntity, 'email' | 'password' | 'name' | 'partnerId' | 'fulfillmentId'>>, em?: EntityManager) {
+  async createUser(args: Partial<Pick<UserEntity, 'email' | 'password' | 'name' | 'partnerId' | 'fulfillmentId'>>, em?: EntityManager) {
     const user = plainToInstance(UserEntity, args);
 
     await this.getRepository(em).insert(user);

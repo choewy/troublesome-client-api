@@ -5,7 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { DateTime } from 'luxon';
 import { EntityManager, Repository } from 'typeorm';
 
-import { IssueInvitationDTO } from './dtos';
+import { InvitationDTO, IssueInvitationDTO } from './dtos';
 
 import { ContextService } from '@/global';
 
@@ -28,7 +28,7 @@ export class InvitationService {
     });
   }
 
-  async update(id: string, args: Partial<Pick<InvitationEntity, 'isCompleted'>>, em?: EntityManager) {
+  async updateInvitation(id: string, args: Partial<Pick<InvitationEntity, 'isCompleted'>>, em?: EntityManager) {
     await this.getRepository(em).update(id, args);
   }
 
@@ -42,5 +42,7 @@ export class InvitationService {
     await this.invitationRepository.insert(invitation);
 
     // TODO 이메일 전송
+
+    return new InvitationDTO(invitation);
   }
 }

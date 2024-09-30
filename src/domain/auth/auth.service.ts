@@ -1,10 +1,10 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { hash, verify } from 'argon2';
 import { DateTime } from 'luxon';
 import { DataSource } from 'typeorm';
 
-import { AuthModuleErrorCode } from './constants';
+import { AuthModuleErrorCode, JwtVerifyResult } from './constants';
 import { LoginDTO, SignUpDTO, TokensDTO } from './dtos';
 import { InvitationService } from '../invitation/invitation.service';
 import { UserService } from '../user/user.service';
@@ -64,8 +64,8 @@ export class AuthService {
     }
 
     const user = await this.dataSource.transaction(async (em) => {
-      await this.invitationService.update(invitation.id, { isCompleted: true }, em);
-      return await this.userService.insert(
+      await this.invitationService.updateInvitation(invitation.id, { isCompleted: true }, em);
+      return await this.userService.createUser(
         {
           email: body.email,
           name: body.name,
@@ -80,10 +80,69 @@ export class AuthService {
     return this.issueTokens(user.id);
   }
 
-  protected issueTokens(id: number) {
+  async getUserContext(id: number) {
+    const user = await this.userService.getUserContext(id);
+
+    if (user === null) {
+      throw new Exception(AuthModuleErrorCode.USER_NOT_FOUND, HttpStatus.FORBIDDEN);
+    }
+
+    if (user.isActivated === false) {
+      throw new Exception(AuthModuleErrorCode.ACCOUNT_DISABLED, HttpStatus.FORBIDDEN);
+    }
+
+    return user;
+  }
+
+  issueTokens(id: number) {
     return new TokensDTO(
       this.jwtService.sign({ id }, this.jwtConfigService.accessTokenSignOptions),
       this.jwtService.sign({ id }, this.jwtConfigService.refreshTokenSignOptions),
     );
+  }
+
+  verifyAccessToken(accessToken: string, ignoreExpiration: boolean = false): JwtVerifyResult {
+    const result: JwtVerifyResult = { id: -1, error: null, expired: ignoreExpiration };
+    const options = this.jwtConfigService.accessTokenVerifyOptions;
+
+    options.ignoreExpiration = ignoreExpiration;
+
+    try {
+      const payload = this.jwtService.verify(accessToken, options);
+
+      if (typeof payload.id !== 'number') {
+        throw new JsonWebTokenError('invalid token');
+      }
+
+      result.id = payload.id;
+    } catch (e) {
+      if (e instanceof TokenExpiredError) {
+        return this.verifyAccessToken(accessToken, true);
+      }
+
+      result.error = e;
+    }
+
+    return result;
+  }
+
+  verifyRefreshToken(refreshToken: string): JwtVerifyResult {
+    const result: JwtVerifyResult = { id: -1, error: null, expired: false };
+    const options = this.jwtConfigService.refreshTokenVerifyOptions;
+
+    try {
+      const payload = this.jwtService.verify(refreshToken, options);
+
+      if (typeof payload.id !== 'number') {
+        throw new JsonWebTokenError('invalid token');
+      }
+
+      result.id = payload.id;
+    } catch (e) {
+      result.error = e;
+      result.expired = e instanceof TokenExpiredError;
+    }
+
+    return result;
   }
 }

@@ -28,7 +28,7 @@ export class InvitatorFulfillmentDTO {
   }
 }
 
-export class InvitatorDTO {
+export class InvitationUserDTO {
   @ApiProperty({ type: Number, description: '초대권 발행인 PK' })
   id: number;
 
@@ -66,22 +66,22 @@ export class InvitationDTO {
   @ApiProperty({ type: Boolean, description: '만료 여부' })
   isExpired: boolean;
 
-  @ApiProperty({ type: InvitatorDTO, description: '초대권 발행인 정보' })
-  invitator: InvitatorDTO | null;
-
   @ApiProperty({ type: Date, description: '만료기한' })
   expiredAt: Date;
 
   @ApiProperty({ type: Date, description: '발행일시' })
   createdAt: Date;
 
+  @ApiProperty({ type: InvitationUserDTO, description: '초대권 발행인 정보' })
+  user: InvitationUserDTO | null;
+
   constructor(invitation: InvitationEntity) {
     this.id = invitation.id;
     this.email = invitation.email;
     this.isCompleted = invitation.isCompleted;
     this.isExpired = DateTime.fromJSDate(invitation.expiredAt).diffNow('milliseconds').get('milliseconds') < 0;
-    this.invitator = invitation.user ? new InvitatorDTO(invitation.user) : null;
     this.expiredAt = invitation.expiredAt;
     this.createdAt = invitation.createdAt;
+    this.user = invitation.user ? new InvitationUserDTO(invitation.user) : null;
   }
 }

@@ -4,6 +4,9 @@ import { ApiCreatedResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } fr
 import { AuthService } from './auth.service';
 import { LoginDTO, SignUpDTO, TokensDTO } from './dtos';
 
+import { Public } from '@/common';
+
+@Public()
 @ApiTags('인증/인가')
 @Controller('auth')
 export class AuthController {
