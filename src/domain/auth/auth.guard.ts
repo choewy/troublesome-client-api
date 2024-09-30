@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { AuthModuleErrorCode } from './constants';
+import { UserService } from '../user/user.service';
 
 import { isPublic, RequestHeader, ResponseHeader } from '@/common';
 import { Exception } from '@/core';
@@ -15,6 +16,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly contextService: ContextService,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -47,7 +49,17 @@ export class AuthGuard implements CanActivate {
       response.set(ResponseHeader.RefreshToken, tokens.refreshToken);
     }
 
-    this.contextService.setUser(await this.authService.getUserContext(accessTokenResult.id));
+    const user = await this.userService.getForContext(accessTokenResult.id);
+
+    if (user === null) {
+      throw new Exception(AuthModuleErrorCode.USER_NOT_FOUND, HttpStatus.FORBIDDEN);
+    }
+
+    if (user.isActivated === false) {
+      throw new Exception(AuthModuleErrorCode.ACCOUNT_DISABLED, HttpStatus.FORBIDDEN);
+    }
+
+    this.contextService.setUser(user);
 
     return true;
   }

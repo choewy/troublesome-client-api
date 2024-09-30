@@ -15,7 +15,7 @@ export class UserService {
     return em instanceof EntityManager ? em.getRepository(UserEntity) : this.userRepository;
   }
 
-  async getUserContext(id: number) {
+  async getForContext(id: number) {
     return this.userRepository.findOne({
       relations: {
         partnerGroup: true,

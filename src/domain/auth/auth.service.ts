@@ -80,20 +80,6 @@ export class AuthService {
     return this.issueTokens(user.id);
   }
 
-  async getUserContext(id: number) {
-    const user = await this.userService.getUserContext(id);
-
-    if (user === null) {
-      throw new Exception(AuthModuleErrorCode.USER_NOT_FOUND, HttpStatus.FORBIDDEN);
-    }
-
-    if (user.isActivated === false) {
-      throw new Exception(AuthModuleErrorCode.ACCOUNT_DISABLED, HttpStatus.FORBIDDEN);
-    }
-
-    return user;
-  }
-
   issueTokens(id: number) {
     return new TokensDTO(
       this.jwtService.sign({ id }, this.jwtConfigService.accessTokenSignOptions),
