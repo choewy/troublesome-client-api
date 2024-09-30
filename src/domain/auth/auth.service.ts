@@ -101,11 +101,16 @@ export class AuthService {
     );
   }
 
-  verifyAccessToken(accessToken: string, ignoreExpiration: boolean = false): JwtVerifyResult {
-    const result: JwtVerifyResult = { id: -1, error: null, expired: ignoreExpiration };
+  verifyAccessToken(accessToken: string, error: unknown = null): JwtVerifyResult {
+    const expired = error instanceof TokenExpiredError;
+    const result: JwtVerifyResult = { id: -1, error, expired };
     const options = this.jwtConfigService.accessTokenVerifyOptions;
 
-    options.ignoreExpiration = ignoreExpiration;
+    options.ignoreExpiration = expired;
+
+    if (error && error instanceof TokenExpiredError === false) {
+      return result;
+    }
 
     try {
       const payload = this.jwtService.verify(accessToken, options);
@@ -115,15 +120,11 @@ export class AuthService {
       }
 
       result.id = payload.id;
+
+      return result;
     } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        return this.verifyAccessToken(accessToken, true);
-      }
-
-      result.error = e;
+      return this.verifyAccessToken(accessToken, e);
     }
-
-    return result;
   }
 
   verifyRefreshToken(refreshToken: string): JwtVerifyResult {

@@ -24,9 +24,9 @@ export class AuthGuard implements CanActivate {
 
     const http = context.switchToHttp();
     const request = http.getRequest<Request>();
-    const response = http.getRequest<Response>();
+    const response = http.getResponse<Response>();
 
-    const accessToken = (request.headers.authorization ?? '').replace('Bearer', '');
+    const accessToken = (request.headers.authorization ?? '').replace('Bearer ', '');
     const accessTokenResult = this.authService.verifyAccessToken(accessToken);
 
     if (accessTokenResult.error) {
@@ -43,8 +43,8 @@ export class AuthGuard implements CanActivate {
 
       const tokens = this.authService.issueTokens(accessTokenResult.id);
 
-      response.setHeader(ResponseHeader.AccessToken, tokens.accessToken);
-      response.setHeader(ResponseHeader.RefreshToken, tokens.refreshToken);
+      response.set(ResponseHeader.AccessToken, tokens.accessToken);
+      response.set(ResponseHeader.RefreshToken, tokens.refreshToken);
     }
 
     this.contextService.setUser(await this.authService.getUserContext(accessTokenResult.id));

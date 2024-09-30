@@ -11,49 +11,57 @@ export class JwtConfigService {
     private readonly appConfigService: AppConfigService,
   ) {}
 
-  public get accessTokenSecret() {
+  private get accessTokenSecret() {
     return this.configService.getOrThrow('JWT_ACCESS_TOKEN_SECRET');
+  }
+
+  private get accessTokenOptions(): Pick<JwtSignOptions, 'subject' | 'audience' | 'issuer'> {
+    return {
+      subject: [this.appConfigService.name, this.appConfigService.env, 'access_token'].join(':'),
+      audience: [this.appConfigService.name, this.appConfigService.env, 'audience'].join(':'),
+      issuer: [this.appConfigService.name, this.appConfigService.env, this.appConfigService.domain].join(':'),
+    };
   }
 
   public get accessTokenSignOptions(): JwtSignOptions {
     return {
       secret: this.accessTokenSecret,
-      subject: [this.appConfigService.name, this.appConfigService.env, 'access_token'].join(':'),
-      audience: [this.appConfigService.name, this.appConfigService.env, 'audience'].join(':'),
-      issuer: [this.appConfigService.name, this.appConfigService.env, this.appConfigService.domain].join(':'),
-      expiresIn: '1h',
+      expiresIn: '1d',
+      ...this.accessTokenOptions,
     };
   }
 
   public get accessTokenVerifyOptions(): JwtVerifyOptions {
     return {
       secret: this.accessTokenSecret,
-      subject: [this.appConfigService.name, this.appConfigService.env, 'access_token'].join(':'),
+      ...this.accessTokenOptions,
+    };
+  }
+
+  private get refreshTokenSecret() {
+    return this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET');
+  }
+
+  private get refreshTokenOptions(): Pick<JwtSignOptions, 'subject' | 'audience' | 'issuer'> {
+    return {
+      subject: [this.appConfigService.name, this.appConfigService.env, 'refresh_token'].join(':'),
       audience: [this.appConfigService.name, this.appConfigService.env, 'audience'].join(':'),
       issuer: [this.appConfigService.name, this.appConfigService.env, this.appConfigService.domain].join(':'),
     };
   }
 
-  public get refreshTokenSecret() {
-    return this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET');
-  }
-
-  public get refreshTokenSignOptions() {
+  public get refreshTokenSignOptions(): JwtSignOptions {
     return {
       secret: this.refreshTokenSecret,
-      subject: [this.appConfigService.name, this.appConfigService.env, 'refresh_token'].join(':'),
-      audience: [this.appConfigService.name, this.appConfigService.env, 'audience'].join(':'),
-      issuer: [this.appConfigService.name, this.appConfigService.env, this.appConfigService.domain].join(':'),
       expiresIn: '14d',
+      ...this.refreshTokenOptions,
     };
   }
 
   public get refreshTokenVerifyOptions(): JwtVerifyOptions {
     return {
       secret: this.refreshTokenSecret,
-      subject: [this.appConfigService.name, this.appConfigService.env, 'refresh_token'].join(':'),
-      audience: [this.appConfigService.name, this.appConfigService.env, 'audience'].join(':'),
-      issuer: [this.appConfigService.name, this.appConfigService.env, this.appConfigService.domain].join(':'),
+      ...this.refreshTokenOptions,
     };
   }
 }
