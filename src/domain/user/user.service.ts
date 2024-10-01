@@ -21,6 +21,7 @@ export class UserService {
         partnerGroup: { partners: true },
         partner: true,
         fulfillment: true,
+        role: { permissions: true },
       },
       where: { id },
     });
