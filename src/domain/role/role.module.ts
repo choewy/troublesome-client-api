@@ -1,7 +1,7 @@
-import { RoleEntity } from '@choewy/troublesome-entity';
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { RoleEntity } from './entities/role.entity';
 import { RoleController } from './role.controller';
 import { RoleService } from './role.service';
 import { PermissionModule } from '../permission/permission.module';

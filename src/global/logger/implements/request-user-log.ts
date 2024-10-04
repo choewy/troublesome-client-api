@@ -1,4 +1,4 @@
-import { UserEntity } from '@choewy/troublesome-entity';
+import { RequestUser } from './interfaces';
 
 export class RequestUserLog {
   id: number;
@@ -8,7 +8,7 @@ export class RequestUserLog {
   partner?: { id: number; name: string };
   fulfillment?: { id: number; name: string };
 
-  constructor(user: UserEntity) {
+  constructor(user: RequestUser) {
     this.id = user.id;
     this.name = user.name;
     this.email = user.email;

@@ -1,7 +1,9 @@
-import { PermissionEntity, PermissionLevel, PermissionTarget } from '@choewy/troublesome-entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { PermissionLevel, PermissionTarget } from './constants/enums';
+import { PermissionEntity } from './entities/permission.entity';
 
 @Injectable()
 export class PermissionService {

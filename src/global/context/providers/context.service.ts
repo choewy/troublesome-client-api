@@ -1,4 +1,3 @@
-import { UserEntity } from '@choewy/troublesome-entity';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 
@@ -24,11 +23,11 @@ export class ContextService {
     return this.clsService.get(ContextKey.Context) ?? null;
   }
 
-  setUser(user: UserEntity) {
+  setUser<T = any>(user: T) {
     this.clsService.set(ContextKey.User, user);
   }
 
-  getUser(): UserEntity | null {
+  getUser<T = any>(): T | null {
     return this.clsService.get(ContextKey.User) ?? null;
   }
 }

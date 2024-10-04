@@ -1,4 +1,3 @@
-import { InvitationEntity } from '@choewy/troublesome-entity';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -7,6 +6,7 @@ import { EntityManager, Repository } from 'typeorm';
 
 import { InvitationModuleErrorCode } from './constants';
 import { InvitationDTO, IssueInvitationDTO } from './dtos';
+import { InvitationEntity } from './entities/invitation.entity';
 import { UserService } from '../user/user.service';
 
 import { Exception } from '@/core';

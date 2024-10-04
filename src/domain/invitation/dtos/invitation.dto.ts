@@ -1,6 +1,11 @@
-import { InvitationEntity, FulfillmentEntity, PartnerEntity, UserEntity } from '@choewy/troublesome-entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { DateTime } from 'luxon';
+
+import { InvitationEntity } from '../entities/invitation.entity';
+
+import { FulfillmentEntity } from '@/domain/fulfillment/entities/fulfillment.entity';
+import { PartnerEntity } from '@/domain/partner/entities/partner.entity';
+import { UserEntity } from '@/domain/user/entities/user.entity';
 
 export class InvitatorPartnerDTO {
   @ApiProperty({ type: Number, description: '고객사 PK' })

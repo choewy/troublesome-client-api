@@ -1,8 +1,10 @@
-import { FulfillmentEntity, PartnerEntity, RoleEntity } from '@choewy/troublesome-entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
+import { RoleEntity } from './entities/role.entity';
+import { FulfillmentEntity } from '../fulfillment/entities/fulfillment.entity';
+import { PartnerEntity } from '../partner/entities/partner.entity';
 import { PermissionService } from '../permission/permission.service';
 
 @Injectable()
