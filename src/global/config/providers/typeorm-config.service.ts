@@ -23,6 +23,7 @@ export class TypeOrmConfigService {
       namingStrategy: new SnakeNamingStrategy(),
       synchronize: this.appConfigService.isLocal,
       entities: [`${process.cwd()}/dist/**/entities/*.entity.{ts,js}`],
+      logging: ['info', 'error', 'warn'],
     };
   }
 }

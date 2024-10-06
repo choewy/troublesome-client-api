@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import {
   Column,
   CreateDateColumn,
@@ -23,8 +24,8 @@ export class InvitationEntity {
   @Column({ type: 'timestamp', comment: '만료일시' })
   expiredAt: Date;
 
-  @Column({ type: 'boolean', default: false, comment: '사용여부' })
-  isCompleted: boolean;
+  @Column({ type: 'timestamp', default: null, comment: '완료일시' })
+  completedAt: Date;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   userId: number;
@@ -41,4 +42,12 @@ export class InvitationEntity {
 
   @DeleteDateColumn({ type: 'timestamp', comment: '삭제일시' })
   readonly deletedAt: Date | null;
+
+  public get isCompleted() {
+    return this.completedAt instanceof Date;
+  }
+
+  public get isExpired() {
+    return DateTime.fromJSDate(this.expiredAt).diffNow('milliseconds').get('milliseconds') < 0;
+  }
 }

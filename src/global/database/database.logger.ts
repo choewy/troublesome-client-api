@@ -11,13 +11,7 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
 
   private createLog(originQuery: string, params?: unknown[], error?: unknown, latency?: number) {
     const log = {
-      request: {
-        id: this.contextService.getRequestId() ?? undefined,
-        context: {
-          className: undefined,
-          handler: undefined,
-        },
-      },
+      request: undefined,
       query: {
         comment: undefined,
         sql: originQuery,
@@ -27,11 +21,19 @@ export class DatabaseLogger implements TypeOrmLoggerInterface {
       },
     };
 
-    const executionContext = this.contextService.getExecutionContext();
+    const requestId = this.contextService.getRequestId();
 
-    if (executionContext) {
-      log.request.context.className = executionContext.getClass()?.name ?? undefined;
-      log.request.context.handler = executionContext.getHandler()?.name ?? undefined;
+    if (requestId) {
+      log.request = { id: requestId, context: undefined };
+
+      const executionContext = this.contextService.getExecutionContext();
+
+      if (executionContext) {
+        log.request.context = {
+          className: executionContext.getClass()?.name ?? undefined,
+          handler: executionContext.getHandler()?.name ?? undefined,
+        };
+      }
     }
 
     const start = '/* ';

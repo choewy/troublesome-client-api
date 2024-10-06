@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { AuthGuard } from './domain/auth/auth.guard';
+import { AuthGuard } from './application/auth/auth.guard';
 
 import { ExceptionFilter, SerializeInterceptor, ValidationPipe } from '@/core';
 import { Swagger } from '@/document';
