@@ -34,5 +34,7 @@ export class InvitationUseCase {
     }
 
     await this.invitationRepository.insert({ email: body.email, user });
+
+    // TODO send email
   }
 }
