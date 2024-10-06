@@ -1,7 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 
+import { InvitationModuleErrorCode } from './constants';
 import { IssueInvitationDTO } from './dtos';
 
+import { Exception } from '@/core';
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService } from '@/global';
@@ -18,13 +20,13 @@ export class InvitationUseCase {
     const user = this.contextService.getUser();
 
     if (body.email === user.email) {
-      throw new ConflictException();
+      throw new Exception(InvitationModuleErrorCode.CannotInviteYourSelf, HttpStatus.CONFLICT);
     }
 
     const hasEmail = await this.userRepository.hasEmail(body.email);
 
     if (hasEmail) {
-      throw new ConflictException();
+      throw new Exception(InvitationModuleErrorCode.AlreadyInvitedUser, HttpStatus.CONFLICT);
     }
 
     await this.invitationRepository.insert({
