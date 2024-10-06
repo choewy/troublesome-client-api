@@ -33,7 +33,7 @@ export class UserRepository extends EntityRepository<UserEntity> {
   }
 
   async insert(
-    args: Pick<UserEntity, 'email' | 'password' | 'name'> & Partial<Pick<UserEntity, 'partnerId' | 'fulfillmentId'>>,
+    args: Pick<UserEntity, 'email' | 'password' | 'name'> & Partial<Pick<UserEntity, 'partnerGroupId' | 'partnerId' | 'fulfillmentId'>>,
     em?: EntityManager,
   ) {
     const user = plainToInstance(UserEntity, args);

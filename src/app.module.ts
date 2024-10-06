@@ -4,6 +4,7 @@ import { AuthModule } from './application/auth/auth.module';
 import { DeliveryCompanyModule } from './application/delivery-company/delivery-company.module';
 import { FulfillmentModule } from './application/fulfillment/fulfillment.module';
 import { InvitationModule } from './application/invitation/invitation.module';
+import { PartnerGroupModule } from './application/partner-group/partner-group.module';
 import { VersionModule } from './application/version/version.module';
 
 import { SerializeInterceptor, ValidationPipe, ExceptionFilter } from '@/core';
@@ -20,6 +21,7 @@ import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from
     InvitationModule,
     DeliveryCompanyModule,
     FulfillmentModule,
+    PartnerGroupModule,
   ],
   providers: [SerializeInterceptor, ExceptionFilter, ValidationPipe],
 })

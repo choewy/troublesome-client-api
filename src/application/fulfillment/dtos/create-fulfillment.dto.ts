@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsInstance, IsInt, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
 
-import { CreateFulfillmentUserDTO } from './create-fulfillment-user.dto';
+import { CreateFulfillmentAdminDTO } from './create-fulfillment-admin.dto';
 
 export class CreateFulfillmentDTO {
   @ApiProperty({ type: String, description: '풀필먼트 센터 이름' })
@@ -15,10 +15,10 @@ export class CreateFulfillmentDTO {
   @IsNotEmpty()
   plantCode: string;
 
-  @ApiProperty({ type: CreateFulfillmentUserDTO, description: '풀필먼트 센터 관리자 계정' })
-  @IsInstance(CreateFulfillmentUserDTO)
+  @ApiProperty({ type: CreateFulfillmentAdminDTO, description: '풀필먼트 센터 관리자 계정' })
+  @IsInstance(CreateFulfillmentAdminDTO)
   @IsNotEmpty()
-  user: CreateFulfillmentUserDTO;
+  admin: CreateFulfillmentAdminDTO;
 
   @ApiPropertyOptional({ type: String, description: '우편번호' })
   @IsNumberString()

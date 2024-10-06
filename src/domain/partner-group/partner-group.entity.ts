@@ -5,6 +5,7 @@ import {
   Entity,
   JoinTable,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,9 +21,9 @@ export class PartnerGroupEntity {
   @Column({ type: 'varchar', length: 50, comment: '고객사 그룹명' })
   name: string;
 
-  @OneToMany(() => UserEntity, (e) => e.partnerGroup, { cascade: true })
+  @OneToOne(() => UserEntity, (e) => e.partnerGroup, { cascade: true })
   @JoinTable()
-  users: UserEntity[];
+  user: UserEntity;
 
   @OneToMany(() => PartnerEntity, (e) => e.partnerGroup, { cascade: true })
   @JoinTable()

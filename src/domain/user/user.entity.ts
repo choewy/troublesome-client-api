@@ -6,6 +6,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -42,7 +43,7 @@ export class UserEntity {
   @Column({ type: 'int', unsigned: true, nullable: true })
   partnerGroupId: number;
 
-  @ManyToOne(() => PartnerGroupEntity, (e) => e.users, { nullable: true, onDelete: 'SET NULL' })
+  @OneToOne(() => PartnerGroupEntity, (e) => e.user, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'partner_group', 'id') })
   partnerGroup: PartnerGroupEntity | null;
 

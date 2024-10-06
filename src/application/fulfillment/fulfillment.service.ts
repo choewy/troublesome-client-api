@@ -25,11 +25,11 @@ export class FulfillmentService {
   }
 
   async create(body: CreateFulfillmentDTO) {
-    if (body.user.password !== body.user.confirmPassword) {
+    if (body.admin.password !== body.admin.confirmPassword) {
       throw new Exception(FulfillmentModuleErrorCode.UserPasswordsMispatch, HttpStatus.BAD_REQUEST);
     }
 
-    const hasEmail = await this.userRepository.hasEmail(body.user.email);
+    const hasEmail = await this.userRepository.hasEmail(body.admin.email);
 
     if (hasEmail) {
       throw new Exception(FulfillmentModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
@@ -64,7 +64,7 @@ export class FulfillmentService {
         em,
       );
 
-      const userId = await this.userRepository.insert({ ...body.user, fulfillmentId });
+      const userId = await this.userRepository.insert({ ...body.admin, fulfillmentId });
 
       console.log(userId);
 
