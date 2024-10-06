@@ -29,9 +29,6 @@ export class InvitationUseCase {
       throw new Exception(InvitationModuleErrorCode.AlreadyInvitedUser, HttpStatus.CONFLICT);
     }
 
-    await this.invitationRepository.insert({
-      email: body.email,
-      user: this.contextService.getContext(),
-    });
+    await this.invitationRepository.insert({ email: body.email, user });
   }
 }
