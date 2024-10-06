@@ -4,9 +4,9 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestj
 import { CreatePartnerDTO, PartnerListDTO } from './dtos';
 import { PartnerService } from './partner.service';
 
-import { Public } from '@/common';
+import { Private, PrivateOptions } from '@/common';
 
-@Public()
+@Private()
 @ApiTags('고객사')
 @Controller('partners')
 export class PartnerController {
@@ -19,6 +19,7 @@ export class PartnerController {
     return this.partnerService.getList();
   }
 
+  @Private(PrivateOptions.PartnerGroup)
   @Post()
   @ApiOperation({ summary: '고객사 등록' })
   @ApiCreatedResponse()

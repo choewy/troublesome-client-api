@@ -1,9 +1,14 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { CreatePartnerDTO, PartnerListDTO } from './dtos';
 
 import { PartnerRepository } from '@/domain/partner/partner.repository';
+import { PartnerGroupRepository } from '@/domain/partner-group/partner-group.repository';
+import { PermissionEntity } from '@/domain/permission/permission.entity';
+import { PermissionRepository } from '@/domain/permission/permission.repository';
+import { RoleRepository } from '@/domain/role/role.repository';
+import { UserType } from '@/domain/user/enums';
 import { UserEntity } from '@/domain/user/user.entity';
 import { ContextService } from '@/global';
 
@@ -13,6 +18,9 @@ export class PartnerService {
     private readonly dataSource: DataSource,
     private readonly contextService: ContextService,
     private readonly partnerRepository: PartnerRepository,
+    private readonly partnerGroupRepository: PartnerGroupRepository,
+    private readonly roleRepository: RoleRepository,
+    private readonly permissionRepository: PermissionRepository,
   ) {}
 
   async getList() {
@@ -22,16 +30,62 @@ export class PartnerService {
   async create(body: CreatePartnerDTO) {
     const user = this.contextService.getUser<UserEntity>();
 
-    if (user.partnerGroupId !== body.partnerGroupId) {
+    if (user.type !== UserType.SystemAdmin && user.partnerGroupId !== body.partnerGroupId) {
       throw new ForbiddenException();
+    }
+
+    const partnerGroup = await this.partnerGroupRepository.findById(body.partnerGroupId);
+
+    if (partnerGroup === null) {
+      throw new NotFoundException();
     }
 
     await this.dataSource.transaction(async (em) => {
       const partnerId = await this.partnerRepository.insert(body, em);
 
-      console.log(partnerId);
+      const partnerAdminRoleId = await this.roleRepository.insert(
+        {
+          name: '관리자',
+          users: [partnerGroup.user],
+          partnerId,
+          isEditable: false,
+        },
+        em,
+      );
 
-      // TODO 고객사 기본 역할 및 권한 생성, 관리자 역할에 userId 추가
+      await this.permissionRepository.insertBulk(
+        {
+          permissions: this.partnerAdminPermissions,
+          roleId: partnerAdminRoleId,
+        },
+        em,
+      );
+
+      const partnerUserRoleId = await this.roleRepository.insert(
+        {
+          name: '사용자',
+          users: [],
+          partnerId,
+          isEditable: false,
+        },
+        em,
+      );
+
+      await this.permissionRepository.insertBulk(
+        {
+          permissions: this.partnerUserPermissions,
+          roleId: partnerUserRoleId,
+        },
+        em,
+      );
     });
+  }
+
+  protected get partnerAdminPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+    return [];
+  }
+
+  protected get partnerUserPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+    return [];
   }
 }

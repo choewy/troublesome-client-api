@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { FulfillmentModuleErrorCode } from './constants';
@@ -8,16 +8,25 @@ import { Exception } from '@/core';
 import { DeliveryCompanyRepository } from '@/domain/delivery-company/delivery-company.repository';
 import { DeliveryCompanySettingRepository } from '@/domain/delivery-company-setting/delivery-company-setting.repository';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
+import { PermissionEntity } from '@/domain/permission/permission.entity';
+import { PermissionRepository } from '@/domain/permission/permission.repository';
+import { RoleRepository } from '@/domain/role/role.repository';
+import { UserType } from '@/domain/user/enums';
+import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
+import { ContextService } from '@/global';
 
 @Injectable()
 export class FulfillmentService {
   constructor(
     private readonly dataSource: DataSource,
+    private readonly contextService: ContextService,
     private readonly fulfillmentRepository: FulfillmentRepository,
     private readonly userRepository: UserRepository,
     private readonly deliveryCompanyRepository: DeliveryCompanyRepository,
     private readonly deliveryCompanySettingRepository: DeliveryCompanySettingRepository,
+    private readonly roleRepository: RoleRepository,
+    private readonly permissionRepository: PermissionRepository,
   ) {}
 
   async getList() {
@@ -25,6 +34,12 @@ export class FulfillmentService {
   }
 
   async create(body: CreateFulfillmentDTO) {
+    const user = this.contextService.getUser<UserEntity>();
+
+    if (user.type !== UserType.SystemAdmin) {
+      throw new ForbiddenException();
+    }
+
     if (body.admin.password !== body.admin.confirmPassword) {
       throw new Exception(FulfillmentModuleErrorCode.UserPasswordsMispatch, HttpStatus.BAD_REQUEST);
     }
@@ -64,11 +79,51 @@ export class FulfillmentService {
         em,
       );
 
-      const userId = await this.userRepository.insert({ ...body.admin, fulfillmentId });
+      const admin = await this.userRepository.save({ ...body.admin, fulfillmentId }, em);
 
-      console.log(userId);
+      const partnerAdminRoleId = await this.roleRepository.insert(
+        {
+          name: '관리자',
+          users: [admin],
+          fulfillmentId,
+          isEditable: false,
+        },
+        em,
+      );
 
-      // TODO 플랜트 기본 역할 및 권한 생성, 관리자 역할에 userId 추가
+      await this.permissionRepository.insertBulk(
+        {
+          permissions: this.fulfillmentAdminPermissions,
+          roleId: partnerAdminRoleId,
+        },
+        em,
+      );
+
+      const partnerUserRoleId = await this.roleRepository.insert(
+        {
+          name: '사용자',
+          users: [],
+          fulfillmentId,
+          isEditable: false,
+        },
+        em,
+      );
+
+      await this.permissionRepository.insertBulk(
+        {
+          permissions: this.fulfillmentUserPermissions,
+          roleId: partnerUserRoleId,
+        },
+        em,
+      );
     });
+  }
+
+  protected get fulfillmentAdminPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+    return [];
+  }
+
+  protected get fulfillmentUserPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+    return [];
   }
 }

@@ -1,12 +1,13 @@
-import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { AuthModuleErrorCode } from './constants';
 
-import { isPublic, RequestHeader, ResponseHeader } from '@/common';
+import { getPrivateOptions, isPublic, PrivateOptions, RequestHeader, ResponseHeader } from '@/common';
 import { Exception } from '@/core';
+import { UserType } from '@/domain/user/enums';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -45,7 +46,41 @@ export class AuthGuard implements CanActivate {
       response.set(ResponseHeader.RefreshToken, tokens.refreshToken);
     }
 
-    await this.authService.setUserContext(accessTokenResult.id);
+    const user = await this.authService.setUserContext(accessTokenResult.id);
+    const privateOptions = getPrivateOptions(this.reflector, context);
+
+    switch (privateOptions) {
+      case PrivateOptions.SystemAdmin:
+        if (user.type === UserType.SystemAdmin) {
+          return true;
+        }
+
+        throw new ForbiddenException();
+
+      case PrivateOptions.PartnerGroup:
+        if (user.type === UserType.SystemAdmin || !!user.partnerGroup) {
+          return true;
+        }
+
+        throw new ForbiddenException();
+
+      case PrivateOptions.Partner:
+        if (user.type === UserType.SystemAdmin || !!user.partnerGroup || !user.partner) {
+          return true;
+        }
+
+        throw new ForbiddenException();
+
+      case PrivateOptions.Fulfillment:
+        if (user.type === UserType.SystemAdmin || !!user.fulfillment) {
+          return true;
+        }
+
+        throw new ForbiddenException();
+
+      default:
+        break;
+    }
 
     return true;
   }

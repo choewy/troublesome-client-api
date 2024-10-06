@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { InvitationModuleErrorCode } from './constants';
 import { IssueInvitationDTO } from './dtos';
@@ -17,6 +17,10 @@ export class InvitationUseCase {
   ) {}
 
   async issueInvitation(body: IssueInvitationDTO) {
+    if (!body.partnetId && !body.fulfillmentId) {
+      throw new BadRequestException();
+    }
+
     const user = this.contextService.getUser();
 
     if (body.email === user.email) {

@@ -4,7 +4,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestj
 import { CreateFulfillmentDTO, FulfillmentListDTO } from './dtos';
 import { FulfillmentService } from './fulfillment.service';
 
-import { Private } from '@/common';
+import { Private, PrivateOptions } from '@/common';
 
 @Private()
 @ApiTags('풀필먼트 센터')
@@ -19,7 +19,7 @@ export class FulfillmentController {
     return this.fulfillmentService.getList();
   }
 
-  // TODO system admin
+  @Private(PrivateOptions.SystemAdmin)
   @Post()
   @ApiOperation({ summary: '풀필먼트 센터 등록' })
   @ApiCreatedResponse()

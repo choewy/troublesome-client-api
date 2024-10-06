@@ -33,11 +33,7 @@ export class PartnerGroupService {
 
     await this.dataSource.transaction(async (em) => {
       const partnerGroupId = await this.partnerGroupRepository.insert({ name: body.name }, em);
-      const userId = await this.userRepository.insert({ ...body.admin, partnerGroupId });
-
-      console.log(userId);
-
-      // TODO 고객사 그룹 기본 역할 및 권한 생성, 관리자 역할에 userId 추가
+      await this.userRepository.insert({ ...body.admin, partnerGroupId });
     });
   }
 }

@@ -4,10 +4,9 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestj
 import { CreatePartnerGroupDTO, PartnerGroupListDTO } from './dtos';
 import { PartnerGroupService } from './partner-group.service';
 
-import { Private } from '@/common';
+import { Private, PrivateOptions } from '@/common';
 
-// TODO system admin
-@Private()
+@Private(PrivateOptions.SystemAdmin)
 @ApiTags('고객사 그룹')
 @Controller('partner-groups')
 export class PartnerGroupController {
