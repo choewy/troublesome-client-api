@@ -2,18 +2,15 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
 
+import { AuthService } from './auth.service';
+
 import { isPublic, RequestHeader, ResponseHeader } from '@/common';
-import { TokenService } from '@/domain/token/token.service';
-import { UserRepository } from '@/domain/user/user.repository';
-import { ContextService } from '@/global';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly contextService: ContextService,
-    private readonly tokenService: TokenService,
-    private readonly userRepository: UserRepository,
+    private readonly authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,7 +23,7 @@ export class AuthGuard implements CanActivate {
     const response = http.getResponse<Response>();
 
     const accessToken = (request.headers.authorization ?? '').replace('Bearer ', '');
-    const accessTokenResult = this.tokenService.verifyAccessToken(accessToken);
+    const accessTokenResult = this.authService.verifyAccessToken(accessToken);
 
     if (accessTokenResult.error) {
       if (accessTokenResult.expired === false) {
@@ -34,29 +31,19 @@ export class AuthGuard implements CanActivate {
       }
 
       const refreshToken = request.headers[RequestHeader.RefreshToken] as string;
-      const refreshTokenResult = this.tokenService.verifyRefreshToken(refreshToken);
+      const refreshTokenResult = this.authService.verifyRefreshToken(refreshToken);
 
       if (refreshTokenResult.error) {
         throw new UnauthorizedException();
       }
 
-      const tokens = this.tokenService.issueTokens(accessTokenResult.id);
+      const tokens = this.authService.issueTokens(accessTokenResult.id);
 
       response.set(ResponseHeader.AccessToken, tokens.accessToken);
       response.set(ResponseHeader.RefreshToken, tokens.refreshToken);
     }
 
-    const user = await this.userRepository.findById(accessTokenResult.id);
-
-    if (user === null) {
-      throw new UnauthorizedException();
-    }
-
-    if (user.isActivated === false) {
-      throw new UnauthorizedException();
-    }
-
-    this.contextService.setUser(user);
+    await this.authService.setUserContext(accessTokenResult.id);
 
     return true;
   }

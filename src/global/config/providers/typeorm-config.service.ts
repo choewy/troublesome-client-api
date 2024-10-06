@@ -22,7 +22,7 @@ export class TypeOrmConfigService {
       database: this.configService.getOrThrow('DB_DATABASE'),
       namingStrategy: new SnakeNamingStrategy(),
       synchronize: this.appConfigService.isLocal,
-      entities: [`${process.cwd()}/dist/**/entities/*.entity.{ts,js}`],
+      entities: [`${process.cwd()}/dist/domain/**/*.entity.{ts,js}`],
       logging: ['info', 'error', 'warn'],
     };
   }

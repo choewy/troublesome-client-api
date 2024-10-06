@@ -1,18 +1,22 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { hash, verify } from 'argon2';
 import { DataSource } from 'typeorm';
 
 import { LoginDTO, SignUpDTO, TokenMapDTO } from './dtos';
+import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
-import { TokenService } from '@/domain/token/token.service';
 import { UserRepository } from '@/domain/user/user.repository';
+import { ContextService, JwtConfigService } from '@/global';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly dataSource: DataSource,
-    private readonly tokenService: TokenService,
+    private readonly jwtConfigService: JwtConfigService,
+    private readonly jwtService: JwtService,
+    private readonly contextService: ContextService,
     private readonly userRepository: UserRepository,
     private readonly invitationRepository: InvitationRepository,
   ) {}
@@ -30,7 +34,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    return new TokenMapDTO(this.tokenService.issueTokens(user.id));
+    return new TokenMapDTO(this.issueTokens(user.id));
   }
 
   async signUp(body: SignUpDTO) {
@@ -72,6 +76,69 @@ export class AuthService {
       );
     });
 
-    return this.tokenService.issueTokens(userId);
+    return this.issueTokens(userId);
+  }
+
+  protected validateTokenPayload(payload: TokenPayload) {
+    if (typeof payload.id === 'number') {
+      return payload.id;
+    }
+
+    throw new JsonWebTokenError('invalid token');
+  }
+
+  public issueTokens(id: number): TokenMap {
+    return {
+      accessToken: this.jwtService.sign({ id }, this.jwtConfigService.accessTokenSignOptions),
+      refreshToken: this.jwtService.sign({ id }, this.jwtConfigService.refreshTokenSignOptions),
+    };
+  }
+
+  public verifyAccessToken(accessToken: string, error: unknown = null): TokenVerifyResult {
+    const options = this.jwtConfigService.accessTokenVerifyOptions;
+    const expired = error instanceof TokenExpiredError;
+    const result: TokenVerifyResult = { id: -1, error, expired };
+
+    options.ignoreExpiration = expired;
+
+    if (error && error instanceof TokenExpiredError === false) {
+      return result;
+    }
+
+    try {
+      result.id = this.validateTokenPayload(this.jwtService.verify(accessToken, options));
+
+      return result;
+    } catch (e) {
+      return this.verifyAccessToken(accessToken, e);
+    }
+  }
+
+  public verifyRefreshToken(refreshToken: string): TokenVerifyResult {
+    const options = this.jwtConfigService.refreshTokenVerifyOptions;
+    const result: TokenVerifyResult = { id: -1, error: null, expired: false };
+
+    try {
+      result.id = this.validateTokenPayload(this.jwtService.verify(refreshToken, options));
+    } catch (e) {
+      result.error = e;
+      result.expired = e instanceof TokenExpiredError;
+    }
+
+    return result;
+  }
+
+  async setUserContext(userId: number) {
+    const user = await this.userRepository.findById(userId);
+
+    if (user === null) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.isActivated === false) {
+      throw new UnauthorizedException();
+    }
+
+    this.contextService.setUser(user);
   }
 }

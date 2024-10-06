@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { TokenMap } from '@/domain/token/interfaces/token-map.interface';
+import { TokenMap } from '../interfaces';
 
 export class TokenMapDTO {
   @ApiProperty({ type: String, description: 'ACCESS TOKEN' })
