@@ -14,4 +14,12 @@ export class DeliveryCompanyRepository extends EntityRepository<DeliveryCompanyE
   async findList(skip: number, take: number) {
     return this.getRepository().findAndCount({ take, skip });
   }
+
+  async findById(id: number) {
+    return this.getRepository().findOneBy({ id });
+  }
+
+  async findByDefault() {
+    return this.getRepository().findOneBy({ isDefault: true });
+  }
 }

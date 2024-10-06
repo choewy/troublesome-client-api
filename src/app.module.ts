@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { AuthModule } from './application/auth/auth.module';
 import { DeliveryCompanyModule } from './application/delivery-company/delivery-company.module';
+import { FulfillmentModule } from './application/fulfillment/fulfillment.module';
 import { InvitationModule } from './application/invitation/invitation.module';
 import { VersionModule } from './application/version/version.module';
 
@@ -18,6 +19,7 @@ import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from
     AuthModule,
     InvitationModule,
     DeliveryCompanyModule,
+    FulfillmentModule,
   ],
   providers: [SerializeInterceptor, ExceptionFilter, ValidationPipe],
 })

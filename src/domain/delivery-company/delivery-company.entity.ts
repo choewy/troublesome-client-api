@@ -10,6 +10,9 @@ export class DeliveryCompanyEntity {
   @Column({ type: 'varchar', length: 50, comment: '택배사 이름' })
   name: string;
 
+  @Column({ type: 'boolean', nullable: false, default: false, comment: '기본 택배사 자동설정 여부' })
+  isDefault: boolean;
+
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.deliveryCompany, { cascade: ['remove'] })
   @JoinTable()
   deliveryCompanySettings: DeliveryCompanySettingEntity[];

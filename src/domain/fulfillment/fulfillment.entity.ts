@@ -23,6 +23,18 @@ export class FulfillmentEntity {
   @Column({ type: 'varchar', length: 50, comment: '풀필먼트센터 이름' })
   name: string;
 
+  @Column({ type: 'varchar', length: 10, comment: '풀필먼트센터 플랜트 코드' })
+  plantCode: string;
+
+  @Column({ type: 'varchar', length: 6, default: null, comment: '우편번호' })
+  zipCode: string | null;
+
+  @Column({ type: 'varchar', length: 255, default: null, comment: '주소' })
+  address: string | null;
+
+  @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
+  addressDetail: string | null;
+
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   deliveryCompanySettings: DeliveryCompanySettingEntity[];
