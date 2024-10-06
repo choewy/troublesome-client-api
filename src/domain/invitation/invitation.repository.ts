@@ -3,7 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { DateTime } from 'luxon';
 import { DataSource, EntityManager } from 'typeorm';
 
-import { InvitationEntity } from './entities/invitation.entity';
+import { InvitationEntity } from './invitation.entity';
 
 import { EntityRepository } from '@/global';
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
-import { PartnerGroupEntity } from './entities/partner-group.entity';
+import { PartnerGroupEntity } from './partner-group.entity';
 
 import { EntityRepository } from '@/global';
 

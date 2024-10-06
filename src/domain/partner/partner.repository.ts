@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
-import { PartnerEntity } from './entities/partner.entity';
+import { PartnerEntity } from './partner.entity';
 
 import { EntityRepository } from '@/global';
 

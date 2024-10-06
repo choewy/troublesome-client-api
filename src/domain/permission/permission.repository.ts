@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
-import { PermissionEntity } from './entities/permission.entity';
+import { PermissionEntity } from './permission.entity';
 
 import { EntityRepository } from '@/global';
 

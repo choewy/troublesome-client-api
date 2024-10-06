@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { DataSource, EntityManager } from 'typeorm';
 
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './user.entity';
 
 import { EntityRepository } from '@/global';
 
