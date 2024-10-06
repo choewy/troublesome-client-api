@@ -19,6 +19,7 @@ export class FulfillmentController {
     return this.fulfillmentService.getList();
   }
 
+  // TODO system admin
   @Post()
   @ApiOperation({ summary: '풀필먼트 센터 등록' })
   @ApiCreatedResponse()

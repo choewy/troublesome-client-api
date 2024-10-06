@@ -8,12 +8,14 @@ import { Exception } from '@/core';
 import { DeliveryCompanyRepository } from '@/domain/delivery-company/delivery-company.repository';
 import { DeliveryCompanySettingRepository } from '@/domain/delivery-company-setting/delivery-company-setting.repository';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
+import { UserRepository } from '@/domain/user/user.repository';
 
 @Injectable()
 export class FulfillmentService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly fulfillmentRepository: FulfillmentRepository,
+    private readonly userRepository: UserRepository,
     private readonly deliveryCompanyRepository: DeliveryCompanyRepository,
     private readonly deliveryCompanySettingRepository: DeliveryCompanySettingRepository,
   ) {}
@@ -23,6 +25,16 @@ export class FulfillmentService {
   }
 
   async create(body: CreateFulfillmentDTO) {
+    if (body.user.password !== body.user.confirmPassword) {
+      throw new Exception(FulfillmentModuleErrorCode.UserPasswordsMispatch, HttpStatus.BAD_REQUEST);
+    }
+
+    const hasEmail = await this.userRepository.hasEmail(body.user.email);
+
+    if (hasEmail) {
+      throw new Exception(FulfillmentModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
+    }
+
     const deliveryCompany = body.defaultDeliveryCompanyId
       ? await this.deliveryCompanyRepository.findById(body.defaultDeliveryCompanyId)
       : await this.deliveryCompanyRepository.findByDefault();
@@ -51,6 +63,12 @@ export class FulfillmentService {
         },
         em,
       );
+
+      const userId = await this.userRepository.insert({ ...body.user, fulfillmentId });
+
+      console.log(userId);
+
+      // TODO 플랜트 기본 역할 및 권한 생성, 관리자 역할에 userId 추가
     });
   }
 }
