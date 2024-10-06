@@ -1,10 +1,12 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
+import { AuthModuleErrorCode } from './constants';
 
 import { isPublic, RequestHeader, ResponseHeader } from '@/common';
+import { Exception } from '@/core';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,14 +29,14 @@ export class AuthGuard implements CanActivate {
 
     if (accessTokenResult.error) {
       if (accessTokenResult.expired === false) {
-        throw new UnauthorizedException();
+        throw new Exception(AuthModuleErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
       }
 
       const refreshToken = request.headers[RequestHeader.RefreshToken] as string;
       const refreshTokenResult = this.authService.verifyRefreshToken(refreshToken);
 
       if (refreshTokenResult.error) {
-        throw new UnauthorizedException();
+        throw new Exception(AuthModuleErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
       }
 
       const tokens = this.authService.issueTokens(accessTokenResult.id);

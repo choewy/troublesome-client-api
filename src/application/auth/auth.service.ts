@@ -1,11 +1,13 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { hash, verify } from 'argon2';
 import { DataSource } from 'typeorm';
 
+import { AuthModuleErrorCode } from './constants';
 import { LoginDTO, SignUpDTO, TokenMapDTO } from './dtos';
 import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
+import { Exception } from '@/core';
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService, JwtConfigService } from '@/global';
@@ -25,13 +27,17 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(body.email);
 
     if (user === null) {
-      throw new UnauthorizedException();
+      throw new Exception(AuthModuleErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);
     }
 
     const isVerify = await verify(user.password, body.password);
 
     if (isVerify === false) {
-      throw new UnauthorizedException();
+      throw new Exception(AuthModuleErrorCode.LoginFailed, HttpStatus.UNAUTHORIZED);
+    }
+
+    if (user.isActivated === false) {
+      throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
     return new TokenMapDTO(this.issueTokens(user.id));
@@ -41,25 +47,21 @@ export class AuthService {
     const invitation = await this.invitationRepository.findById(body.invitationId);
 
     if (invitation === null) {
-      throw new ForbiddenException();
+      throw new Exception(AuthModuleErrorCode.NotInvited, HttpStatus.FORBIDDEN);
     }
 
-    if (invitation.isCompleted) {
-      throw new ForbiddenException();
-    }
-
-    if (invitation.isExpired) {
-      throw new ForbiddenException();
+    if (invitation.isCompleted || invitation.isExpired) {
+      throw new Exception(AuthModuleErrorCode.InvalidInvitation, HttpStatus.FORBIDDEN);
     }
 
     const hasEmail = await this.userRepository.hasEmail(body.email);
 
     if (hasEmail) {
-      throw new ConflictException();
+      throw new Exception(AuthModuleErrorCode.AlreadyExist, HttpStatus.CONFLICT);
     }
 
     if (body.password !== body.confirmPassword) {
-      throw new BadRequestException();
+      throw new Exception(AuthModuleErrorCode.PasswordsMispatch, HttpStatus.BAD_REQUEST);
     }
 
     const userId = await this.dataSource.transaction(async (em) => {
@@ -132,11 +134,11 @@ export class AuthService {
     const user = await this.userRepository.findById(userId);
 
     if (user === null) {
-      throw new UnauthorizedException();
+      throw new Exception(AuthModuleErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
     }
 
     if (user.isActivated === false) {
-      throw new UnauthorizedException();
+      throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
     this.contextService.setUser(user);
