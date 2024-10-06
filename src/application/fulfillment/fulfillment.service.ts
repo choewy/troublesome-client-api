@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
+import { FulfillmentModuleErrorCode } from './constants';
 import { CreateFulfillmentDTO, FulfillmentListDTO } from './dtos';
 
+import { Exception } from '@/core';
 import { DeliveryCompanyRepository } from '@/domain/delivery-company/delivery-company.repository';
 import { DeliveryCompanySettingRepository } from '@/domain/delivery-company-setting/delivery-company-setting.repository';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
@@ -26,7 +28,7 @@ export class FulfillmentService {
       : await this.deliveryCompanyRepository.findByDefault();
 
     if (deliveryCompany === null) {
-      throw new NotFoundException();
+      throw new Exception(FulfillmentModuleErrorCode.NotFoundDefaultDeliveryCompany, HttpStatus.NOT_FOUND);
     }
 
     await this.dataSource.transaction(async (em) => {
