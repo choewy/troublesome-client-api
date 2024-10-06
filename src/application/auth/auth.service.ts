@@ -46,7 +46,7 @@ export class AuthService {
   async signUp(body: SignUpDTO) {
     const invitation = await this.invitationRepository.findById(body.invitationId);
 
-    if (invitation === null) {
+    if (invitation === null || invitation.email !== body.email) {
       throw new Exception(AuthModuleErrorCode.NotInvited, HttpStatus.FORBIDDEN);
     }
 
@@ -66,6 +66,8 @@ export class AuthService {
 
     const userId = await this.dataSource.transaction(async (em) => {
       await this.invitationRepository.update(invitation.id, { completedAt: new Date() }, em);
+
+      // TODO fulfillmentId, partnerId 변경
       return this.userRepository.insert(
         {
           email: body.email,
@@ -142,5 +144,7 @@ export class AuthService {
     }
 
     this.contextService.setUser(user);
+
+    return user;
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 
 import { UserEntity } from './user.entity';
 
@@ -40,5 +40,12 @@ export class UserRepository extends EntityRepository<UserEntity> {
     await this.getRepository(em).insert(user);
 
     return user.id;
+  }
+
+  async save(args: DeepPartial<UserEntity>, em?: EntityManager) {
+    const userRepository = this.getRepository(em);
+    const user = await userRepository.save(userRepository.create(args));
+
+    return user;
   }
 }

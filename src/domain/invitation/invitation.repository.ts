@@ -24,6 +24,7 @@ export class InvitationRepository extends EntityRepository<InvitationEntity> {
     await this.getRepository(em).update(id, args);
   }
 
+  // TODO user, fulfillmentId, partnerId 분리
   async insert(args: Pick<InvitationEntity, 'email' | 'user'>) {
     const invitation = plainToInstance(InvitationEntity, { ...args, expiredAt: DateTime.local().plus({ minutes: 5 }).toJSDate() });
     await this.getRepository().insert(invitation);

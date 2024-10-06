@@ -2,16 +2,17 @@ import { applyDecorators, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ApiBearerAuth, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 
-import { RequestHeader, ResponseHeader, SetMetadataKey } from '../constants';
+import { PrivateOptions, RequestHeader, ResponseHeader, SetMetadataKey } from '../constants';
 
 export const Public = () => SetMetadata(SetMetadataKey.AccessModifier, true);
 
 export const isPublic = (reflector: Reflector, context: ExecutionContext) =>
   reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === true;
 
-export const Private = () =>
+export const Private = (options?: PrivateOptions) =>
   applyDecorators(
     SetMetadata(SetMetadataKey.AccessModifier, false),
+    SetMetadata(SetMetadataKey.AccessModifierOptions, options ?? null),
     ApiBearerAuth(RequestHeader.AccessToken),
     ApiSecurity(RequestHeader.RefreshToken),
     ApiResponse({
@@ -25,3 +26,6 @@ export const Private = () =>
 
 export const isPrivate = (reflector: Reflector, context: ExecutionContext) =>
   reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === false;
+
+export const getPrivateOptions = (reflector: Reflector, context: ExecutionContext): PrivateOptions | null =>
+  reflector.getAllAndOverride(SetMetadataKey.AccessModifierOptions, [context.getClass(), context.getHandler()]);
