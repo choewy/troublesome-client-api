@@ -16,7 +16,7 @@ export class InvitationController {
   @Private(PermissionTarget.InvitationCreate)
   @ApiOperation({ summary: '회원가입 초대 이메일 발송' })
   @ApiCreatedResponse()
-  async issueInvitation(@Body() body: IssueInvitationDTO) {
-    return this.invitationUseCase.issueInvitation(body);
+  async create(@Body() body: IssueInvitationDTO) {
+    return this.invitationUseCase.create(body);
   }
 }

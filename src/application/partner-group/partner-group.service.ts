@@ -16,7 +16,7 @@ export class PartnerGroupService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async getList() {
+  async list() {
     return new PartnerGroupListDTO(await this.partnerGroupRepository.findList(0, 1000));
   }
 

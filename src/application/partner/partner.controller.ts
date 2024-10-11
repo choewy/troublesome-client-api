@@ -16,8 +16,8 @@ export class PartnerController {
   @Private(PermissionTarget.PartnerRead)
   @ApiOperation({ summary: '고객사 목록 조회' })
   @ApiOkResponse({ type: PartnerListDTO })
-  async getList() {
-    return this.partnerService.getList();
+  async list() {
+    return this.partnerService.list();
   }
 
   @Post()

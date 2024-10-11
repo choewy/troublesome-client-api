@@ -16,7 +16,7 @@ export class InvitationUseCase {
     private readonly invitationRepository: InvitationRepository,
   ) {}
 
-  async issueInvitation(body: IssueInvitationDTO) {
+  async create(body: IssueInvitationDTO) {
     if (!body.partnetId && !body.fulfillmentId) {
       throw new BadRequestException();
     }

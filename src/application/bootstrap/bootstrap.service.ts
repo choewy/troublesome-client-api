@@ -5,7 +5,6 @@ import { DataSource } from 'typeorm';
 import { PermissionTarget } from '@/domain/permission/enums';
 import { PermissionRepository } from '@/domain/permission/permission.repository';
 import { RoleRepository } from '@/domain/role/role.repository';
-import { UserType } from '@/domain/user/enums';
 import { UserRepository } from '@/domain/user/user.repository';
 import { InitializerConfigService } from '@/global';
 
@@ -54,7 +53,6 @@ export class BootstrapService implements OnModuleInit {
     const systemAdmin = this.initializerConfigService.systemAdmin;
     return this.userRepository.getRepository().create({
       id: 1,
-      type: UserType.SystemAdmin,
       name: '시스템 관리자',
       email: systemAdmin.email,
       password: systemAdmin.password,
