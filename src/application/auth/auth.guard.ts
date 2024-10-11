@@ -49,7 +49,7 @@ export class AuthGuard implements CanActivate {
       response.set(ResponseHeader.RefreshToken, tokens.refreshToken);
     }
 
-    await this.authService.setUserContext(accessTokenResult.payload.id);
+    await this.authService.setUserContext(accessTokenResult.payload);
 
     return true;
   }

@@ -4,11 +4,14 @@ import { hash, verify } from 'argon2';
 import { DataSource } from 'typeorm';
 
 import { AuthModuleErrorCode } from './constants';
-import { LoginDTO, SignUpDTO, TokenMapDTO } from './dtos';
+import { LoginDTO, ConversionDTO, SignUpDTO, TokenMapDTO } from './dtos';
 import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
 import { Exception } from '@/core';
+import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
+import { PartnerRepository } from '@/domain/partner/partner.repository';
+import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService, JwtConfigService } from '@/global';
 
@@ -20,6 +23,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly contextService: ContextService,
     private readonly userRepository: UserRepository,
+    private readonly partnerRepository: PartnerRepository,
+    private readonly fulfillmentRepository: FulfillmentRepository,
     private readonly invitationRepository: InvitationRepository,
   ) {}
 
@@ -132,8 +137,8 @@ export class AuthService {
     return result;
   }
 
-  async setUserContext(userId: number) {
-    const user = await this.userRepository.findById(userId);
+  async setUserContext(payload: TokenPayload) {
+    const user = await this.userRepository.findById(payload.id);
 
     if (user === null) {
       throw new Exception(AuthModuleErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
@@ -143,8 +148,36 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
-    this.contextService.setUser(user);
+    if (user.partner === null && user.fulfillment === null) {
+      if (payload.partnerId) {
+        user.partner = await this.partnerRepository.findById(payload.partnerId);
+      }
+
+      if (payload.fulfillmentId) {
+        user.fulfillment = await this.fulfillmentRepository.findById(payload.fulfillmentId);
+      }
+    }
+
+    this.contextService.setUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      fulfillment: user.fulfillment,
+      fulfillmentId: user.fulfillmentId,
+      partner: user.partner,
+      partnerId: user.partnerId,
+    });
 
     return user;
+  }
+
+  async conversion(body: ConversionDTO) {
+    const user = this.contextService.getUser<UserEntity>();
+
+    user.partnerId = body.partnerId ?? null;
+    user.fulfillmentId = body.fulfillmentId ?? null;
+
+    return this.issueTokens(user);
   }
 }

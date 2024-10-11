@@ -16,6 +16,10 @@ export class PartnerRepository extends EntityRepository<PartnerEntity> {
     return this.getRepository().findAndCount({ skip, take });
   }
 
+  async findById(id: number) {
+    return this.getRepository().findOne({ where: { id } });
+  }
+
   async insert(args: Pick<PartnerEntity, 'name' | 'partnerGroupId'>, em?: EntityManager) {
     const partner = plainToInstance(PartnerEntity, args);
     await this.getRepository(em).insert(partner);

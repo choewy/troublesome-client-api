@@ -5,13 +5,15 @@ import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
+import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
+import { PartnerRepository } from '@/domain/partner/partner.repository';
 import { UserRepository } from '@/domain/user/user.repository';
 
 @Module({
   imports: [JwtModule],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard, UserRepository, InvitationRepository],
+  providers: [AuthService, AuthGuard, UserRepository, PartnerRepository, FulfillmentRepository, InvitationRepository],
   exports: [AuthGuard],
 })
 export class AuthModule {}
