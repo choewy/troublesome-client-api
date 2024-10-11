@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CreateFulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from './dtos';
 import { FulfillmentService } from './fulfillment.service';
@@ -29,8 +29,16 @@ export class FulfillmentController {
   @Patch(':id(\\d+)')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '풀필먼트 센터 수정' })
-  @ApiCreatedResponse()
+  @ApiNoContentResponse()
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateFulfillmentDTO) {
     return this.fulfillmentService.update(id, body);
+  }
+
+  @Delete(':id(\\d+)')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '풀필먼트 센터 삭제' })
+  @ApiNoContentResponse()
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.fulfillmentService.delete(id);
   }
 }

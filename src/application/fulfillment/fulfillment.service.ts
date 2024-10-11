@@ -118,4 +118,14 @@ export class FulfillmentService {
       addressDetail: toUndefined(toNull(body.addressDetail)),
     });
   }
+
+  async delete(id: number) {
+    const hasFulfillment = await this.fulfillmentRepository.hasById(id);
+
+    if (hasFulfillment === false) {
+      throw new Exception(FulfillmentModuleErrorCode.NotFoundFulfillment, HttpStatus.NOT_FOUND);
+    }
+
+    await this.fulfillmentRepository.getRepository().softDelete(id);
+  }
 }
