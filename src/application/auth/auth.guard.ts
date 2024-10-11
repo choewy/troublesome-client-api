@@ -39,13 +39,17 @@ export class AuthGuard implements CanActivate {
         throw new Exception(AuthModuleErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
       }
 
-      const tokens = this.authService.issueTokens(accessTokenResult.id);
+      if (accessTokenResult.payload.id !== refreshTokenResult.payload.id) {
+        throw new Exception(AuthModuleErrorCode.InvalidToken, HttpStatus.UNAUTHORIZED);
+      }
+
+      const tokens = this.authService.issueTokens(accessTokenResult.payload);
 
       response.set(ResponseHeader.AccessToken, tokens.accessToken);
       response.set(ResponseHeader.RefreshToken, tokens.refreshToken);
     }
 
-    await this.authService.setUserContext(accessTokenResult.id);
+    await this.authService.setUserContext(accessTokenResult.payload.id);
 
     return true;
   }

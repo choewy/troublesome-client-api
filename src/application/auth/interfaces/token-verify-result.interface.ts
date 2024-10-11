@@ -1,5 +1,7 @@
+import { TokenPayload } from './token-payload.interface';
+
 export interface TokenVerifyResult {
-  id: number | null;
+  payload: TokenPayload | null;
   error: unknown;
   expired: boolean;
 }

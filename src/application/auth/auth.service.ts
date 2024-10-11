@@ -40,7 +40,7 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
-    return new TokenMapDTO(this.issueTokens(user.id));
+    return new TokenMapDTO(this.issueTokens(user));
   }
 
   async signUp(body: SignUpDTO) {
@@ -64,44 +64,44 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.PasswordsMispatch, HttpStatus.BAD_REQUEST);
     }
 
-    const userId = await this.dataSource.transaction(async (em) => {
+    const user = await this.dataSource.transaction(async (em) => {
       await this.invitationRepository.update(invitation.id, { completedAt: new Date() }, em);
+      const userRepository = this.userRepository.getRepository(em);
+      const user = userRepository.create({
+        email: body.email,
+        name: body.name,
+        password: await hash(body.password),
+        partnerId: invitation?.user?.partner?.id,
+        fulfillmentId: invitation?.user?.fulfillment?.id,
+      });
 
-      // TODO fulfillmentId, partnerId 변경
-      return this.userRepository.insert(
-        {
-          email: body.email,
-          name: body.name,
-          password: await hash(body.password),
-          partnerId: invitation?.user?.partner?.id,
-          fulfillmentId: invitation?.user?.fulfillment?.id,
-        },
-        em,
-      );
+      await userRepository.insert(user);
+
+      return user;
     });
 
-    return this.issueTokens(userId);
+    return this.issueTokens(user);
   }
 
   protected validateTokenPayload(payload: TokenPayload) {
     if (typeof payload.id === 'number') {
-      return payload.id;
+      return payload;
     }
 
     throw new JsonWebTokenError('invalid token');
   }
 
-  public issueTokens(id: number): TokenMap {
+  public issueTokens(payload: TokenPayload): TokenMap {
     return {
-      accessToken: this.jwtService.sign({ id }, this.jwtConfigService.accessTokenSignOptions),
-      refreshToken: this.jwtService.sign({ id }, this.jwtConfigService.refreshTokenSignOptions),
+      accessToken: this.jwtService.sign(payload, this.jwtConfigService.accessTokenSignOptions),
+      refreshToken: this.jwtService.sign({ id: payload.id }, this.jwtConfigService.refreshTokenSignOptions),
     };
   }
 
   public verifyAccessToken(accessToken: string, error: unknown = null): TokenVerifyResult {
     const options = this.jwtConfigService.accessTokenVerifyOptions;
     const expired = error instanceof TokenExpiredError;
-    const result: TokenVerifyResult = { id: -1, error, expired };
+    const result: TokenVerifyResult = { payload: null, error, expired };
 
     options.ignoreExpiration = expired;
 
@@ -110,7 +110,7 @@ export class AuthService {
     }
 
     try {
-      result.id = this.validateTokenPayload(this.jwtService.verify(accessToken, options));
+      result.payload = this.validateTokenPayload(this.jwtService.verify(accessToken, options));
 
       return result;
     } catch (e) {
@@ -120,10 +120,10 @@ export class AuthService {
 
   public verifyRefreshToken(refreshToken: string): TokenVerifyResult {
     const options = this.jwtConfigService.refreshTokenVerifyOptions;
-    const result: TokenVerifyResult = { id: -1, error: null, expired: false };
+    const result: TokenVerifyResult = { payload: null, error: null, expired: false };
 
     try {
-      result.id = this.validateTokenPayload(this.jwtService.verify(refreshToken, options));
+      result.payload = this.validateTokenPayload(this.jwtService.verify(refreshToken, options));
     } catch (e) {
       result.error = e;
       result.expired = e instanceof TokenExpiredError;

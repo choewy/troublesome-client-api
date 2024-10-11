@@ -29,7 +29,15 @@ export class UserRepository extends EntityRepository<UserEntity> {
   }
 
   async findByEmail(email: string) {
-    return this.getRepository().findOneBy({ email });
+    return this.getRepository().findOne({
+      relations: {
+        partnerGroup: { partners: true },
+        partner: true,
+        fulfillment: true,
+        role: { permissions: true },
+      },
+      where: { email },
+    });
   }
 
   async hasEmail(email: string) {
