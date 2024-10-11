@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 
 import { FulfillmentEntity } from './fulfillment.entity';
 
@@ -10,6 +10,10 @@ import { EntityRepository } from '@/global';
 export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
   constructor(dataSource: DataSource) {
     super(dataSource, FulfillmentEntity);
+  }
+
+  async hasByPlantCode(plantCode: string) {
+    return (await this.getRepository().countBy({ plantCode })) > 0;
   }
 
   async findList(skip: number, take: number) {
@@ -42,5 +46,9 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
     await this.getRepository(em).insert(fulfillment);
 
     return fulfillment.id;
+  }
+
+  async save(args: DeepPartial<FulfillmentEntity>, em?: EntityManager) {
+    return this.getRepository(em).save(args);
   }
 }

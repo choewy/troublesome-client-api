@@ -7,6 +7,7 @@ import { FulfillmentModule } from './application/fulfillment/fulfillment.module'
 import { InvitationModule } from './application/invitation/invitation.module';
 import { PartnerModule } from './application/partner/partner.module';
 import { PartnerGroupModule } from './application/partner-group/partner-group.module';
+import { PermissionModule } from './application/permission/permission.module';
 import { VersionModule } from './application/version/version.module';
 
 import { SerializeInterceptor, ValidationPipe, ExceptionFilter } from '@/core';
@@ -20,6 +21,7 @@ import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from
     DatabaseModule,
     VersionModule,
     BootstrapModule,
+    PermissionModule,
     AuthModule,
     InvitationModule,
     DeliveryCompanyModule,

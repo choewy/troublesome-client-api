@@ -25,7 +25,7 @@ export class RoleEntity {
   @Column({ type: 'varchar', length: 50, comment: '역할 이름' })
   name: string;
 
-  @Column({ type: 'boolean', default: true, comment: '역할 변경 여부' })
+  @Column({ type: 'boolean', default: true, comment: '역할 변경 가능 여부' })
   isEditable: boolean;
 
   @Column({ type: 'int', unsigned: true, nullable: true })

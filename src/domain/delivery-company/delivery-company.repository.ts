@@ -11,6 +11,10 @@ export class DeliveryCompanyRepository extends EntityRepository<DeliveryCompanyE
     super(dataSource, DeliveryCompanyEntity);
   }
 
+  async hasById(id: number) {
+    return (await this.getRepository().countBy({ id })) > 0;
+  }
+
   async findList(skip: number, take: number) {
     return this.getRepository().findAndCount({ take, skip });
   }

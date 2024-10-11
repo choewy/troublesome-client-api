@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -14,7 +15,9 @@ import { DeliveryCompanySettingEntity } from '@/domain/delivery-company-setting/
 import { LocationEntity } from '@/domain/location/location.entity';
 import { RoleEntity } from '@/domain/role/role.entity';
 import { UserEntity } from '@/domain/user/user.entity';
+import { createIndexConstraintName } from '@/global';
 
+@Index(createIndexConstraintName('fulfillment', 'plant_code'), ['plantCode'])
 @Entity({ name: 'fulfillment', comment: '풀필먼트센터' })
 export class FulfillmentEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '풀필먼트센터 PK' })

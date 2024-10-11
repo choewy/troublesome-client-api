@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CreateFulfillmentDTO, FulfillmentListDTO } from './dtos';
@@ -25,5 +25,14 @@ export class FulfillmentController {
   @ApiCreatedResponse()
   async create(@Body() body: CreateFulfillmentDTO) {
     return this.fulfillmentService.create(body);
+  }
+
+  @Private(PrivateOptions.SystemAdmin)
+  @Patch(':id(\\d+)')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '풀필먼트 센터 수정' })
+  @ApiCreatedResponse()
+  async update() {
+    return;
   }
 }
