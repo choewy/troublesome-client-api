@@ -7,11 +7,11 @@ export abstract class EntityRepository<T> {
     protected readonly EntityType: Type<T>,
   ) {}
 
-  protected getRepository(em?: EntityManager) {
+  public getRepository(em?: EntityManager) {
     return em instanceof EntityManager ? em.getRepository(this.EntityType) : this.dataSource.getRepository(this.EntityType);
   }
 
-  protected pickRepository<T>(EntityType: Type<T>, em?: EntityManager) {
+  public pickRepository<T>(EntityType: Type<T>, em?: EntityManager) {
     return em instanceof EntityManager ? em.getRepository(EntityType) : this.dataSource.getRepository(EntityType);
   }
 }

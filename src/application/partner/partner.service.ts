@@ -81,11 +81,11 @@ export class PartnerService {
     });
   }
 
-  protected get partnerAdminPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+  protected get partnerAdminPermissions(): Pick<PermissionEntity, 'target'>[] {
     return [];
   }
 
-  protected get partnerUserPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+  protected get partnerUserPermissions(): Pick<PermissionEntity, 'target'>[] {
     return [];
   }
 }

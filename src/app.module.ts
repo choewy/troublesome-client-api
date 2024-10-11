@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { AuthModule } from './application/auth/auth.module';
+import { BootstrapModule } from './application/bootstrap/bootstrap.module';
 import { DeliveryCompanyModule } from './application/delivery-company/delivery-company.module';
 import { FulfillmentModule } from './application/fulfillment/fulfillment.module';
 import { InvitationModule } from './application/invitation/invitation.module';
@@ -18,6 +19,7 @@ import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from
     LoggerModule,
     DatabaseModule,
     VersionModule,
+    BootstrapModule,
     AuthModule,
     InvitationModule,
     DeliveryCompanyModule,

@@ -9,7 +9,9 @@ export enum PrivateOptions {
   SystemAdmin = '__SYSTEM_ADMIN__',
   PartnerGroup = '__PARTNER_GROUP__',
   Partner = '__PARTNER__',
+  PartnerAdmin = '__PARTNER_ADMIN__',
   Fulfillment = '__FULFILLMENT__',
+  FulfillmentAdmin = '__FULFILLMENT_ADMIN__',
 }
 
 export enum RequestHeader {

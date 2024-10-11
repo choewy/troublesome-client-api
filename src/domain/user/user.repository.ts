@@ -12,6 +12,10 @@ export class UserRepository extends EntityRepository<UserEntity> {
     super(dataSource, UserEntity);
   }
 
+  async hasById(id: number) {
+    return (await this.getRepository().countBy({ id })) > 0;
+  }
+
   async findById(id: number) {
     return this.getRepository().findOne({
       relations: {

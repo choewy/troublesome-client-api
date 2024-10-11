@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { PermissionLevel, PermissionTarget } from './enums';
+import { PermissionTarget } from './enums';
 
 import { RoleEntity } from '@/domain/role/role.entity';
 import { createForeignKeyConstraintName } from '@/global';
@@ -21,9 +21,6 @@ export class PermissionEntity {
 
   @Column({ type: 'varchar', length: 30, comment: '권한 대상' })
   target: PermissionTarget;
-
-  @Column({ type: 'tinyint', unsigned: true, comment: '권한 수준' })
-  level: PermissionLevel;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   roleId: number;

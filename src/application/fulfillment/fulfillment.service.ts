@@ -119,11 +119,11 @@ export class FulfillmentService {
     });
   }
 
-  protected get fulfillmentAdminPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+  protected get fulfillmentAdminPermissions(): Pick<PermissionEntity, 'target'>[] {
     return [];
   }
 
-  protected get fulfillmentUserPermissions(): Pick<PermissionEntity, 'target' | 'level'>[] {
+  protected get fulfillmentUserPermissions(): Pick<PermissionEntity, 'target'>[] {
     return [];
   }
 }

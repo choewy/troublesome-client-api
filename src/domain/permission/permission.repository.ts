@@ -12,10 +12,7 @@ export class PermissionRepository extends EntityRepository<PermissionEntity> {
     super(dataSource, PermissionEntity);
   }
 
-  async insertBulk(
-    args: { permissions: Pick<PermissionEntity, 'target' | 'level'>[] } & Pick<PermissionEntity, 'roleId'>,
-    em?: EntityManager,
-  ) {
+  async insertBulk(args: { permissions: Pick<PermissionEntity, 'target'>[] } & Pick<PermissionEntity, 'roleId'>, em?: EntityManager) {
     const permissionArgs = args.permissions.map((permission) => ({ ...permission, roleId: args.roleId }));
     const permissions = plainToInstance(PermissionEntity, permissionArgs);
     await this.getRepository(em).insert(permissions);
