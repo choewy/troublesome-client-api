@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,14 +11,19 @@ import {
 } from 'typeorm';
 
 import { DeliveryCompanySettingEntity } from '@/domain/delivery-company-setting/delivery-company-setting.entity';
+import { createIndexConstraintName } from '@/global';
 
+@Index(createIndexConstraintName('delivery_company', 'alias'), ['alias'])
 @Entity({ name: 'delivery_company', comment: '택배사' })
 export class DeliveryCompanyEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '택배사 PK' })
   readonly id: number;
 
-  @Column({ type: 'varchar', length: 50, comment: '택배사 이름' })
+  @Column({ type: 'varchar', length: 20, comment: '택배사 이름' })
   name: string;
+
+  @Column({ type: 'varchar', length: 20, comment: '택배사 별칭' })
+  alias: string;
 
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.deliveryCompany, { cascade: ['remove'] })
   @JoinTable()

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 
 import { DeliveryCompanyEntity } from './delivery-company.entity';
 
@@ -13,6 +13,12 @@ export class DeliveryCompanyRepository extends EntityRepository<DeliveryCompanyE
 
   async hasById(id: number) {
     return (await this.getRepository().countBy({ id })) > 0;
+  }
+
+  async hasByAlias(alias: string, omitId?: number) {
+    const id = omitId ? Not(omitId) : undefined;
+
+    return (await this.getRepository().countBy({ alias, id })) > 0;
   }
 
   async findList(skip: number, take: number) {

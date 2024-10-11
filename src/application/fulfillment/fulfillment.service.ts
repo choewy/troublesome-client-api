@@ -121,8 +121,8 @@ export class FulfillmentService {
     }
 
     await this.fulfillmentRepository.update(id, {
-      name: body.name ?? undefined,
-      plantCode: body.plantCode ?? undefined,
+      name: toUndefined(body.name),
+      plantCode: toUndefined(body.plantCode),
       zipCode: toUndefined(toNull(body.zipCode)),
       address: toUndefined(toNull(body.address)),
       addressDetail: toUndefined(toNull(body.addressDetail)),
