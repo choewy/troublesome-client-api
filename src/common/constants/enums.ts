@@ -1,17 +1,8 @@
 export enum SetMetadataKey {
   AccessModifier = '__ACCESS_MODIFIER__',
-  AccessModifierOptions = '__ACCESS_MODIFIER_OPTIONS__',
+  PermissionTarget = '__PERMISSION_TARGET__',
   Privilige = '__PRIVILIGE__',
   UserType = '__USER_TYPE__',
-}
-
-export enum PrivateOptions {
-  SystemAdmin = '__SYSTEM_ADMIN__',
-  PartnerGroup = '__PARTNER_GROUP__',
-  Partner = '__PARTNER__',
-  PartnerAdmin = '__PARTNER_ADMIN__',
-  Fulfillment = '__FULFILLMENT__',
-  FulfillmentAdmin = '__FULFILLMENT_ADMIN__',
 }
 
 export enum RequestHeader {

@@ -5,14 +5,15 @@ import { DeliveryCompanyService } from './delivery-company.service';
 import { CreateDeliveryCompanyDTO, DeliveryCompanyListDTO } from './dtos';
 
 import { Private } from '@/common';
+import { PermissionTarget } from '@/domain/permission/enums';
 
-@Private()
 @ApiTags('택배사')
 @Controller('delivery-companies')
 export class DeliveryCompanyController {
   constructor(private readonly deliveryCompanyService: DeliveryCompanyService) {}
 
   @Get()
+  @Private(PermissionTarget.DeliveryCompanyRead)
   @ApiOperation({ summary: '택배사 목록 조회' })
   @ApiOkResponse({ type: DeliveryCompanyListDTO })
   async list() {
@@ -20,6 +21,7 @@ export class DeliveryCompanyController {
   }
 
   @Post()
+  @Private(PermissionTarget.Admin)
   @ApiOperation({ summary: '택배사 정보 등록' })
   @ApiCreatedResponse()
   async create(@Body() body: CreateDeliveryCompanyDTO) {
@@ -27,6 +29,7 @@ export class DeliveryCompanyController {
   }
 
   @Patch(':id(\\d+)')
+  @Private(PermissionTarget.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '택배사 정보 수정' })
   @ApiNoContentResponse()
@@ -35,6 +38,7 @@ export class DeliveryCompanyController {
   }
 
   @Delete(':id(\\d+)')
+  @Private(PermissionTarget.Admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '택배사 정보 삭제' })
   @ApiNoContentResponse()

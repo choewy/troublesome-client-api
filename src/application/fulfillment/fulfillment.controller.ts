@@ -5,14 +5,15 @@ import { CreateFulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from '
 import { FulfillmentService } from './fulfillment.service';
 
 import { Private } from '@/common';
+import { PermissionTarget } from '@/domain/permission/enums';
 
-@Private()
 @ApiTags('풀필먼트 센터')
 @Controller('fulfillments')
 export class FulfillmentController {
   constructor(private readonly fulfillmentService: FulfillmentService) {}
 
   @Get()
+  @Private(PermissionTarget.FulfillmentRead)
   @ApiOperation({ summary: '풀필먼트 센터 목록 조회' })
   @ApiOkResponse({ type: FulfillmentListDTO })
   async list() {
@@ -20,6 +21,7 @@ export class FulfillmentController {
   }
 
   @Get(':id(\\d+)')
+  @Private(PermissionTarget.FulfillmentRead)
   @ApiOperation({ summary: '풀필먼트 센터 단일 조회' })
   @ApiOkResponse({})
   async detail(@Param('id', ParseIntPipe) id: number) {
@@ -27,6 +29,7 @@ export class FulfillmentController {
   }
 
   @Post()
+  @Private(PermissionTarget.FulfillmentCreate)
   @ApiOperation({ summary: '풀필먼트 센터 등록' })
   @ApiCreatedResponse()
   async create(@Body() body: CreateFulfillmentDTO) {
@@ -34,6 +37,7 @@ export class FulfillmentController {
   }
 
   @Patch(':id(\\d+)')
+  @Private(PermissionTarget.FulfillmentUpdate)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '풀필먼트 센터 수정' })
   @ApiNoContentResponse()
@@ -42,6 +46,7 @@ export class FulfillmentController {
   }
 
   @Delete(':id(\\d+)')
+  @Private(PermissionTarget.FulfillmentDelete)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '풀필먼트 센터 삭제' })
   @ApiNoContentResponse()

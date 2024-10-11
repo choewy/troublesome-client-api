@@ -2,17 +2,19 @@ import { applyDecorators, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ApiBearerAuth, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 
-import { PrivateOptions, RequestHeader, ResponseHeader, SetMetadataKey } from '../constants';
+import { RequestHeader, ResponseHeader, SetMetadataKey } from '../constants';
 
-export const Public = () => SetMetadata(SetMetadataKey.AccessModifier, true);
+import { PermissionTarget } from '@/domain/permission/enums';
+
+export const Public = () => applyDecorators(SetMetadata(SetMetadataKey.AccessModifier, true));
 
 export const isPublic = (reflector: Reflector, context: ExecutionContext) =>
   reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === true;
 
-export const Private = (options?: PrivateOptions) =>
+export const Private = (target?: PermissionTarget) =>
   applyDecorators(
     SetMetadata(SetMetadataKey.AccessModifier, false),
-    SetMetadata(SetMetadataKey.AccessModifierOptions, options ?? null),
+    SetMetadata(SetMetadataKey.PermissionTarget, target ?? null),
     ApiBearerAuth(RequestHeader.AccessToken),
     ApiSecurity(RequestHeader.RefreshToken),
     ApiResponse({
@@ -24,8 +26,8 @@ export const Private = (options?: PrivateOptions) =>
     }),
   );
 
-export const isPrivate = (reflector: Reflector, context: ExecutionContext) =>
+export const isPrivate = (reflector: Reflector, context: ExecutionContext): boolean =>
   reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === false;
 
-export const getPrivateOptions = (reflector: Reflector, context: ExecutionContext): PrivateOptions | null =>
-  reflector.getAllAndOverride(SetMetadataKey.AccessModifierOptions, [context.getClass(), context.getHandler()]);
+export const getPermissionTarget = (reflector: Reflector, context: ExecutionContext): PermissionTarget | null =>
+  reflector.getAllAndOverride(SetMetadataKey.PermissionTarget, [context.getClass(), context.getHandler()]) ?? null;

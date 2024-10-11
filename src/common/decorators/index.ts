@@ -1,1 +1,1 @@
-export * from './access-modifier-metadata.decorators';
+export * from './set-metadata.decorators';

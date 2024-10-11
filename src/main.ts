@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { AppModule } from './app.module';
 import { AuthGuard } from './application/auth/auth.guard';
+import { PermissionGuard } from './application/permission/permission.guard';
 
 import { ExceptionFilter, SerializeInterceptor, ValidationPipe } from '@/core';
 import { Swagger, SwaggerDocumentOptions } from '@/document';
@@ -36,7 +37,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(app.get(SerializeInterceptor), app.get(ContextInterceptor));
   app.useGlobalPipes(app.get(ValidationPipe));
   app.useGlobalFilters(app.get(ExceptionFilter));
-  app.useGlobalGuards(app.get(AuthGuard));
+  app.useGlobalGuards(app.get(AuthGuard), app.get(PermissionGuard));
 
   await app.listen(appConfigService.port, appConfigService.host);
 }

@@ -4,23 +4,24 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestj
 import { CreatePartnerDTO, PartnerListDTO } from './dtos';
 import { PartnerService } from './partner.service';
 
-import { Private, PrivateOptions } from '@/common';
+import { Private } from '@/common';
+import { PermissionTarget } from '@/domain/permission/enums';
 
-@Private()
 @ApiTags('고객사')
 @Controller('partners')
 export class PartnerController {
   constructor(private readonly partnerService: PartnerService) {}
 
   @Get()
+  @Private(PermissionTarget.PartnerRead)
   @ApiOperation({ summary: '고객사 목록 조회' })
   @ApiOkResponse({ type: PartnerListDTO })
   async getList() {
     return this.partnerService.getList();
   }
 
-  @Private(PrivateOptions.PartnerGroup)
   @Post()
+  @Private(PermissionTarget.PartnerCreate)
   @ApiOperation({ summary: '고객사 등록' })
   @ApiCreatedResponse()
   async create(@Body() body: CreatePartnerDTO) {
