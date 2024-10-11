@@ -44,6 +44,27 @@ export class Swagger {
       RequestHeader.RefreshToken,
     );
 
-    SwaggerModule.setup('api-docs', app, SwaggerModule.createDocument(app, builder.build()));
+    SwaggerModule.setup('api-docs', app, SwaggerModule.createDocument(app, builder.build()), {
+      swaggerOptions: {
+        docExpansion: 'none',
+        authAction: {
+          [RequestHeader.AccessToken]: {
+            schema: {
+              type: 'http',
+              in: 'header',
+              schema: 'bearer',
+            },
+            value: options.authOption?.accessToken,
+          },
+          [RequestHeader.RefreshToken]: {
+            schema: {
+              type: 'apiKey',
+              in: 'header',
+            },
+            value: options.authOption?.refreshToken,
+          },
+        },
+      },
+    });
   }
 }

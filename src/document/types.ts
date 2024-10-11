@@ -9,4 +9,8 @@ export type SwaggerDocumentOptions = {
     description?: string;
     variables?: Record<string, ServerVariableObject>;
   };
+  authOption?: {
+    accessToken?: string;
+    refreshToken?: string;
+  };
 };
