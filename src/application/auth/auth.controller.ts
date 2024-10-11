@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { LoginDTO, ConversionDTO, SignUpDTO, TokenMapDTO } from './dtos';
+import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO } from './dtos';
 
 import { Private, Public } from '@/common';
 import { PermissionTarget } from '@/domain/permission/enums';
@@ -30,12 +30,12 @@ export class AuthController {
     return this.authService.signUp(body);
   }
 
-  @Post('conversion')
+  @Post('convert')
   @Private(PermissionTarget.Admin)
   @ApiOperation({ summary: '(시스템 관리자 전용) 파트너/풀필먼트 계정 전환' })
   @ApiCreatedResponse({ type: TokenMapDTO })
   @ApiUnauthorizedResponse()
-  async conversion(@Body() body: ConversionDTO) {
-    return this.authService.conversion(body);
+  async convert(@Body() body: ConvertDTO) {
+    return this.authService.convert(body);
   }
 }

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional } from 'class-validator';
 
-export class ConversionDTO {
+export class ConvertDTO {
   @ApiProperty({ type: Number, description: '고객사 PK' })
   @IsInt()
   @IsOptional()

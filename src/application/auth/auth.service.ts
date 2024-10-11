@@ -4,7 +4,7 @@ import { hash, verify } from 'argon2';
 import { DataSource } from 'typeorm';
 
 import { AuthModuleErrorCode } from './constants';
-import { LoginDTO, ConversionDTO, SignUpDTO, TokenMapDTO } from './dtos';
+import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO } from './dtos';
 import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
 import { Exception } from '@/core';
@@ -172,7 +172,7 @@ export class AuthService {
     return user;
   }
 
-  async conversion(body: ConversionDTO) {
+  async convert(body: ConvertDTO) {
     const user = this.contextService.getUser<UserEntity>();
 
     user.partnerId = body.partnerId ?? null;
