@@ -15,8 +15,15 @@ export class FulfillmentController {
   @Get()
   @ApiOperation({ summary: '풀필먼트 센터 목록 조회' })
   @ApiOkResponse({ type: FulfillmentListDTO })
-  async getList() {
-    return this.fulfillmentService.getList();
+  async list() {
+    return this.fulfillmentService.list();
+  }
+
+  @Get(':id(\\d+)')
+  @ApiOperation({ summary: '풀필먼트 센터 단일 조회' })
+  @ApiOkResponse({})
+  async detail(@Param('id', ParseIntPipe) id: number) {
+    return this.fulfillmentService.detail(id);
   }
 
   @Post()

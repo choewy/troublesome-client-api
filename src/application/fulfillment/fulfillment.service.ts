@@ -3,7 +3,7 @@ import { hash } from 'argon2';
 import { DataSource } from 'typeorm';
 
 import { FulfillmentModuleErrorCode } from './constants';
-import { CreateFulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from './dtos';
+import { CreateFulfillmentDTO, FulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from './dtos';
 
 import { toNull, toUndefined } from '@/common';
 import { Exception } from '@/core';
@@ -21,8 +21,18 @@ export class FulfillmentService {
     private readonly deliveryCompanyRepository: DeliveryCompanyRepository,
   ) {}
 
-  async getList() {
+  async list() {
     return new FulfillmentListDTO(await this.fulfillmentRepository.findList(0, 1000));
+  }
+
+  async detail(id: number) {
+    const fulfillment = await this.fulfillmentRepository.findById(id);
+
+    if (fulfillment === null) {
+      throw new Exception(FulfillmentModuleErrorCode.NotFoundFulfillment, HttpStatus.NOT_FOUND);
+    }
+
+    return new FulfillmentDTO(fulfillment);
   }
 
   async create(body: CreateFulfillmentDTO) {

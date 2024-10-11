@@ -22,6 +22,24 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
     return (await this.getRepository().countBy({ plantCode, id })) > 0;
   }
 
+  async findById(id: number) {
+    return this.getRepository()
+      .createQueryBuilder('fulfillment')
+      .leftJoinAndMapOne(
+        'fulfillment.defaultDeliveryCompanySetting',
+        'fulfillment.defaultDeliveryCompanySetting',
+        'defaultDeliveryCompanySetting',
+        'defaultDeliveryCompanySetting.isDefault = 1',
+      )
+      .leftJoinAndMapOne(
+        'defaultDeliveryCompanySetting.deliveryCompany',
+        'defaultDeliveryCompanySetting.deliveryCompany',
+        'deliveryCompany',
+      )
+      .where({ id })
+      .getOne();
+  }
+
   async findList(skip: number, take: number) {
     return this.getRepository()
       .createQueryBuilder('fulfillment')

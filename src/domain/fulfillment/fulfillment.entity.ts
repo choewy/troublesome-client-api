@@ -47,6 +47,10 @@ export class FulfillmentEntity {
   @JoinTable()
   defaultDeliveryCompanySetting: DeliveryCompanySettingEntity;
 
+  @OneToOne(() => UserEntity, (e) => e.fulfillment, { cascade: true })
+  @JoinTable()
+  admin: UserEntity;
+
   @OneToMany(() => UserEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   users: UserEntity[];
