@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { CreateFulfillmentDTO, FulfillmentListDTO } from './dtos';
+import { CreateFulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from './dtos';
 import { FulfillmentService } from './fulfillment.service';
 
-import { Private, PrivateOptions } from '@/common';
+import { Private } from '@/common';
 
 @Private()
 @ApiTags('풀필먼트 센터')
@@ -19,7 +19,6 @@ export class FulfillmentController {
     return this.fulfillmentService.getList();
   }
 
-  @Private(PrivateOptions.SystemAdmin)
   @Post()
   @ApiOperation({ summary: '풀필먼트 센터 등록' })
   @ApiCreatedResponse()
@@ -27,12 +26,11 @@ export class FulfillmentController {
     return this.fulfillmentService.create(body);
   }
 
-  @Private(PrivateOptions.SystemAdmin)
   @Patch(':id(\\d+)')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '풀필먼트 센터 수정' })
   @ApiCreatedResponse()
-  async update() {
-    return;
+  async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateFulfillmentDTO) {
+    return this.fulfillmentService.update(id, body);
   }
 }

@@ -1,17 +1,23 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinTable,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { DeliveryCompanySettingEntity } from '@/domain/delivery-company-setting/delivery-company-setting.entity';
 
 @Entity({ name: 'delivery_company', comment: '택배사' })
 export class DeliveryCompanyEntity {
-  @PrimaryColumn({ type: 'int', unsigned: true, comment: '택배사 PK' })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '택배사 PK' })
   readonly id: number;
 
   @Column({ type: 'varchar', length: 50, comment: '택배사 이름' })
   name: string;
-
-  @Column({ type: 'boolean', nullable: false, default: false, comment: '기본 택배사 자동설정 여부' })
-  isDefault: boolean;
 
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.deliveryCompany, { cascade: ['remove'] })
   @JoinTable()

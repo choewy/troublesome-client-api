@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { DataSource, DeepPartial, EntityManager } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager, Not } from 'typeorm';
 
 import { FulfillmentEntity } from './fulfillment.entity';
 
@@ -12,20 +12,30 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
     super(dataSource, FulfillmentEntity);
   }
 
-  async hasByPlantCode(plantCode: string) {
-    return (await this.getRepository().countBy({ plantCode })) > 0;
+  async hasById(id: number) {
+    return (await this.getRepository().countBy({ id })) > 0;
+  }
+
+  async hasByPlantCode(plantCode: string, omitId?: number) {
+    const id = omitId ? Not(omitId) : undefined;
+
+    return (await this.getRepository().countBy({ plantCode, id })) > 0;
   }
 
   async findList(skip: number, take: number) {
     return this.getRepository()
       .createQueryBuilder('fulfillment')
-      .leftJoinAndMapMany(
-        'fulfillment.deliveryCompanySettings',
-        'fulfillment.deliveryCompanySettings',
-        'deliveryCompanySettings',
-        'deliveryCompanySettings.isDefault = 1',
+      .leftJoinAndMapOne(
+        'fulfillment.defaultDeliveryCompanySetting',
+        'fulfillment.defaultDeliveryCompanySetting',
+        'defaultDeliveryCompanySetting',
+        'defaultDeliveryCompanySetting.isDefault = 1',
       )
-      .leftJoinAndMapOne('deliveryCompanySettings.deliveryCompany', 'deliveryCompanySettings.deliveryCompany', 'deliveryCompany')
+      .leftJoinAndMapOne(
+        'defaultDeliveryCompanySetting.deliveryCompany',
+        'defaultDeliveryCompanySetting.deliveryCompany',
+        'deliveryCompany',
+      )
       .skip(skip)
       .take(take)
       .getManyAndCount();
@@ -50,5 +60,9 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
 
   async save(args: DeepPartial<FulfillmentEntity>, em?: EntityManager) {
     return this.getRepository(em).save(args);
+  }
+
+  async update(id: number, args: DeepPartial<FulfillmentEntity>, em?: EntityManager) {
+    return this.getRepository(em).update(id, args);
   }
 }

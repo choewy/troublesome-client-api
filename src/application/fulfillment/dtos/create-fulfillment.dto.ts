@@ -15,10 +15,10 @@ export class CreateFulfillmentDTO {
   @IsNotEmpty()
   plantCode: string;
 
-  @ApiProperty({ type: Number, description: '기본 택배사 PK' })
+  @ApiPropertyOptional({ type: Number, description: '기본 택배사 PK' })
   @IsInt()
-  @IsNotEmpty()
-  defaultDeliveryCompanyId: number;
+  @IsOptional()
+  defaultDeliveryCompanyId?: number;
 
   @ApiProperty({ type: CreateFulfillmentAdminDTO, description: '풀필먼트 센터 관리자 계정' })
   @IsInstance(CreateFulfillmentAdminDTO)

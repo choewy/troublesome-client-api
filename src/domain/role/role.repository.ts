@@ -25,7 +25,7 @@ export class RoleRepository extends EntityRepository<RoleEntity> {
   }
 
   async insert(
-    args: Pick<RoleEntity, 'name' | 'users'> & Partial<Pick<RoleEntity, 'partnerId' | 'fulfillmentId' | 'isEditable'>>,
+    args: Pick<RoleEntity, 'name' | 'users'> & Partial<Pick<RoleEntity, 'permissions' | 'partnerId' | 'fulfillmentId' | 'isEditable'>>,
     em?: EntityManager,
   ) {
     const role = plainToInstance(RoleEntity, args);

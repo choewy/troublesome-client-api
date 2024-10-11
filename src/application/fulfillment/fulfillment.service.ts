@@ -3,8 +3,9 @@ import { hash } from 'argon2';
 import { DataSource } from 'typeorm';
 
 import { FulfillmentModuleErrorCode } from './constants';
-import { CreateFulfillmentDTO, FulfillmentListDTO } from './dtos';
+import { CreateFulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from './dtos';
 
+import { toNull, toUndefined } from '@/common';
 import { Exception } from '@/core';
 import { DeliveryCompanyRepository } from '@/domain/delivery-company/delivery-company.repository';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
@@ -31,10 +32,12 @@ export class FulfillmentService {
       throw new Exception(FulfillmentModuleErrorCode.AlreadyExistPlantCode, HttpStatus.CONFLICT);
     }
 
-    const hadDeliveryCompany = await this.deliveryCompanyRepository.hasById(body.defaultDeliveryCompanyId);
+    if (body.defaultDeliveryCompanyId) {
+      const hasDeliveryCompany = await this.deliveryCompanyRepository.hasById(body.defaultDeliveryCompanyId);
 
-    if (hadDeliveryCompany === false) {
-      throw new Exception(FulfillmentModuleErrorCode.NotFoundDefaultDeliveryCompany, HttpStatus.NOT_FOUND);
+      if (hasDeliveryCompany === false) {
+        throw new Exception(FulfillmentModuleErrorCode.NotFoundDefaultDeliveryCompany, HttpStatus.NOT_FOUND);
+      }
     }
 
     if (body.admin.password !== body.admin.confirmPassword) {
@@ -48,13 +51,16 @@ export class FulfillmentService {
     }
 
     await this.dataSource.transaction(async (em) => {
-      const fulfillment = this.fulfillmentRepository.getRepository().create({
+      const fulfillmentRepository = this.fulfillmentRepository.getRepository(em);
+      const fulfillment = fulfillmentRepository.create({
         name: body.name,
         plantCode: body.plantCode,
         zipCode: body.zipCode ?? null,
         address: body.address ?? null,
         addressDetail: body.addressDetail ?? null,
-        deliveryCompanySettings: [{ deliveryCompanyId: body.defaultDeliveryCompanyId, isDefault: true }],
+        deliveryCompanySettings: body.defaultDeliveryCompanyId
+          ? [{ deliveryCompanyId: body.defaultDeliveryCompanyId, isDefault: true }]
+          : [],
         users: [{ email: body.admin.email, name: body.admin.name, password: await hash(body.admin.password) }],
         roles: [
           {
@@ -70,15 +76,46 @@ export class FulfillmentService {
         ],
       });
 
-      await this.fulfillmentRepository.insert(fulfillment, em);
-      const fulfillmentId = fulfillment.id;
+      const fulfillmentId = await fulfillmentRepository.insert(fulfillment);
 
-      fulfillment.deliveryCompanySettings.map((deliveryCompanySetting) => ({ ...deliveryCompanySetting, fulfillmentId }));
-      fulfillment.users.map((user) => ({ ...user, fulfillmentId }));
-      fulfillment.roles.map((role) => ({ ...role, fulfillmentId }));
+      fulfillment.deliveryCompanySettings.map((args) => ({ ...args, fulfillmentId }));
+      fulfillment.users.map((args) => ({ ...args, fulfillmentId }));
+      fulfillment.roles.map((args) => ({ ...args, fulfillmentId }));
       fulfillment.roles[0].users = fulfillment.users;
 
-      await this.fulfillmentRepository.save(fulfillment, em);
+      await fulfillmentRepository.save(fulfillment);
+    });
+  }
+
+  async update(id: number, body: UpdateFulfillmentDTO) {
+    const hasFulfillment = await this.fulfillmentRepository.hasById(id);
+
+    if (hasFulfillment === false) {
+      throw new Exception(FulfillmentModuleErrorCode.NotFoundFulfillment, HttpStatus.NOT_FOUND);
+    }
+
+    if (body.plantCode) {
+      const hasPlantCode = await this.fulfillmentRepository.hasByPlantCode(body.plantCode, id);
+
+      if (hasPlantCode) {
+        throw new Exception(FulfillmentModuleErrorCode.AlreadyExistPlantCode, HttpStatus.CONFLICT);
+      }
+    }
+
+    if (body.defaultDeliveryCompanyId) {
+      const hasDeliveryCompany = await this.deliveryCompanyRepository.hasById(body.defaultDeliveryCompanyId);
+
+      if (hasDeliveryCompany === false) {
+        throw new Exception(FulfillmentModuleErrorCode.NotFoundDefaultDeliveryCompany, HttpStatus.NOT_FOUND);
+      }
+    }
+
+    await this.fulfillmentRepository.update(id, {
+      name: body.name ?? undefined,
+      plantCode: body.plantCode ?? undefined,
+      zipCode: toUndefined(toNull(body.zipCode)),
+      address: toUndefined(toNull(body.address)),
+      addressDetail: toUndefined(toNull(body.addressDetail)),
     });
   }
 }
