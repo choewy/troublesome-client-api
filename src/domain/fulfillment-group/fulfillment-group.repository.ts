@@ -10,4 +10,12 @@ export class FulfillmentGroupRepository extends EntityRepository<FulfillmentGrou
   constructor(dataSource: DataSource) {
     super(dataSource, FulfillmentGroupEntity);
   }
+
+  async findList(skip: number, take: number) {
+    return this.getRepository().findAndCount({
+      relations: { manager: true },
+      skip,
+      take,
+    });
+  }
 }

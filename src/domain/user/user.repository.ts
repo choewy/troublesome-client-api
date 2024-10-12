@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { DataSource, DeepPartial, EntityManager } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import { UserEntity } from './user.entity';
 
@@ -42,22 +41,5 @@ export class UserRepository extends EntityRepository<UserEntity> {
 
   async hasEmail(email: string) {
     return this.getRepository().existsBy({ email });
-  }
-
-  async insert(
-    args: Pick<UserEntity, 'email' | 'password' | 'name'> & Partial<Pick<UserEntity, 'partnerGroupId' | 'partnerId' | 'fulfillmentId'>>,
-    em?: EntityManager,
-  ) {
-    const user = plainToInstance(UserEntity, args);
-    await this.getRepository(em).insert(user);
-
-    return user.id;
-  }
-
-  async save(args: DeepPartial<UserEntity>, em?: EntityManager) {
-    const userRepository = this.getRepository(em);
-    const user = await userRepository.save(userRepository.create(args));
-
-    return user;
   }
 }

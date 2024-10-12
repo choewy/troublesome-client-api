@@ -1,8 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { hash } from 'argon2';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 
-import { SYSTEM_ADMIN_PERMISSION_TARGETS } from '@/domain/permission/constants';
+import {
+  FULFILLMENT_GROUP_MANAGER_PERMISSION_TARGETS,
+  PARTNER_GROUP_MANAGER_PERMISSION_TARGETS,
+  SYSTEM_ADMIN_PERMISSION_TARGETS,
+} from '@/domain/permission/constants';
 import { PermissionEntity } from '@/domain/permission/permission.entity';
 import { RoleDefaultPK } from '@/domain/role/enums';
 import { RoleEntity } from '@/domain/role/role.entity';
@@ -19,12 +23,50 @@ export class BootstrapService implements OnModuleInit {
 
   async onModuleInit() {
     await this.dataSource.transaction(async (em) => {
-      await this.insertAdmin(em);
-      await this.insertAdminRole(em);
+      await this.insertSystemAdmin(em);
+      await this.insertSystemAdminRole(em);
+      await this.insertPartnerGroupRole(em);
+      await this.insertFulfillmentGroupRole(em);
     });
   }
 
-  private async insertAdmin(em: EntityManager) {
+  private get systemAdmin(): DeepPartial<UserEntity> {
+    const systemAdmin = this.initializerConfigService.systemAdmin;
+
+    return {
+      id: 1,
+      name: '시스템 관리자',
+      email: systemAdmin.email,
+      password: systemAdmin.password,
+      isActivated: true,
+    };
+  }
+
+  private get sysetmAdminRole(): DeepPartial<RoleEntity> {
+    return {
+      id: RoleDefaultPK.SystemAdmin,
+      name: '시스템 관리자',
+      isEditable: false,
+    };
+  }
+
+  private get partnerGroupManagerRole(): DeepPartial<RoleEntity> {
+    return {
+      id: RoleDefaultPK.PartnerGroupManager,
+      name: '고객사 그룹 관리자',
+      isEditable: false,
+    };
+  }
+
+  private get fulfillmentGroupManagerRole(): DeepPartial<RoleEntity> {
+    return {
+      id: RoleDefaultPK.FulfillmentGroupManager,
+      name: '풀필먼트 센터 그룹 관리자',
+      isEditable: false,
+    };
+  }
+
+  private async insertSystemAdmin(em: EntityManager) {
     const user = this.systemAdmin;
     const userRepository = em.getRepository(UserEntity);
 
@@ -37,11 +79,16 @@ export class BootstrapService implements OnModuleInit {
     await userRepository.insert(user);
   }
 
-  private async insertAdminRole(em: EntityManager) {
-    const role = this.sysetmAdminRole;
-    const roleId = role.id;
+  private async insertSystemAdminRole(em: EntityManager) {
     const roleRepository = em.getRepository(RoleEntity);
-    await roleRepository.upsert(role, { conflictPaths: { id: true } });
+    const role = roleRepository.create(this.sysetmAdminRole);
+
+    if ((await roleRepository.countBy({ id: role.id })) > 0) {
+      return;
+    }
+
+    await roleRepository.insert(role);
+    const roleId = role.id;
 
     const permissions = SYSTEM_ADMIN_PERMISSION_TARGETS.map((target) => ({ target, roleId }));
     const permissionRepository = em.getRepository(PermissionEntity);
@@ -53,23 +100,37 @@ export class BootstrapService implements OnModuleInit {
     await userRolesRepository.upsert(userRoles, { conflictPaths: { userId: true, roleId: true } });
   }
 
-  private get systemAdmin() {
-    const systemAdmin = this.initializerConfigService.systemAdmin;
+  private async insertPartnerGroupRole(em: EntityManager) {
+    const roleRepository = em.getRepository(RoleEntity);
+    const role = roleRepository.create(this.partnerGroupManagerRole);
 
-    return {
-      id: 1,
-      name: '시스템 관리자',
-      email: systemAdmin.email,
-      password: systemAdmin.password,
-      isActivated: true,
-    };
+    if ((await roleRepository.countBy({ id: role.id })) > 0) {
+      return;
+    }
+
+    await roleRepository.insert(role);
+    const roleId = role.id;
+
+    const permissions = PARTNER_GROUP_MANAGER_PERMISSION_TARGETS.map((target) => ({ target, roleId }));
+    const permissionRepository = em.getRepository(PermissionEntity);
+    await permissionRepository.delete({ roleId });
+    await permissionRepository.insert(permissions);
   }
 
-  private get sysetmAdminRole() {
-    return {
-      id: RoleDefaultPK.SystemAdmin,
-      name: '시스템 관리자',
-      isEditable: false,
-    };
+  private async insertFulfillmentGroupRole(em: EntityManager) {
+    const roleRepository = em.getRepository(RoleEntity);
+    const role = roleRepository.create(this.fulfillmentGroupManagerRole);
+
+    if ((await roleRepository.countBy({ id: role.id })) > 0) {
+      return;
+    }
+
+    await roleRepository.insert(role);
+    const roleId = role.id;
+
+    const permissions = FULFILLMENT_GROUP_MANAGER_PERMISSION_TARGETS.map((target) => ({ target, roleId }));
+    const permissionRepository = em.getRepository(PermissionEntity);
+    await permissionRepository.delete({ roleId });
+    await permissionRepository.insert(permissions);
   }
 }

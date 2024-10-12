@@ -4,6 +4,7 @@ import { AuthModule } from './application/auth/auth.module';
 import { BootstrapModule } from './application/bootstrap/bootstrap.module';
 import { DeliveryCompanyModule } from './application/delivery-company/delivery-company.module';
 import { FulfillmentModule } from './application/fulfillment/fulfillment.module';
+import { FulfillmentGroupModule } from './application/fulfillment-group/fulfillment-group.module';
 import { InvitationModule } from './application/invitation/invitation.module';
 import { PartnerModule } from './application/partner/partner.module';
 import { PartnerGroupModule } from './application/partner-group/partner-group.module';
@@ -23,11 +24,12 @@ import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from
     BootstrapModule,
     PermissionModule,
     AuthModule,
-    InvitationModule,
-    DeliveryCompanyModule,
+    FulfillmentGroupModule,
     FulfillmentModule,
     PartnerGroupModule,
     PartnerModule,
+    InvitationModule,
+    DeliveryCompanyModule,
   ],
   providers: [SerializeInterceptor, ExceptionFilter, ValidationPipe],
 })

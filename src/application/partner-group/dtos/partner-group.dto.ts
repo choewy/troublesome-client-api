@@ -15,16 +15,16 @@ export class PartnerGroupDTO {
   createdAt: Date;
 
   @ApiProperty({ type: PartnerGroupManagerDTO, description: '고객사 그룹 관리자 정보' })
-  admin: PartnerGroupManagerDTO | null;
+  manager: PartnerGroupManagerDTO | null;
 
   constructor(partnerGroup: PartnerGroupEntity) {
     this.id = partnerGroup.id;
     this.name = partnerGroup.name;
     this.createdAt = partnerGroup.createdAt;
-    this.admin = null;
+    this.manager = null;
 
     if (partnerGroup.manager) {
-      this.admin = new PartnerGroupManagerDTO(partnerGroup.manager);
+      this.manager = new PartnerGroupManagerDTO(partnerGroup.manager);
     }
   }
 }
