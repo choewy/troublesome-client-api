@@ -22,48 +22,33 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
     return (await this.getRepository().countBy({ plantCode, id })) > 0;
   }
 
+  async findList(skip: number, take: number) {
+    return this.getRepository().findAndCount({
+      relations: { deliveryCompanySettings: { deliveryCompany: true } },
+      where: { deliveryCompanySettings: { isDefault: true } },
+      skip,
+      take,
+    });
+  }
+
+  async findListByGroupId(fulfillmentGroupId: number) {
+    return this.getRepository().findAndCount({
+      where: { fulfillmentGroupId },
+    });
+  }
+
   async findContextById(id: number) {
     return this.getRepository().findOne({
       where: { id },
-      select: { id: true, name: true },
+      select: { id: true, name: true, fulfillmentGroupId: true },
     });
   }
 
   async findById(id: number) {
-    return this.getRepository()
-      .createQueryBuilder('fulfillment')
-      .leftJoinAndMapOne(
-        'fulfillment.defaultDeliveryCompanySetting',
-        'fulfillment.defaultDeliveryCompanySetting',
-        'defaultDeliveryCompanySetting',
-        'defaultDeliveryCompanySetting.isDefault = 1',
-      )
-      .leftJoinAndMapOne(
-        'defaultDeliveryCompanySetting.deliveryCompany',
-        'defaultDeliveryCompanySetting.deliveryCompany',
-        'deliveryCompany',
-      )
-      .where({ id })
-      .getOne();
-  }
-
-  async findList(skip: number, take: number) {
-    return this.getRepository()
-      .createQueryBuilder('fulfillment')
-      .leftJoinAndMapOne(
-        'fulfillment.defaultDeliveryCompanySetting',
-        'fulfillment.defaultDeliveryCompanySetting',
-        'defaultDeliveryCompanySetting',
-        'defaultDeliveryCompanySetting.isDefault = 1',
-      )
-      .leftJoinAndMapOne(
-        'defaultDeliveryCompanySetting.deliveryCompany',
-        'defaultDeliveryCompanySetting.deliveryCompany',
-        'deliveryCompany',
-      )
-      .skip(skip)
-      .take(take)
-      .getManyAndCount();
+    return this.getRepository().findOne({
+      relations: { deliveryCompanySettings: { deliveryCompany: true } },
+      where: { id, deliveryCompanySettings: { isDefault: true } },
+    });
   }
 
   async insert(

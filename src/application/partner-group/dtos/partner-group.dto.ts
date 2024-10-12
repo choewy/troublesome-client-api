@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { PartnerGroupManagerDTO } from './partner-group-manager.dto';
+import { PartnerGroupPartnerDTO } from './partner-group-partner.dto';
 
 import { PartnerGroupEntity } from '@/domain/partner-group/partner-group.entity';
 
@@ -17,14 +18,22 @@ export class PartnerGroupDTO {
   @ApiProperty({ type: PartnerGroupManagerDTO, description: '고객사 그룹 관리자 정보' })
   manager: PartnerGroupManagerDTO | null;
 
+  @ApiProperty({ type: [PartnerGroupPartnerDTO], description: '고객사 목록' })
+  partners: PartnerGroupPartnerDTO[];
+
   constructor(partnerGroup: PartnerGroupEntity) {
     this.id = partnerGroup.id;
     this.name = partnerGroup.name;
     this.createdAt = partnerGroup.createdAt;
     this.manager = null;
+    this.partners = [];
 
     if (partnerGroup.manager) {
       this.manager = new PartnerGroupManagerDTO(partnerGroup.manager);
+    }
+
+    for (const partner of partnerGroup.partners) {
+      this.partners.push(new PartnerGroupPartnerDTO(partner));
     }
   }
 }

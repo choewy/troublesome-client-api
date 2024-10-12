@@ -1,28 +1,32 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { hash } from 'argon2';
-import { DataSource } from 'typeorm';
 
 import { PartnerGroupModuleErrorCode } from './constants';
-import { CreatePartnerGroupDTO, PartnerGroupListDTO } from './dtos';
+import { CreatePartnerGroupDTO, PartnerGroupListDTO, PartnerGroupPartnerListDTO, UpdatePartnerGroupDTO } from './dtos';
 
+import { toUndefined } from '@/common';
 import { Exception } from '@/core';
-import { PartnerGroupEntity } from '@/domain/partner-group/partner-group.entity';
+import { PartnerRepository } from '@/domain/partner/partner.repository';
 import { PartnerGroupRepository } from '@/domain/partner-group/partner-group.repository';
-import { RoleDefaultPK } from '@/domain/role/enums';
-import { UserRolesEntity } from '@/domain/user/user-roles.entity';
-import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
+import { ContextService } from '@/global';
 
 @Injectable()
 export class PartnerGroupService {
   constructor(
-    private readonly dataSource: DataSource,
+    private readonly contextService: ContextService,
     private readonly partnerGroupRepository: PartnerGroupRepository,
+    private readonly partnerRepository: PartnerRepository,
     private readonly userRepository: UserRepository,
   ) {}
 
   async list() {
     return new PartnerGroupListDTO(await this.partnerGroupRepository.findList(0, 1000));
+  }
+
+  async partners() {
+    const userContext = this.contextService.getUser();
+
+    return new PartnerGroupPartnerListDTO(await this.partnerRepository.findListByGroupId(userContext.fulfillmentGroup?.id));
   }
 
   async create(body: CreatePartnerGroupDTO) {
@@ -36,17 +40,26 @@ export class PartnerGroupService {
       throw new Exception(PartnerGroupModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
     }
 
-    await this.dataSource.transaction(async (em) => {
-      const partnerGroupRepository = em.getRepository(PartnerGroupEntity);
-      const partnerGroup = partnerGroupRepository.create({ name: body.name });
-      await partnerGroupRepository.insert(partnerGroup);
+    await this.partnerGroupRepository.insert({ name: body.name, manager: body.manager });
+  }
 
-      const userRepository = em.getRepository(UserEntity);
-      const user = userRepository.create({ email: body.manager.email, password: await hash(body.manager.password), partnerGroup });
-      await userRepository.insert(user);
+  async update(id: number, body: UpdatePartnerGroupDTO) {
+    const hasPartnerGroup = await this.partnerGroupRepository.hasById(id);
 
-      const userRolesRepository = em.getRepository(UserRolesEntity);
-      await userRolesRepository.insert({ user, roleId: RoleDefaultPK.PartnerGroupManager });
-    });
+    if (hasPartnerGroup === false) {
+      throw new Exception(PartnerGroupModuleErrorCode.NotFound, HttpStatus.NOT_FOUND);
+    }
+
+    await this.partnerGroupRepository.update(id, { name: toUndefined(body.name) });
+  }
+
+  async delete(id: number) {
+    const hasPartnerGroup = await this.partnerGroupRepository.hasById(id);
+
+    if (hasPartnerGroup === false) {
+      throw new Exception(PartnerGroupModuleErrorCode.NotFound, HttpStatus.NOT_FOUND);
+    }
+
+    await this.partnerGroupRepository.delete(id);
   }
 }

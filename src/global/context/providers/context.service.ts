@@ -2,7 +2,7 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 
 import { ContextKey } from '../enums';
-import { ContextUser } from '../implements';
+import { ContextUser, ContextUserRelation } from '../implements';
 
 @Injectable()
 export class ContextService {
@@ -30,5 +30,15 @@ export class ContextService {
 
   getUser(): ContextUser | null {
     return this.clsService.get(ContextKey.User) ?? null;
+  }
+
+  canAccessFulfillment<T extends Pick<ContextUserRelation, 'id'> & { fulfillmentGroupId: number }>(fulfillment: T) {
+    const userContext = this.getUser();
+
+    return (
+      (userContext.fulfillment === null && userContext.fulfillmentGroup === null) ||
+      (userContext.fulfillment && userContext.fulfillment.id !== fulfillment.id) ||
+      (userContext.fulfillmentGroup && userContext.fulfillmentGroup.id !== fulfillment.fulfillmentGroupId)
+    );
   }
 }

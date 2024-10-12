@@ -44,6 +44,7 @@ export class FulfillmentService {
 
   async create(body: CreateFulfillmentDTO) {
     const userContext = this.contextService.getUser();
+
     const fulfillmentGroupId = userContext.fulfillmentGroup?.id ?? null;
 
     if (fulfillmentGroupId === null) {
@@ -135,10 +136,14 @@ export class FulfillmentService {
   }
 
   async update(id: number, body: UpdateFulfillmentDTO) {
-    const hasFulfillment = await this.fulfillmentRepository.hasById(id);
+    const fulfillment = await this.fulfillmentRepository.findContextById(id);
 
-    if (hasFulfillment === false) {
+    if (fulfillment === null) {
       throw new Exception(FulfillmentModuleErrorCode.NotFoundFulfillment, HttpStatus.NOT_FOUND);
+    }
+
+    if (this.contextService.canAccessFulfillment(fulfillment) === false) {
+      throw new Exception(FulfillmentModuleErrorCode.CannotUpdateOrDelete, HttpStatus.FORBIDDEN);
     }
 
     if (body.plantCode) {
@@ -167,10 +172,14 @@ export class FulfillmentService {
   }
 
   async delete(id: number) {
-    const hasFulfillment = await this.fulfillmentRepository.hasById(id);
+    const fulfillment = await this.fulfillmentRepository.findContextById(id);
 
-    if (hasFulfillment === false) {
+    if (fulfillment === null) {
       throw new Exception(FulfillmentModuleErrorCode.NotFoundFulfillment, HttpStatus.NOT_FOUND);
+    }
+
+    if (this.contextService.canAccessFulfillment(fulfillment) === false) {
+      throw new Exception(FulfillmentModuleErrorCode.CannotUpdateOrDelete, HttpStatus.FORBIDDEN);
     }
 
     await this.fulfillmentRepository.getRepository().softDelete(id);

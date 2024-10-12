@@ -40,7 +40,7 @@ export class FulfillmentDTO {
     this.address = fulfillment.address;
     this.addressDetail = fulfillment.addressDetail;
 
-    const defaultDeliveryCompany = fulfillment.defaultDeliveryCompanySetting?.deliveryCompany ?? null;
+    const defaultDeliveryCompany = fulfillment.deliveryCompanySettings[0]?.deliveryCompany ?? null;
 
     if (defaultDeliveryCompany) {
       this.defaultDeliveryCompany = new FulfillmentDefaultDeliveryCompanyDTO(defaultDeliveryCompany);

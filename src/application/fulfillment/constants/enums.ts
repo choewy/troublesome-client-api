@@ -5,4 +5,5 @@ export enum FulfillmentModuleErrorCode {
   NotFoundDefaultDeliveryCompany = 'FULFILLMENT_NOT_FOUND_DEFAULT_DELIVERY_COMPANY',
   NotFoundFulfillment = 'FULFILLMENT_NOT_FOUND',
   NotSelectedFulfillmentGroup = 'FULFILLMENT_NOT_SELECTED_FULFILLMENT_GROUP',
+  CannotUpdateOrDelete = 'FULFILLMENT_CANNOT_UPDATE_OR_DELETE',
 }

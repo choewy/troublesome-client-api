@@ -1,23 +1,21 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { hash } from 'argon2';
-import { DataSource } from 'typeorm';
 
 import { FulfillmentGroupModuleErrorCode } from './constants';
-import { CreateFulfillmentGroupDTO, FulfillmentGroupListDTO } from './dtos';
+import { CreateFulfillmentGroupDTO, FulfillmentGroupFulfillmentListDTO, FulfillmentGroupListDTO, UpdateFulfillmentGroupDTO } from './dtos';
 
+import { toUndefined } from '@/common';
 import { Exception } from '@/core';
-import { FulfillmentGroupEntity } from '@/domain/fulfillment-group/fulfillment-group.entity';
+import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
 import { FulfillmentGroupRepository } from '@/domain/fulfillment-group/fulfillment-group.repository';
-import { RoleDefaultPK } from '@/domain/role/enums';
-import { UserRolesEntity } from '@/domain/user/user-roles.entity';
-import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
+import { ContextService } from '@/global';
 
 @Injectable()
 export class FulfillmentGroupService {
   constructor(
-    private readonly dataSource: DataSource,
+    private readonly contextService: ContextService,
     private readonly fulfillmentGroupRepository: FulfillmentGroupRepository,
+    private readonly fulfillmentRepository: FulfillmentRepository,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -25,34 +23,43 @@ export class FulfillmentGroupService {
     return new FulfillmentGroupListDTO(await this.fulfillmentGroupRepository.findList(0, 1000));
   }
 
+  async fulfillments() {
+    const userContext = this.contextService.getUser();
+
+    return new FulfillmentGroupFulfillmentListDTO(await this.fulfillmentRepository.findListByGroupId(userContext.fulfillmentGroup?.id));
+  }
+
   async create(body: CreateFulfillmentGroupDTO) {
     if (body.manager.password !== body.manager.confirmPassword) {
       throw new Exception(FulfillmentGroupModuleErrorCode.UserPasswordsMispatch, HttpStatus.BAD_REQUEST);
     }
 
-    const manager = body.manager;
-    const hasEmail = await this.userRepository.hasEmail(manager.email);
+    const hasEmail = await this.userRepository.hasEmail(body.manager.email);
 
     if (hasEmail) {
       throw new Exception(FulfillmentGroupModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
     }
 
-    await this.dataSource.transaction(async (em) => {
-      const fulfillmentGroupRepository = em.getRepository(FulfillmentGroupEntity);
-      const fulfillmentGroup = fulfillmentGroupRepository.create({ name: body.name });
-      await fulfillmentGroupRepository.insert(fulfillmentGroup);
+    await this.fulfillmentGroupRepository.insert({ name: body.name, manager: body.manager });
+  }
 
-      const userRepository = em.getRepository(UserEntity);
-      const user = userRepository.create({
-        email: manager.email,
-        password: await hash(manager.password),
-        name: manager.name,
-        fulfillmentGroup,
-      });
-      await userRepository.insert(user);
+  async update(id: number, body: UpdateFulfillmentGroupDTO) {
+    const hasFulfillmentGroup = await this.fulfillmentGroupRepository.hasById(id);
 
-      const userRolesRepository = em.getRepository(UserRolesEntity);
-      await userRolesRepository.insert({ user, roleId: RoleDefaultPK.FulfillmentGroupManager });
-    });
+    if (hasFulfillmentGroup === false) {
+      throw new Exception(FulfillmentGroupModuleErrorCode.NotFound, HttpStatus.NOT_FOUND);
+    }
+
+    await this.fulfillmentGroupRepository.update(id, { name: toUndefined(body.name) });
+  }
+
+  async delete(id: number) {
+    const hasFulfillmentGroup = await this.fulfillmentGroupRepository.hasById(id);
+
+    if (hasFulfillmentGroup === false) {
+      throw new Exception(FulfillmentGroupModuleErrorCode.NotFound, HttpStatus.NOT_FOUND);
+    }
+
+    await this.fulfillmentGroupRepository.delete(id);
   }
 }

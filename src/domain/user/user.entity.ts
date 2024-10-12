@@ -21,7 +21,7 @@ import { PartnerEntity } from '@/domain/partner/partner.entity';
 import { PartnerGroupEntity } from '@/domain/partner-group/partner-group.entity';
 import { createForeignKeyConstraintName, createIndexConstraintName } from '@/global';
 
-@Index(createIndexConstraintName('user', 'email'), ['email'], { unique: true })
+@Index(createIndexConstraintName('user', 'email'), ['email'])
 @Entity({ name: 'user', comment: '사용자' })
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '사용자 PK' })

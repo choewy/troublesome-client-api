@@ -16,10 +16,16 @@ export class PartnerRepository extends EntityRepository<PartnerEntity> {
     return this.getRepository().findAndCount({ skip, take });
   }
 
+  async findListByGroupId(partnerGroupId: number) {
+    return this.getRepository().findAndCount({
+      where: { partnerGroupId },
+    });
+  }
+
   async findContextById(id: number) {
     return this.getRepository().findOne({
       where: { id },
-      select: { id: true, name: true },
+      select: { id: true, name: true, partnerGroupId: true },
     });
   }
 
