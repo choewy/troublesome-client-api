@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { hash } from 'argon2';
+import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 
 import { UserEntity } from './user.entity';
+import { InvitationEntity } from '../invitation/invitation.entity';
 
 import { EntityRepository } from '@/global';
 
@@ -43,5 +45,22 @@ export class UserRepository extends EntityRepository<UserEntity> {
 
   async hasEmail(email: string) {
     return this.getRepository().existsBy({ email });
+  }
+
+  async insertWithInvitation(invitation: InvitationEntity, args: DeepPartial<UserEntity>, em?: EntityManager) {
+    const password = await hash(args.password);
+
+    const transactional = async (em: EntityManager) => {
+      const invitationRepository = em.getRepository(InvitationEntity);
+      await invitationRepository.update(invitation.id, { completedAt: new Date() });
+
+      const userRepository = em.getRepository(UserEntity);
+      const user = userRepository.create({ ...args, password, partnerId: invitation.partnerId, fulfillmentId: invitation.fulfillmentId });
+      await userRepository.insert(user);
+
+      return user;
+    };
+
+    return em ? transactional(em) : this.dataSource.transaction(transactional);
   }
 }

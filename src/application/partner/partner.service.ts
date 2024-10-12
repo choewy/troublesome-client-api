@@ -30,6 +30,7 @@ export class PartnerService {
       throw new NotFoundException();
     }
 
+    // FIXME refactor
     await this.dataSource.transaction(async (em) => {
       const partnerId = await this.partnerRepository.insert(body, em);
 

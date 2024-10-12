@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { hash, verify } from 'argon2';
-import { DataSource } from 'typeorm';
+import { verify } from 'argon2';
 
 import { AuthModuleErrorCode } from './constants';
 import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO } from './dtos';
@@ -19,7 +18,6 @@ import { ContextService, JwtConfigService } from '@/global';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly dataSource: DataSource,
     private readonly jwtConfigService: JwtConfigService,
     private readonly jwtService: JwtService,
     private readonly contextService: ContextService,
@@ -72,20 +70,10 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.PasswordsMispatch, HttpStatus.BAD_REQUEST);
     }
 
-    const user = await this.dataSource.transaction(async (em) => {
-      await this.invitationRepository.update(invitation.id, { completedAt: new Date() }, em);
-      const userRepository = this.userRepository.getRepository(em);
-      const user = userRepository.create({
-        email: body.email,
-        name: body.name,
-        password: await hash(body.password),
-        partnerId: invitation?.user?.partner?.id,
-        fulfillmentId: invitation?.user?.fulfillment?.id,
-      });
-
-      await userRepository.insert(user);
-
-      return user;
+    const user = await this.userRepository.insertWithInvitation(invitation, {
+      email: body.email,
+      name: body.name,
+      password: body.password,
     });
 
     return this.issueTokens(user);

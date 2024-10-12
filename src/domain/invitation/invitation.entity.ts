@@ -10,6 +10,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { FulfillmentEntity } from '../fulfillment/fulfillment.entity';
+import { PartnerEntity } from '../partner/partner.entity';
+
 import { UserEntity } from '@/domain/user/user.entity';
 import { createForeignKeyConstraintName } from '@/global';
 
@@ -27,12 +30,26 @@ export class InvitationEntity {
   @Column({ type: 'timestamp', default: null, comment: '완료일시' })
   completedAt: Date;
 
-  @Column({ type: 'int', unsigned: true, nullable: true })
+  @Column({ type: 'int', unsigned: true })
   userId: number;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('invitation', 'user', 'id') })
   user: UserEntity;
+
+  @Column({ type: 'int', unsigned: true, nullable: true })
+  partnerId: number | null;
+
+  @ManyToOne(() => PartnerEntity, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('invitation', 'partner', 'id') })
+  partner: PartnerEntity | null;
+
+  @Column({ type: 'int', unsigned: true, nullable: true })
+  fulfillmentId: number | null;
+
+  @ManyToOne(() => FulfillmentEntity, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('invitation', 'fulfillment', 'id') })
+  fulfillment: FulfillmentEntity | null;
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;

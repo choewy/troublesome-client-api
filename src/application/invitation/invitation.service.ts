@@ -33,7 +33,12 @@ export class InvitationUseCase {
       throw new Exception(InvitationModuleErrorCode.AlreadyInvitedUser, HttpStatus.CONFLICT);
     }
 
-    await this.invitationRepository.insert({ email: body.email, user: { id: userContext.id } });
+    await this.invitationRepository.insert({
+      email: body.email,
+      userId: userContext.id,
+      partnerId: body.partnetId,
+      fulfillmentId: body.fulfillmentId,
+    });
 
     // TODO send email
   }

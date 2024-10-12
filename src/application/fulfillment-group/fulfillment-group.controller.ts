@@ -29,7 +29,7 @@ export class FulfillmentGroupController {
   }
 
   @Get('fulfillments')
-  @Private(PermissionTarget.FulfillmentRead)
+  @Private(PermissionTarget.FulfillmentAll)
   @ApiOperation({ summary: '풀필먼트 센터 그룹 내 풀필먼트 센터 목록 조회' })
   @ApiOkResponse({ type: FulfillmentGroupFulfillmentListDTO })
   async fulfillments() {

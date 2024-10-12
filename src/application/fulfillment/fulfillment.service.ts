@@ -77,6 +77,7 @@ export class FulfillmentService {
       throw new Exception(FulfillmentModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
     }
 
+    // FIXME refactor
     await this.dataSource.transaction(async (em) => {
       const fulfillmentRepository = em.getRepository(FulfillmentEntity);
       const fulfillment = fulfillmentRepository.create({
