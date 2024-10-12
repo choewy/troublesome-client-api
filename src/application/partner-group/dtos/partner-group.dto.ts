@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { PartnerGroupAdminDTO } from './partner-group-admin.dto';
+import { PartnerGroupManagerDTO } from './partner-group-manager.dto';
 
 import { PartnerGroupEntity } from '@/domain/partner-group/partner-group.entity';
 
@@ -14,8 +14,8 @@ export class PartnerGroupDTO {
   @ApiProperty({ type: Date, description: '등록일시' })
   createdAt: Date;
 
-  @ApiProperty({ type: PartnerGroupAdminDTO, description: '고객사 그룹 관리자 정보' })
-  admin: PartnerGroupAdminDTO | null;
+  @ApiProperty({ type: PartnerGroupManagerDTO, description: '고객사 그룹 관리자 정보' })
+  admin: PartnerGroupManagerDTO | null;
 
   constructor(partnerGroup: PartnerGroupEntity) {
     this.id = partnerGroup.id;
@@ -23,8 +23,8 @@ export class PartnerGroupDTO {
     this.createdAt = partnerGroup.createdAt;
     this.admin = null;
 
-    if (partnerGroup.user) {
-      this.admin = new PartnerGroupAdminDTO(partnerGroup.user);
+    if (partnerGroup.manager) {
+      this.admin = new PartnerGroupManagerDTO(partnerGroup.manager);
     }
   }
 }

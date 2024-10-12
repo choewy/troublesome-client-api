@@ -4,19 +4,23 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
   JoinTable,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { FulfillmentGroupEntity } from '../fulfillment-group/fulfillment-group.entity';
+
 import { BoxEntity } from '@/domain/box/box.entity';
 import { DeliveryCompanySettingEntity } from '@/domain/delivery-company-setting/delivery-company-setting.entity';
 import { LocationEntity } from '@/domain/location/location.entity';
 import { RoleEntity } from '@/domain/role/role.entity';
 import { UserEntity } from '@/domain/user/user.entity';
-import { createIndexConstraintName } from '@/global';
+import { createForeignKeyConstraintName, createIndexConstraintName } from '@/global';
 
 @Index(createIndexConstraintName('fulfillment', 'plant_code'), ['plantCode'])
 @Entity({ name: 'fulfillment', comment: '풀필먼트센터' })
@@ -38,6 +42,10 @@ export class FulfillmentEntity {
 
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
+
+  @ManyToOne(() => FulfillmentGroupEntity, (e) => e.fulfillments, { onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('fulfillment', 'fulfillment_group', 'id') })
+  fulfillmentGroup: FulfillmentGroupEntity;
 
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()

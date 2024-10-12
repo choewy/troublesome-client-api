@@ -11,6 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { FulfillmentGroupEntity } from '../fulfillment-group/fulfillment-group.entity';
+
 import { FulfillmentEntity } from '@/domain/fulfillment/fulfillment.entity';
 import { PartnerEntity } from '@/domain/partner/partner.entity';
 import { PartnerGroupEntity } from '@/domain/partner-group/partner-group.entity';
@@ -38,7 +40,7 @@ export class UserEntity {
   @Column({ type: 'int', unsigned: true, nullable: true })
   partnerGroupId: number;
 
-  @OneToOne(() => PartnerGroupEntity, (e) => e.user, { nullable: true, onDelete: 'SET NULL' })
+  @OneToOne(() => PartnerGroupEntity, (e) => e.manager, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'partner_group', 'id') })
   partnerGroup: PartnerGroupEntity | null;
 
@@ -48,6 +50,13 @@ export class UserEntity {
   @ManyToOne(() => PartnerEntity, (e) => e.users, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'partner', 'id') })
   partner: PartnerEntity | null;
+
+  @Column({ type: 'int', unsigned: true, nullable: true })
+  fulfillmentGroupId: number;
+
+  @OneToOne(() => FulfillmentGroupEntity, (e) => e.manager, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'fulfillment_group', 'id') })
+  fulfillmentGroup: FulfillmentGroupEntity | null;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   fulfillmentId: number;

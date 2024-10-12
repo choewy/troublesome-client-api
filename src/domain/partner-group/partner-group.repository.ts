@@ -14,7 +14,7 @@ export class PartnerGroupRepository extends EntityRepository<PartnerGroupEntity>
 
   async findList(skip: number, take: number) {
     return this.getRepository().findAndCount({
-      relations: { user: true },
+      relations: { manager: true },
       skip,
       take,
     });
@@ -22,7 +22,7 @@ export class PartnerGroupRepository extends EntityRepository<PartnerGroupEntity>
 
   async findById(id: number) {
     return this.getRepository().findOne({
-      relations: { user: true },
+      relations: { manager: true },
       where: { id },
     });
   }

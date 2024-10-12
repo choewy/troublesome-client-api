@@ -23,7 +23,7 @@ export class PartnerGroupEntity {
 
   @OneToOne(() => UserEntity, (e) => e.partnerGroup, { cascade: true })
   @JoinTable()
-  user: UserEntity;
+  manager: UserEntity;
 
   @OneToMany(() => PartnerEntity, (e) => e.partnerGroup, { cascade: true })
   @JoinTable()

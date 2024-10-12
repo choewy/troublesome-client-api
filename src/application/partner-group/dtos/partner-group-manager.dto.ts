@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { UserEntity } from '@/domain/user/user.entity';
 
-export class PartnerGroupAdminDTO {
+export class PartnerGroupManagerDTO {
   @ApiProperty({ type: Number, description: '고객사 그룹 관리자 PK' })
   id: number;
 

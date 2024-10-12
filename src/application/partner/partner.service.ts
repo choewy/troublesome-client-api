@@ -36,7 +36,7 @@ export class PartnerService {
       const partnerAdminRoleId = await this.roleRepository.insert(
         {
           name: '관리자',
-          users: [partnerGroup.user],
+          users: [partnerGroup.manager],
           partnerId,
           isEditable: false,
         },
