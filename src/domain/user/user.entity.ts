@@ -5,18 +5,20 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { UserRolesEntity } from './user-roles.entity';
 import { FulfillmentGroupEntity } from '../fulfillment-group/fulfillment-group.entity';
 
 import { FulfillmentEntity } from '@/domain/fulfillment/fulfillment.entity';
 import { PartnerEntity } from '@/domain/partner/partner.entity';
 import { PartnerGroupEntity } from '@/domain/partner-group/partner-group.entity';
-import { RoleEntity } from '@/domain/role/role.entity';
 import { createForeignKeyConstraintName, createIndexConstraintName } from '@/global';
 
 @Index(createIndexConstraintName('user', 'email'), ['email'], { unique: true })
@@ -68,9 +70,9 @@ export class UserEntity {
   @Column({ type: 'int', unsigned: true, nullable: true })
   roleId: number;
 
-  @ManyToOne(() => RoleEntity, (e) => e.users, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'role', 'id') })
-  role: RoleEntity | null;
+  @OneToMany(() => UserRolesEntity, (e) => e.user, { cascade: true })
+  @JoinTable()
+  roles: UserRolesEntity[];
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;

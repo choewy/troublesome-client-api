@@ -19,13 +19,14 @@ export class PermissionService {
 
   checkPermission(permissionTarget: PermissionTarget) {
     const user = this.contextService.getUser<UserEntity>();
-    const permissions = user?.role?.permissions ?? [];
 
-    for (const permission of permissions) {
-      const regExp = new RegExp(permission.target.replaceAll('*', '.'));
+    for (const { role } of user.roles) {
+      for (const permission of role.permissions) {
+        const regExp = new RegExp(permission.target.replaceAll('*', '.'));
 
-      if (regExp.test(permissionTarget)) {
-        return true;
+        if (regExp.test(permissionTarget)) {
+          return true;
+        }
       }
     }
 

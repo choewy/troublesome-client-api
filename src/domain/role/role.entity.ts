@@ -11,10 +11,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { UserRolesEntity } from '../user/user-roles.entity';
+
 import { FulfillmentEntity } from '@/domain/fulfillment/fulfillment.entity';
 import { PartnerEntity } from '@/domain/partner/partner.entity';
 import { PermissionEntity } from '@/domain/permission/permission.entity';
-import { UserEntity } from '@/domain/user/user.entity';
 import { createForeignKeyConstraintName } from '@/global';
 
 @Entity({ name: 'role', comment: '역할' })
@@ -46,9 +47,9 @@ export class RoleEntity {
   @JoinTable()
   permissions: PermissionEntity[];
 
-  @OneToMany(() => UserEntity, (e) => e.role, { cascade: true })
+  @OneToMany(() => UserRolesEntity, (e) => e.role, { cascade: true })
   @JoinTable()
-  users: UserEntity[];
+  users: UserRolesEntity[];
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;

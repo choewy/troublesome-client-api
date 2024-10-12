@@ -1,86 +1,75 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { hash } from 'argon2';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 
-import { PermissionTarget } from '@/domain/permission/enums';
-import { PermissionRepository } from '@/domain/permission/permission.repository';
-import { RoleRepository } from '@/domain/role/role.repository';
-import { UserRepository } from '@/domain/user/user.repository';
+import { SYSTEM_ADMIN_PERMISSION_TARGETS } from '@/domain/permission/constants';
+import { PermissionEntity } from '@/domain/permission/permission.entity';
+import { RoleDefaultPK } from '@/domain/role/enums';
+import { RoleEntity } from '@/domain/role/role.entity';
+import { UserRolesEntity } from '@/domain/user/user-roles.entity';
+import { UserEntity } from '@/domain/user/user.entity';
 import { InitializerConfigService } from '@/global';
 
 @Injectable()
 export class BootstrapService implements OnModuleInit {
   constructor(
-    private readonly initializerConfigService: InitializerConfigService,
     private readonly dataSource: DataSource,
-    private readonly userRepository: UserRepository,
-    private readonly roleRepository: RoleRepository,
-    private readonly permissionRepository: PermissionRepository,
+    private readonly initializerConfigService: InitializerConfigService,
   ) {}
 
   async onModuleInit() {
-    await this.saveDefaultUsers();
-    await this.saveDefaultRoles();
+    await this.dataSource.transaction(async (em) => {
+      await this.insertAdmin(em);
+      await this.insertAdminRole(em);
+    });
   }
 
-  private async saveDefaultUsers() {
-    for (const user of [this.systemAdmin]) {
-      if (await this.userRepository.hasById(user.id)) {
-        continue;
-      }
+  private async insertAdmin(em: EntityManager) {
+    const user = this.systemAdmin;
+    const userRepository = em.getRepository(UserEntity);
 
-      user.password = await hash(user.password);
-
-      await this.userRepository.insert(user);
+    if ((await userRepository.countBy({ id: user.id })) > 0) {
+      return;
     }
+
+    user.password = await hash(user.password);
+
+    await userRepository.insert(user);
   }
 
-  private async saveDefaultRoles() {
-    for (const role of [this.sysetmAdminRole]) {
-      await this.dataSource.transaction(async (em) => {
-        const roleId = role.id;
+  private async insertAdminRole(em: EntityManager) {
+    const role = this.sysetmAdminRole;
+    const roleId = role.id;
+    const roleRepository = em.getRepository(RoleEntity);
+    await roleRepository.upsert(role, { conflictPaths: { id: true } });
 
-        const permissionRepository = this.permissionRepository.getRepository(em);
-        await permissionRepository.delete({ roleId });
+    const permissions = SYSTEM_ADMIN_PERMISSION_TARGETS.map((target) => ({ target, roleId }));
+    const permissionRepository = em.getRepository(PermissionEntity);
+    await permissionRepository.delete({ roleId });
+    await permissionRepository.insert(permissions);
 
-        const roleRepository = this.roleRepository.getRepository(em);
-        await roleRepository.save(role);
-      });
-    }
+    const userRoles = [this.systemAdmin].map((user) => ({ userId: user.id, roleId }));
+    const userRolesRepository = em.getRepository(UserRolesEntity);
+    await userRolesRepository.upsert(userRoles, { conflictPaths: { userId: true, roleId: true } });
   }
 
   private get systemAdmin() {
     const systemAdmin = this.initializerConfigService.systemAdmin;
-    return this.userRepository.getRepository().create({
+
+    return {
       id: 1,
       name: '시스템 관리자',
       email: systemAdmin.email,
       password: systemAdmin.password,
       isActivated: true,
-    });
-  }
-
-  private get systemAdminRef() {
-    return this.roleRepository.getRepository().create({ id: this.systemAdmin.id });
-  }
-
-  private get systemAdminPermissions() {
-    return [
-      this.permissionRepository.getRepository().create({
-        id: 1,
-        roleId: 1,
-        target: PermissionTarget.Admin,
-      }),
-    ];
+    };
   }
 
   private get sysetmAdminRole() {
-    return this.roleRepository.getRepository().create({
-      id: 1,
+    return {
+      id: RoleDefaultPK.SystemAdmin,
       name: '시스템 관리자',
       isEditable: false,
-      permissions: this.systemAdminPermissions,
-      users: [this.systemAdminRef],
-    });
+    };
   }
 }

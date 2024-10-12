@@ -9,7 +9,7 @@ import { toNull, toUndefined } from '@/common';
 import { Exception } from '@/core';
 import { DeliveryCompanyRepository } from '@/domain/delivery-company/delivery-company.repository';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
-import { FULFILLMENT_ADMIN_PERMISSION_TARGETS, FULFILLMENT_USER_PERMISSION_TARGETS } from '@/domain/permission/constants';
+import { FULFILLMENT_MANAGER_PERMISSION_TARGETS, FULFILLMENT_USER_PERMISSION_TARGETS } from '@/domain/permission/constants';
 import { UserRepository } from '@/domain/user/user.repository';
 
 @Injectable()
@@ -76,7 +76,7 @@ export class FulfillmentService {
           {
             name: '풀필먼트 센터 관리자',
             isEditable: false,
-            permissions: FULFILLMENT_ADMIN_PERMISSION_TARGETS.map((target) => ({ target })),
+            permissions: FULFILLMENT_MANAGER_PERMISSION_TARGETS.map((target) => ({ target })),
           },
           {
             name: '풀필먼트 센터 사용자',
@@ -91,7 +91,7 @@ export class FulfillmentService {
       fulfillment.deliveryCompanySettings.map((args) => ({ ...args, fulfillmentId }));
       fulfillment.users.map((args) => ({ ...args, fulfillmentId }));
       fulfillment.roles.map((args) => ({ ...args, fulfillmentId }));
-      fulfillment.roles[0].users = fulfillment.users;
+      // fulfillment.roles[0].users = fulfillment.users;
 
       await fulfillmentRepository.save(fulfillment);
     });

@@ -162,7 +162,7 @@ export class AuthService {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      roles: user.roles,
       fulfillment: user.fulfillment,
       fulfillmentId: user.fulfillmentId,
       partner: user.partner,
