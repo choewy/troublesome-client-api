@@ -20,6 +20,13 @@ export class PartnerGroupRepository extends EntityRepository<PartnerGroupEntity>
     });
   }
 
+  async findContextById(id: number) {
+    return this.getRepository().findOne({
+      where: { id },
+      select: { id: true, name: true },
+    });
+  }
+
   async findById(id: number) {
     return this.getRepository().findOne({
       relations: { manager: true },

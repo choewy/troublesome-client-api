@@ -1,4 +1,4 @@
-import { RequestUser } from './interfaces';
+import { ContextUser } from '@/global/context/implements';
 
 export class RequestUserLog {
   id: number;
@@ -6,9 +6,10 @@ export class RequestUserLog {
   email: string;
   partnerGroup?: { id: number; name: string };
   partner?: { id: number; name: string };
+  fulfillmentGroup?: { id: number; name: string };
   fulfillment?: { id: number; name: string };
 
-  constructor(user: RequestUser) {
+  constructor(user: ContextUser) {
     this.id = user.id;
     this.name = user.name;
     this.email = user.email;
@@ -24,6 +25,13 @@ export class RequestUserLog {
       ? {
           id: user.partner.id,
           name: user.partner.name,
+        }
+      : null;
+
+    this.fulfillmentGroup = user.fulfillmentGroup
+      ? {
+          id: user.fulfillmentGroup.id,
+          name: user.fulfillmentGroup.name,
         }
       : null;
 

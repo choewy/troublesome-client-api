@@ -2,6 +2,7 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 
 import { ContextKey } from '../enums';
+import { ContextUser } from '../implements';
 
 @Injectable()
 export class ContextService {
@@ -23,11 +24,11 @@ export class ContextService {
     return this.clsService.get(ContextKey.Context) ?? null;
   }
 
-  setUser<T = any>(user: T) {
+  setUser(user: ContextUser) {
     this.clsService.set(ContextKey.User, user);
   }
 
-  getUser<T = any>(): T | null {
+  getUser(): ContextUser | null {
     return this.clsService.get(ContextKey.User) ?? null;
   }
 }

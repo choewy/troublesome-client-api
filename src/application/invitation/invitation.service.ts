@@ -21,9 +21,9 @@ export class InvitationUseCase {
       throw new BadRequestException();
     }
 
-    const user = this.contextService.getUser();
+    const userContext = this.contextService.getUser();
 
-    if (body.email === user.email) {
+    if (body.email === userContext.email) {
       throw new Exception(InvitationModuleErrorCode.CannotInviteYourSelf, HttpStatus.CONFLICT);
     }
 
@@ -33,7 +33,7 @@ export class InvitationUseCase {
       throw new Exception(InvitationModuleErrorCode.AlreadyInvitedUser, HttpStatus.CONFLICT);
     }
 
-    await this.invitationRepository.insert({ email: body.email, user });
+    await this.invitationRepository.insert({ email: body.email, user: { id: userContext.id } });
 
     // TODO send email
   }

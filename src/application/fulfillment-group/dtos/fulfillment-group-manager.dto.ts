@@ -6,10 +6,10 @@ export class FulfillmentGroupManagerDTO {
   @ApiProperty({ type: Number, description: '풀필먼트 그룹 관리자 PK' })
   id: number;
 
-  @ApiProperty({ type: Number, description: '풀필먼트 그룹 관리자 이름' })
+  @ApiProperty({ type: String, description: '풀필먼트 그룹 관리자 이름' })
   name: string;
 
-  @ApiProperty({ type: Number, description: '풀필먼트 그룹 관리자 이메일' })
+  @ApiProperty({ type: String, format: 'email', description: '풀필먼트 그룹 관리자 이메일' })
   email: string;
 
   constructor(user: UserEntity) {

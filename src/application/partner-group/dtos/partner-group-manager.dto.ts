@@ -6,10 +6,10 @@ export class PartnerGroupManagerDTO {
   @ApiProperty({ type: Number, description: '고객사 그룹 관리자 PK' })
   id: number;
 
-  @ApiProperty({ type: Number, description: '고객사 그룹 관리자 이름' })
+  @ApiProperty({ type: String, description: '고객사 그룹 관리자 이름' })
   name: string;
 
-  @ApiProperty({ type: Number, description: '고객사 그룹 관리자 이메일' })
+  @ApiProperty({ type: String, format: 'email', description: '고객사 그룹 관리자 이메일' })
   email: string;
 
   constructor(user: UserEntity) {

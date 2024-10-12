@@ -43,6 +43,9 @@ export class FulfillmentEntity {
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
 
+  @Column({ type: 'int', unsigned: true })
+  fulfillmentGroupId: number;
+
   @ManyToOne(() => FulfillmentGroupEntity, (e) => e.fulfillments, { onDelete: 'CASCADE' })
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('fulfillment', 'fulfillment_group', 'id') })
   fulfillmentGroup: FulfillmentGroupEntity;

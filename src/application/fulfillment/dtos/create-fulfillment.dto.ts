@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsInstance, IsInt, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
 
-import { CreateFulfillmentAdminDTO } from './create-fulfillment-admin.dto';
+import { CreateFulfillmentManagerDTO } from './create-fulfillment-manager.dto';
 
 export class CreateFulfillmentDTO {
   @ApiProperty({ type: String, description: '풀필먼트 센터 이름' })
@@ -20,10 +20,10 @@ export class CreateFulfillmentDTO {
   @IsOptional()
   defaultDeliveryCompanyId?: number;
 
-  @ApiProperty({ type: CreateFulfillmentAdminDTO, description: '풀필먼트 센터 관리자 계정' })
-  @IsInstance(CreateFulfillmentAdminDTO)
+  @ApiProperty({ type: CreateFulfillmentManagerDTO, description: '풀필먼트 센터 관리자 계정' })
+  @IsInstance(CreateFulfillmentManagerDTO)
   @IsNotEmpty()
-  admin: CreateFulfillmentAdminDTO;
+  manager: CreateFulfillmentManagerDTO;
 
   @ApiPropertyOptional({ type: String, description: '우편번호' })
   @IsNumberString()

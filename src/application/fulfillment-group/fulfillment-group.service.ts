@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { hash } from 'argon2';
 import { DataSource } from 'typeorm';
 
-import { FulfillmentGroupModuleErrorCode } from './constants/enums';
+import { FulfillmentGroupModuleErrorCode } from './constants';
 import { CreateFulfillmentGroupDTO, FulfillmentGroupListDTO } from './dtos';
 
 import { Exception } from '@/core';

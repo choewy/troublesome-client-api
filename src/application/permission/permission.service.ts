@@ -6,7 +6,6 @@ import { PermissionMetadataMap } from './implements';
 
 import { Exception } from '@/core';
 import { PermissionTarget } from '@/domain/permission/enums';
-import { UserEntity } from '@/domain/user/user.entity';
 import { ContextService } from '@/global';
 
 @Injectable()
@@ -18,9 +17,9 @@ export class PermissionService {
   }
 
   checkPermission(permissionTarget: PermissionTarget) {
-    const user = this.contextService.getUser<UserEntity>();
+    const userContext = this.contextService.getUser();
 
-    for (const { role } of user.roles) {
+    for (const { role } of userContext.roles) {
       for (const permission of role.permissions) {
         const regExp = new RegExp(permission.target.replaceAll('*', '.'));
 

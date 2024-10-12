@@ -9,9 +9,10 @@ import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
 import { Exception } from '@/core';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
+import { FulfillmentGroupRepository } from '@/domain/fulfillment-group/fulfillment-group.repository';
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
 import { PartnerRepository } from '@/domain/partner/partner.repository';
-import { UserEntity } from '@/domain/user/user.entity';
+import { PartnerGroupRepository } from '@/domain/partner-group/partner-group.repository';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService, JwtConfigService } from '@/global';
 
@@ -23,7 +24,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly contextService: ContextService,
     private readonly userRepository: UserRepository,
+    private readonly partnerGroupRepository: PartnerGroupRepository,
     private readonly partnerRepository: PartnerRepository,
+    private readonly fulfillmentGroupRepository: FulfillmentGroupRepository,
     private readonly fulfillmentRepository: FulfillmentRepository,
     private readonly invitationRepository: InvitationRepository,
   ) {}
@@ -148,13 +151,21 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
-    if (user.partner === null && user.fulfillment === null) {
+    if (payload.convert) {
+      if (payload.partnerGroupId) {
+        user.partnerGroup = await this.partnerGroupRepository.findContextById(payload.partnerGroupId);
+      }
+
       if (payload.partnerId) {
-        user.partner = await this.partnerRepository.findById(payload.partnerId);
+        user.partner = await this.partnerRepository.findContextById(payload.partnerId);
+      }
+
+      if (payload.fulfillmentGroupId) {
+        user.fulfillmentGroup = await this.fulfillmentGroupRepository.findContextById(payload.fulfillmentGroupId);
       }
 
       if (payload.fulfillmentId) {
-        user.fulfillment = await this.fulfillmentRepository.findById(payload.fulfillmentId);
+        user.fulfillment = await this.fulfillmentRepository.findContextById(payload.fulfillmentId);
       }
     }
 
@@ -163,21 +174,39 @@ export class AuthService {
       name: user.name,
       email: user.email,
       roles: user.roles,
-      fulfillment: user.fulfillment,
-      fulfillmentId: user.fulfillmentId,
       partner: user.partner,
-      partnerId: user.partnerId,
+      partnerGroup: user.partnerGroup,
+      fulfillment: user.fulfillment,
+      fulfillmentGroup: user.fulfillmentGroup,
     });
 
     return user;
   }
 
   async convert(body: ConvertDTO) {
-    const user = this.contextService.getUser<UserEntity>();
+    const userContext = this.contextService.getUser();
 
-    user.partnerId = body.partnerId ?? null;
-    user.fulfillmentId = body.fulfillmentId ?? null;
+    switch (true) {
+      case !!body.partnerGroupId || !!body.partnerId:
+        userContext.partner = !!body.partnerId ? await this.partnerRepository.findContextById(body.partnerId) : null;
+        userContext.partnerGroup = !!body.partnerGroupId ? await this.partnerGroupRepository.findContextById(body.partnerGroupId) : null;
+        break;
 
-    return this.issueTokens(user);
+      case !!body.fulfillmentGroupId || !!body.fulfillmentId:
+        userContext.fulfillment = !!body.fulfillmentId ? await this.fulfillmentRepository.findContextById(body.fulfillmentId) : null;
+        userContext.fulfillmentGroup = !!body.fulfillmentGroupId
+          ? await this.fulfillmentGroupRepository.findContextById(body.fulfillmentGroupId)
+          : null;
+        break;
+    }
+
+    return this.issueTokens({
+      id: userContext.id,
+      partnerId: userContext.partner?.id,
+      partnerGroupId: userContext.partnerGroup?.id,
+      fulfillmentId: userContext.fulfillment?.id,
+      fulfillmentGroupId: userContext.fulfillmentGroup?.id,
+      convert: true,
+    });
   }
 }

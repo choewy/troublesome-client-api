@@ -20,6 +20,7 @@ export class UserRepository extends EntityRepository<UserEntity> {
       relations: {
         partnerGroup: { partners: true },
         partner: true,
+        fulfillmentGroup: { fulfillments: true },
         fulfillment: true,
         roles: { role: { permissions: true } },
       },
@@ -32,6 +33,7 @@ export class UserRepository extends EntityRepository<UserEntity> {
       relations: {
         partnerGroup: { partners: true },
         partner: true,
+        fulfillmentGroup: { fulfillments: true },
         fulfillment: true,
         roles: { role: { permissions: true } },
       },

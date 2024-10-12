@@ -13,9 +13,16 @@ export class FulfillmentGroupRepository extends EntityRepository<FulfillmentGrou
 
   async findList(skip: number, take: number) {
     return this.getRepository().findAndCount({
-      relations: { manager: true },
+      relations: { manager: true, fulfillments: true },
       skip,
       take,
+    });
+  }
+
+  async findContextById(id: number) {
+    return this.getRepository().findOne({
+      where: { id },
+      select: { id: true, name: true },
     });
   }
 }

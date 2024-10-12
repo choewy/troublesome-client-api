@@ -22,6 +22,13 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
     return (await this.getRepository().countBy({ plantCode, id })) > 0;
   }
 
+  async findContextById(id: number) {
+    return this.getRepository().findOne({
+      where: { id },
+      select: { id: true, name: true },
+    });
+  }
+
   async findById(id: number) {
     return this.getRepository()
       .createQueryBuilder('fulfillment')

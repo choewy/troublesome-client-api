@@ -28,11 +28,11 @@ export class LoggerMiddleware implements NestMiddleware {
     };
 
     res.on('finish', () => {
-      const user = this.contextService.getUser();
+      const userContext = this.contextService.getUser();
       const log = {
         request: new RequestLog(req),
         response: new ResponseLog(res),
-        user: user ? new RequestUserLog(user) : null,
+        user: userContext ? new RequestUserLog(userContext) : null,
         latency: latency.finish(),
       };
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { DateTime } from 'luxon';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 
 import { InvitationEntity } from './invitation.entity';
 
@@ -25,7 +25,7 @@ export class InvitationRepository extends EntityRepository<InvitationEntity> {
   }
 
   // TODO user, fulfillmentId, partnerId 분리
-  async insert(args: Pick<InvitationEntity, 'email' | 'user'>) {
+  async insert(args: DeepPartial<InvitationEntity>) {
     const invitation = plainToInstance(InvitationEntity, { ...args, expiredAt: DateTime.local().plus({ minutes: 5 }).toJSDate() });
     await this.getRepository().insert(invitation);
 

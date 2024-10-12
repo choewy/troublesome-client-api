@@ -21,7 +21,7 @@ export class PartnerGroupController {
   }
 
   @Post()
-  @ApiOperation({ summary: '고객사 그룹 및 관리자 계정 생성' })
+  @ApiOperation({ summary: '고객사 그룹 생성' })
   @ApiCreatedResponse()
   async create(@Body() body: CreatePartnerGroupDTO) {
     return this.partnerGroupService.create(body);
