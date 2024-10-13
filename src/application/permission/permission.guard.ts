@@ -13,12 +13,12 @@ export class PermissionGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const permissionTarget = getPermissionTarget(this.reflector, context);
+    const permissionTargets = getPermissionTarget(this.reflector, context);
 
-    if (permissionTarget === null) {
+    if (Array.isArray(permissionTargets) === false || permissionTargets.length === 0) {
       return true;
     }
 
-    return this.permissionService.checkPermission(permissionTarget);
+    return this.permissionService.checkPermission(permissionTargets);
   }
 }

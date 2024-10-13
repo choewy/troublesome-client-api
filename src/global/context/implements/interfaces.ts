@@ -29,4 +29,6 @@ export interface ContextUser {
   partner?: ContextUserRelation;
   fulfillmentGroup?: ContextUserRelation;
   fulfillment?: ContextUserRelation;
+  systemAdmin?: boolean;
+  manager?: boolean;
 }

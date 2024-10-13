@@ -4,5 +4,6 @@ export interface TokenPayload {
   partnerId?: number;
   fulfillmentGroupId?: number;
   fulfillmentId?: number;
-  convert?: boolean;
+  systemAdmin?: boolean;
+  manager?: boolean;
 }

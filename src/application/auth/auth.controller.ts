@@ -1,8 +1,8 @@
-import { Body, Controller, Patch, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO, UpdatePasswordDTO } from './dtos';
+import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO, UpdatePasswordDTO, UserContextDTO } from './dtos';
 
 import { Private, Public } from '@/common';
 import { PermissionTarget } from '@/domain/permission/enums';
@@ -11,6 +11,15 @@ import { PermissionTarget } from '@/domain/permission/enums';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get()
+  @Private()
+  @ApiOperation({ summary: '로그인 정보' })
+  @ApiOkResponse({ type: UserContextDTO })
+  @ApiUnauthorizedResponse()
+  async auth() {
+    return this.authService.auth();
+  }
 
   @Post('login')
   @Public()
@@ -30,15 +39,6 @@ export class AuthController {
     return this.authService.signUp(body);
   }
 
-  @Post('convert')
-  @Private(PermissionTarget.Admin)
-  @ApiOperation({ summary: '(시스템 관리자 전용) 파트너/풀필먼트 계정 전환' })
-  @ApiCreatedResponse({ type: TokenMapDTO })
-  @ApiUnauthorizedResponse()
-  async convert(@Body() body: ConvertDTO) {
-    return this.authService.convert(body);
-  }
-
   @Patch('password')
   @Private()
   @ApiOperation({ summary: '비밀번호 변경' })
@@ -46,5 +46,23 @@ export class AuthController {
   @ApiUnauthorizedResponse()
   async updatePassword(@Body() body: UpdatePasswordDTO) {
     return this.authService.updatePassword(body);
+  }
+
+  @Post('convert/admin')
+  @Private(PermissionTarget.Admin)
+  @ApiOperation({ summary: '(시스템 관리자 전용) 소속 전환' })
+  @ApiCreatedResponse({ type: TokenMapDTO })
+  @ApiUnauthorizedResponse()
+  async convertAdmin(@Body() body: ConvertDTO) {
+    return this.authService.convert(body, true);
+  }
+
+  @Post('convert/manager')
+  @Private(PermissionTarget.PartnerAll, PermissionTarget.FulfillmentAll)
+  @ApiOperation({ summary: '(파트너/풀필먼트 관리자 전용) 소속 전환' })
+  @ApiCreatedResponse({ type: TokenMapDTO })
+  @ApiUnauthorizedResponse()
+  async convertManager(@Body() body: ConvertDTO) {
+    return this.authService.convert(body, false);
   }
 }

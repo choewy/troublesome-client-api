@@ -3,7 +3,7 @@ import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { verify } from 'argon2';
 
 import { AuthModuleErrorCode } from './constants';
-import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO, UpdatePasswordDTO } from './dtos';
+import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO, UpdatePasswordDTO, UserContextDTO } from './dtos';
 import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
 import { Exception } from '@/core';
@@ -12,6 +12,7 @@ import { FulfillmentGroupRepository } from '@/domain/fulfillment-group/fulfillme
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
 import { PartnerRepository } from '@/domain/partner/partner.repository';
 import { PartnerGroupRepository } from '@/domain/partner-group/partner-group.repository';
+import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService, JwtConfigService } from '@/global';
 
@@ -28,6 +29,10 @@ export class AuthService {
     private readonly fulfillmentRepository: FulfillmentRepository,
     private readonly invitationRepository: InvitationRepository,
   ) {}
+
+  async auth() {
+    return new UserContextDTO(this.contextService.getUser());
+  }
 
   async login(body: LoginDTO) {
     const user = await this.userRepository.findByEmail(body.email);
@@ -46,14 +51,14 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
-    return new TokenMapDTO(this.issueTokens(user));
+    return new TokenMapDTO(this.issueTokens(this.createTokenPayload(user)));
   }
 
   async signUp(body: SignUpDTO) {
     const invitation = await this.invitationRepository.findById(body.invitationId);
 
     if (invitation === null || invitation.email !== body.email) {
-      throw new Exception(AuthModuleErrorCode.NotInvited, HttpStatus.FORBIDDEN);
+      throw new Exception(AuthModuleErrorCode.InvalidInvitation, HttpStatus.FORBIDDEN);
     }
 
     if (invitation.isCompleted || invitation.isExpired) {
@@ -67,7 +72,7 @@ export class AuthService {
     }
 
     if (body.password !== body.confirmPassword) {
-      throw new Exception(AuthModuleErrorCode.PasswordsMispatch, HttpStatus.BAD_REQUEST);
+      throw new Exception(AuthModuleErrorCode.PasswordsMismatch, HttpStatus.BAD_REQUEST);
     }
 
     const user = await this.userRepository.insertWithInvitation(invitation, {
@@ -76,7 +81,17 @@ export class AuthService {
       password: body.password,
     });
 
-    return this.issueTokens(user);
+    return new TokenMapDTO(this.issueTokens(this.createTokenPayload(user)));
+  }
+
+  protected createTokenPayload(user: UserEntity): TokenPayload {
+    return {
+      id: user.id,
+      partnerGroupId: user.partnerGroupId ?? null,
+      partnerId: user.partnerId ?? null,
+      fulfillmentGroupId: user.fulfillmentGroupId ?? null,
+      fulfillmentId: user.fulfillmentId ?? null,
+    };
   }
 
   protected validateTokenPayload(payload: TokenPayload) {
@@ -139,7 +154,7 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
-    if (payload.convert) {
+    if (payload.systemAdmin || payload.manager) {
       if (payload.partnerGroupId) {
         user.partnerGroup = await this.partnerGroupRepository.findContextById(payload.partnerGroupId);
       }
@@ -166,6 +181,8 @@ export class AuthService {
       partnerGroup: user.partnerGroup,
       fulfillment: user.fulfillment,
       fulfillmentGroup: user.fulfillmentGroup,
+      systemAdmin: payload.systemAdmin,
+      manager: payload.manager,
     });
 
     return user;
@@ -182,7 +199,7 @@ export class AuthService {
     }
 
     if (body.newPassword !== body.confirmPassword) {
-      throw new Exception(AuthModuleErrorCode.PasswordsMispatch, HttpStatus.BAD_REQUEST);
+      throw new Exception(AuthModuleErrorCode.PasswordsMismatch, HttpStatus.BAD_REQUEST);
     }
 
     if (body.currentPassword === body.newPassword) {
@@ -192,7 +209,7 @@ export class AuthService {
     await this.userRepository.updatePassword(userId, body.newPassword);
   }
 
-  async convert(body: ConvertDTO) {
+  async convert(body: ConvertDTO, isSystemAdmin: boolean) {
     const userContext = this.contextService.getUser();
 
     switch (true) {
@@ -215,7 +232,8 @@ export class AuthService {
       partnerGroupId: userContext.partnerGroup?.id,
       fulfillmentId: userContext.fulfillment?.id,
       fulfillmentGroupId: userContext.fulfillmentGroup?.id,
-      convert: true,
+      systemAdmin: isSystemAdmin,
+      manager: !isSystemAdmin,
     });
   }
 }

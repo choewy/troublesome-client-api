@@ -16,15 +16,17 @@ export class PermissionService {
     return new PermissionMetadataMap().values.map((metadata) => new PermissionMetadataDTO(metadata));
   }
 
-  checkPermission(permissionTarget: PermissionTarget) {
+  checkPermission(permissionTargets: PermissionTarget[]) {
     const userContext = this.contextService.getUser();
 
     for (const { role } of userContext.roles) {
       for (const permission of role.permissions) {
         const regExp = new RegExp(permission.target.replaceAll('*', '.'));
 
-        if (regExp.test(permissionTarget)) {
-          return true;
+        for (const permissionTarget of permissionTargets) {
+          if (regExp.test(permissionTarget)) {
+            return true;
+          }
         }
       }
     }

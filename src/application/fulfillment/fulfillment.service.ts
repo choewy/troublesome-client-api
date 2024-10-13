@@ -130,8 +130,14 @@ export class FulfillmentService {
       });
       await userRepository.insert(user);
 
+      const userIds = [user.id];
+
+      if (userContext.manager) {
+        userIds.push(userContext.id);
+      }
+
       const userRolesRepository = em.getRepository(UserRolesEntity);
-      const userRoles = userRolesRepository.create([userContext.id, user.id].map((userId) => ({ userId, roleId: roles[0].id })));
+      const userRoles = userRolesRepository.create(userIds.map((userId) => ({ userId, roleId: roles[0].id })));
       await userRolesRepository.insert(userRoles);
     });
   }

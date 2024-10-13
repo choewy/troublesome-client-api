@@ -11,10 +11,10 @@ export const Public = () => applyDecorators(SetMetadata(SetMetadataKey.AccessMod
 export const isPublic = (reflector: Reflector, context: ExecutionContext) =>
   reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === true;
 
-export const Private = (target?: PermissionTarget) =>
+export const Private = (...targets: PermissionTarget[]) =>
   applyDecorators(
     SetMetadata(SetMetadataKey.AccessModifier, false),
-    SetMetadata(SetMetadataKey.PermissionTarget, target ?? null),
+    SetMetadata(SetMetadataKey.PermissionTarget, targets ?? []),
     ApiBearerAuth(RequestHeader.AccessToken),
     ApiSecurity(RequestHeader.RefreshToken),
     ApiResponse({
@@ -29,5 +29,5 @@ export const Private = (target?: PermissionTarget) =>
 export const isPrivate = (reflector: Reflector, context: ExecutionContext): boolean =>
   reflector.getAllAndOverride(SetMetadataKey.AccessModifier, [context.getClass(), context.getHandler()]) === false;
 
-export const getPermissionTarget = (reflector: Reflector, context: ExecutionContext): PermissionTarget | null =>
-  reflector.getAllAndOverride(SetMetadataKey.PermissionTarget, [context.getClass(), context.getHandler()]) ?? null;
+export const getPermissionTarget = (reflector: Reflector, context: ExecutionContext): PermissionTarget[] =>
+  reflector.getAllAndOverride(SetMetadataKey.PermissionTarget, [context.getClass(), context.getHandler()]) ?? [];
