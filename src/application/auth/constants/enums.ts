@@ -5,5 +5,7 @@ export enum AuthModuleErrorCode {
   InvalidToken = 'AUTH_INVALID_TOKEN',
   AlreadyExist = 'AUTH_ALREADY_EXIST',
   PasswordsMispatch = 'AUTH_PASSWORDS_MISMATCH',
+  WrongPassword = 'AUTH_WRONG_PASSWORD',
+  SamePassword = 'AUTH_SAME_PASSWORD',
   Blocked = 'AUTH_BLOCKED',
 }

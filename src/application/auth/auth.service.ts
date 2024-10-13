@@ -3,7 +3,7 @@ import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { verify } from 'argon2';
 
 import { AuthModuleErrorCode } from './constants';
-import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO } from './dtos';
+import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO, UpdatePasswordDTO } from './dtos';
 import { TokenMap, TokenPayload, TokenVerifyResult } from './interfaces';
 
 import { Exception } from '@/core';
@@ -169,6 +169,27 @@ export class AuthService {
     });
 
     return user;
+  }
+
+  async updatePassword(body: UpdatePasswordDTO) {
+    const userId = this.contextService.getUser().id;
+    const user = await this.userRepository.findPasswordById(userId);
+
+    const isVerify = await verify(user.password, body.currentPassword);
+
+    if (isVerify === false) {
+      throw new Exception(AuthModuleErrorCode.WrongPassword, HttpStatus.UNAUTHORIZED);
+    }
+
+    if (body.newPassword !== body.confirmPassword) {
+      throw new Exception(AuthModuleErrorCode.PasswordsMispatch, HttpStatus.BAD_REQUEST);
+    }
+
+    if (body.currentPassword === body.newPassword) {
+      throw new Exception(AuthModuleErrorCode.SamePassword, HttpStatus.BAD_REQUEST);
+    }
+
+    await this.userRepository.updatePassword(userId, body.newPassword);
   }
 
   async convert(body: ConvertDTO) {

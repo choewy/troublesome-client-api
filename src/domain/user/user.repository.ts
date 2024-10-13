@@ -30,6 +30,13 @@ export class UserRepository extends EntityRepository<UserEntity> {
     });
   }
 
+  async findPasswordById(id: number) {
+    return this.getRepository().findOne({
+      select: { password: true },
+      where: { id },
+    });
+  }
+
   async findByEmail(email: string) {
     return this.getRepository().findOne({
       relations: {
@@ -62,5 +69,9 @@ export class UserRepository extends EntityRepository<UserEntity> {
     };
 
     return em ? transactional(em) : this.dataSource.transaction(transactional);
+  }
+
+  async updatePassword(id: number, password: string, em?: EntityManager) {
+    await this.getRepository(em).update(id, { password: await hash(password) });
   }
 }

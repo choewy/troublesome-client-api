@@ -1,8 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Body, Controller, Patch, Post } from '@nestjs/common';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO } from './dtos';
+import { LoginDTO, ConvertDTO, SignUpDTO, TokenMapDTO, UpdatePasswordDTO } from './dtos';
 
 import { Private, Public } from '@/common';
 import { PermissionTarget } from '@/domain/permission/enums';
@@ -37,5 +37,14 @@ export class AuthController {
   @ApiUnauthorizedResponse()
   async convert(@Body() body: ConvertDTO) {
     return this.authService.convert(body);
+  }
+
+  @Patch('password')
+  @Private()
+  @ApiOperation({ summary: '비밀번호 변경' })
+  @ApiNoContentResponse()
+  @ApiUnauthorizedResponse()
+  async updatePassword(@Body() body: UpdatePasswordDTO) {
+    return this.authService.updatePassword(body);
   }
 }
