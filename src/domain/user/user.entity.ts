@@ -13,6 +13,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { UserType } from './enums';
 import { UserRolesEntity } from './user-roles.entity';
 import { FulfillmentGroupEntity } from '../fulfillment-group/fulfillment-group.entity';
 import { GridEntity } from '../grid/grid.entity';
@@ -27,6 +28,9 @@ import { createForeignKeyConstraintName, createIndexConstraintName } from '@/glo
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '사용자 PK' })
   readonly id: number;
+
+  @Column({ type: 'tinyint', unsigned: true, comment: '사용자 계정 구분' })
+  type: UserType;
 
   @Column({ type: 'varchar', length: 340, comment: '사용자 이메일 계정' })
   email: string;

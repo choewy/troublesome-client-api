@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsInstance, IsNotEmpty, IsString } from 'class-validator';
+
+import { CreatePartnerManagerDTO } from './create-partner-manager.dto';
 
 export class CreatePartnerDTO {
   @ApiProperty({ type: String, description: '고객사 이름' })
@@ -7,8 +9,8 @@ export class CreatePartnerDTO {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ type: String, description: '고객사 그룹 PK' })
-  @IsInt()
+  @ApiProperty({ type: CreatePartnerManagerDTO, description: '고객사 관리자 계정' })
+  @IsInstance(CreatePartnerManagerDTO)
   @IsNotEmpty()
-  partnerGroupId: number;
+  manager: CreatePartnerManagerDTO;
 }

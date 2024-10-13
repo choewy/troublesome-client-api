@@ -1,22 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { HttpStatus, Injectable } from '@nestjs/common';
 
+import { ParterModuleErrorCode } from './constants';
 import { CreatePartnerDTO, PartnerListDTO } from './dtos';
 
+import { Exception } from '@/core';
 import { PartnerRepository } from '@/domain/partner/partner.repository';
-import { PartnerGroupRepository } from '@/domain/partner-group/partner-group.repository';
-import { PermissionEntity } from '@/domain/permission/permission.entity';
-import { PermissionRepository } from '@/domain/permission/permission.repository';
-import { RoleRepository } from '@/domain/role/role.repository';
+import { UserRepository } from '@/domain/user/user.repository';
+import { ContextService } from '@/global';
 
 @Injectable()
 export class PartnerService {
   constructor(
-    private readonly dataSource: DataSource,
+    private readonly contextService: ContextService,
+    private readonly userRepository: UserRepository,
     private readonly partnerRepository: PartnerRepository,
-    private readonly partnerGroupRepository: PartnerGroupRepository,
-    private readonly roleRepository: RoleRepository,
-    private readonly permissionRepository: PermissionRepository,
   ) {}
 
   async list() {
@@ -24,59 +21,29 @@ export class PartnerService {
   }
 
   async create(body: CreatePartnerDTO) {
-    const partnerGroup = await this.partnerGroupRepository.findById(body.partnerGroupId);
+    const userContext = this.contextService.getUser();
+    const partnerGroupId = userContext.partnerGroup?.id ?? null;
 
-    if (partnerGroup === null) {
-      throw new NotFoundException();
+    if (partnerGroupId === null) {
+      throw new Exception(ParterModuleErrorCode.NotSelectedPartnerGroup, HttpStatus.BAD_REQUEST);
     }
 
-    // FIXME refactor
-    await this.dataSource.transaction(async (em) => {
-      const partnerId = await this.partnerRepository.insert(body, em);
+    const manager = body.manager;
 
-      const partnerAdminRoleId = await this.roleRepository.insert(
-        {
-          name: '관리자',
-          users: [],
-          partnerId,
-          isEditable: false,
-        },
-        em,
-      );
+    if (manager.password !== manager.confirmPassword) {
+      throw new Exception(ParterModuleErrorCode.UserPasswordsMispatch, HttpStatus.BAD_REQUEST);
+    }
 
-      await this.permissionRepository.insertBulk(
-        {
-          permissions: this.partnerAdminPermissions,
-          roleId: partnerAdminRoleId,
-        },
-        em,
-      );
+    const hasEmail = await this.userRepository.hasEmail(manager.email);
 
-      const partnerUserRoleId = await this.roleRepository.insert(
-        {
-          name: '사용자',
-          users: [],
-          partnerId,
-          isEditable: false,
-        },
-        em,
-      );
+    if (hasEmail) {
+      throw new Exception(ParterModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
+    }
 
-      await this.permissionRepository.insertBulk(
-        {
-          permissions: this.partnerUserPermissions,
-          roleId: partnerUserRoleId,
-        },
-        em,
-      );
-    });
-  }
-
-  protected get partnerAdminPermissions(): Pick<PermissionEntity, 'target'>[] {
-    return [];
-  }
-
-  protected get partnerUserPermissions(): Pick<PermissionEntity, 'target'>[] {
-    return [];
+    await this.partnerRepository.insertByGroupManager(
+      userContext,
+      { email: manager.email, name: manager.name, password: manager.password },
+      { partnerGroupId, name: body.name },
+    );
   }
 }

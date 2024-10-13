@@ -8,7 +8,6 @@ import {
   JoinTable,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -53,10 +52,6 @@ export class FulfillmentEntity {
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   deliveryCompanySettings: DeliveryCompanySettingEntity[];
-
-  @OneToOne(() => UserEntity, (e) => e.fulfillment, { cascade: true })
-  @JoinTable()
-  admin: UserEntity;
 
   @OneToMany(() => UserEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()

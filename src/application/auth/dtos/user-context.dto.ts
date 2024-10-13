@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { UserType } from '@/domain/user/enums';
 import { ContextUser, ContextUserRelation, ContextUserRole } from '@/global/context/implements';
 
 export class UserContextRoleDTO {
@@ -36,6 +37,9 @@ export class UserContextDTO {
   @ApiProperty({ type: Number, description: 'PK' })
   id: number;
 
+  @ApiProperty({ type: Number, enum: UserType, description: '사용자 계정 구분' })
+  type: UserType;
+
   @ApiProperty({ type: String, description: '사용자 이름' })
   name: string;
 
@@ -59,6 +63,7 @@ export class UserContextDTO {
 
   constructor(userContext: ContextUser) {
     this.id = userContext.id;
+    this.type = userContext.type;
     this.name = userContext.name;
     this.email = userContext.email;
     this.roles = userContext.roles.map(({ role }) => new UserContextRoleDTO(role));

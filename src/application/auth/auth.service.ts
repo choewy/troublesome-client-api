@@ -12,6 +12,7 @@ import { FulfillmentGroupRepository } from '@/domain/fulfillment-group/fulfillme
 import { InvitationRepository } from '@/domain/invitation/invitation.repository';
 import { PartnerRepository } from '@/domain/partner/partner.repository';
 import { PartnerGroupRepository } from '@/domain/partner-group/partner-group.repository';
+import { UserType } from '@/domain/user/enums';
 import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService, JwtConfigService } from '@/global';
@@ -87,6 +88,7 @@ export class AuthService {
   protected createTokenPayload(user: UserEntity): TokenPayload {
     return {
       id: user.id,
+      type: user.type,
       partnerGroupId: user.partnerGroupId ?? null,
       partnerId: user.partnerId ?? null,
       fulfillmentGroupId: user.fulfillmentGroupId ?? null,
@@ -154,7 +156,7 @@ export class AuthService {
       throw new Exception(AuthModuleErrorCode.Blocked, HttpStatus.FORBIDDEN);
     }
 
-    if (payload.systemAdmin || payload.manager) {
+    if (payload.type > UserType.User) {
       if (payload.partnerGroupId) {
         user.partnerGroup = await this.partnerGroupRepository.findContextById(payload.partnerGroupId);
       }
@@ -174,6 +176,7 @@ export class AuthService {
 
     this.contextService.setUser({
       id: user.id,
+      type: user.type,
       name: user.name,
       email: user.email,
       roles: user.roles,
@@ -181,8 +184,6 @@ export class AuthService {
       partnerGroup: user.partnerGroup,
       fulfillment: user.fulfillment,
       fulfillmentGroup: user.fulfillmentGroup,
-      systemAdmin: payload.systemAdmin,
-      manager: payload.manager,
     });
 
     return user;
@@ -209,17 +210,16 @@ export class AuthService {
     await this.userRepository.updatePassword(userId, body.newPassword);
   }
 
-  async convert(body: ConvertDTO, isSystemAdmin: boolean) {
+  async convert(body: ConvertDTO) {
     const userContext = this.contextService.getUser();
 
     return this.issueTokens({
       id: userContext.id,
+      type: userContext.type,
       partnerId: body.partnerId,
       partnerGroupId: body.partnerGroupId,
       fulfillmentId: body.fulfillmentId,
       fulfillmentGroupId: body.fulfillmentGroupId,
-      systemAdmin: isSystemAdmin,
-      manager: !isSystemAdmin,
     });
   }
 }

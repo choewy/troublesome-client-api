@@ -10,6 +10,7 @@ import {
 import { PermissionEntity } from '@/domain/permission/permission.entity';
 import { RoleDefaultPK } from '@/domain/role/enums';
 import { RoleEntity } from '@/domain/role/role.entity';
+import { UserType } from '@/domain/user/enums';
 import { UserRolesEntity } from '@/domain/user/user-roles.entity';
 import { UserEntity } from '@/domain/user/user.entity';
 import { InitializerConfigService } from '@/global';
@@ -35,6 +36,7 @@ export class BootstrapService implements OnModuleInit {
 
     return {
       id: 1,
+      type: UserType.SystemAdmin,
       name: '시스템 관리자',
       email: systemAdmin.email,
       password: systemAdmin.password,

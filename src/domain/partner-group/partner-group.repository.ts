@@ -5,6 +5,7 @@ import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 import { PartnerGroupEntity } from './partner-group.entity';
 import { PartnerEntity } from '../partner/partner.entity';
 import { RoleDefaultPK } from '../role/enums';
+import { UserType } from '../user/enums';
 import { UserRolesEntity } from '../user/user-roles.entity';
 import { UserEntity } from '../user/user.entity';
 
@@ -22,7 +23,7 @@ export class PartnerGroupRepository extends EntityRepository<PartnerGroupEntity>
 
   async findList(skip: number, take: number) {
     return this.getRepository().findAndCount({
-      relations: { manager: true },
+      relations: { manager: true, partners: true },
       skip,
       take,
     });
@@ -43,8 +44,6 @@ export class PartnerGroupRepository extends EntityRepository<PartnerGroupEntity>
   }
 
   async insert(args: DeepPartial<PartnerGroupEntity>, em?: EntityManager) {
-    const password = await hash(args.manager.password);
-
     const transactional = async (em: EntityManager) => {
       const partnerGroupRepository = em.getRepository(PartnerGroupEntity);
       const partnerGroup = partnerGroupRepository.create({ name: args.name });
@@ -52,7 +51,8 @@ export class PartnerGroupRepository extends EntityRepository<PartnerGroupEntity>
 
       if (args.manager) {
         const userRepository = em.getRepository(UserEntity);
-        const user = userRepository.create({ ...args.manager, password, partnerGroup });
+        const password = await hash(args.manager.password);
+        const user = userRepository.create({ ...args.manager, type: UserType.PartnerGroupManager, password, partnerGroup });
         await userRepository.insert(user);
 
         const userRolesRepository = em.getRepository(UserRolesEntity);

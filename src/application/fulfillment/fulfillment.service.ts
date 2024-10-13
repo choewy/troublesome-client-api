@@ -1,6 +1,4 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { hash } from 'argon2';
-import { DataSource } from 'typeorm';
 
 import { FulfillmentModuleErrorCode } from './constants';
 import { CreateFulfillmentDTO, FulfillmentDTO, FulfillmentListDTO, UpdateFulfillmentDTO } from './dtos';
@@ -8,20 +6,13 @@ import { CreateFulfillmentDTO, FulfillmentDTO, FulfillmentListDTO, UpdateFulfill
 import { toNull, toUndefined } from '@/common';
 import { Exception } from '@/core';
 import { DeliveryCompanyRepository } from '@/domain/delivery-company/delivery-company.repository';
-import { DeliveryCompanySettingEntity } from '@/domain/delivery-company-setting/delivery-company-setting.entity';
-import { FulfillmentEntity } from '@/domain/fulfillment/fulfillment.entity';
 import { FulfillmentRepository } from '@/domain/fulfillment/fulfillment.repository';
-import { FULFILLMENT_MANAGER_PERMISSION_TARGETS, FULFILLMENT_USER_PERMISSION_TARGETS } from '@/domain/permission/constants';
-import { RoleEntity } from '@/domain/role/role.entity';
-import { UserRolesEntity } from '@/domain/user/user-roles.entity';
-import { UserEntity } from '@/domain/user/user.entity';
 import { UserRepository } from '@/domain/user/user.repository';
 import { ContextService } from '@/global';
 
 @Injectable()
 export class FulfillmentService {
   constructor(
-    private readonly dataSource: DataSource,
     private readonly contextService: ContextService,
     private readonly userRepository: UserRepository,
     private readonly fulfillmentRepository: FulfillmentRepository,
@@ -57,7 +48,9 @@ export class FulfillmentService {
       throw new Exception(FulfillmentModuleErrorCode.AlreadyExistPlantCode, HttpStatus.CONFLICT);
     }
 
-    if (body.defaultDeliveryCompanyId) {
+    const deliveryCompanyId = body.defaultDeliveryCompanyId ?? null;
+
+    if (deliveryCompanyId) {
       const hasDeliveryCompany = await this.deliveryCompanyRepository.hasById(body.defaultDeliveryCompanyId);
 
       if (hasDeliveryCompany === false) {
@@ -77,69 +70,19 @@ export class FulfillmentService {
       throw new Exception(FulfillmentModuleErrorCode.UserAlreadyExist, HttpStatus.CONFLICT);
     }
 
-    // FIXME refactor
-    await this.dataSource.transaction(async (em) => {
-      const fulfillmentRepository = em.getRepository(FulfillmentEntity);
-      const fulfillment = fulfillmentRepository.create({
+    await this.fulfillmentRepository.insertByGroupManager(
+      userContext,
+      { email: manager.email, name: manager.name, password: manager.password },
+      {
+        fulfillmentGroupId,
         name: body.name,
         plantCode: body.plantCode,
-        zipCode: body.zipCode ?? null,
-        address: body.address ?? null,
-        addressDetail: body.addressDetail ?? null,
-        fulfillmentGroupId,
-      });
-
-      await fulfillmentRepository.insert(fulfillment);
-      const fulfillmentId = fulfillment.id;
-
-      if (body.defaultDeliveryCompanyId) {
-        const deliveryCompanySettingRepository = em.getRepository(DeliveryCompanySettingEntity);
-        const deliveryCompanySetting = deliveryCompanySettingRepository.create({
-          deliveryCompanyId: body.defaultDeliveryCompanyId,
-          isDefault: true,
-          fulfillmentId,
-        });
-
-        await deliveryCompanySettingRepository.insert(deliveryCompanySetting);
-      }
-
-      const roleRepository = em.getRepository(RoleEntity);
-      const roles = roleRepository.create([
-        {
-          name: '풀필먼트 센터 관리자',
-          isEditable: false,
-          permissions: FULFILLMENT_MANAGER_PERMISSION_TARGETS.map((target) => ({ target })),
-          fulfillmentId,
-        },
-        {
-          name: '풀필먼트 센터 사용자',
-          isEditable: false,
-          permissions: FULFILLMENT_USER_PERMISSION_TARGETS.map((target) => ({ target })),
-          fulfillmentId,
-        },
-      ]);
-
-      await roleRepository.insert(roles);
-
-      const userRepository = em.getRepository(UserEntity);
-      const user = userRepository.create({
-        email: manager.email,
-        name: manager.name,
-        password: await hash(manager.password),
-        fulfillmentId,
-      });
-      await userRepository.insert(user);
-
-      const userIds = [user.id];
-
-      if (userContext.manager) {
-        userIds.push(userContext.id);
-      }
-
-      const userRolesRepository = em.getRepository(UserRolesEntity);
-      const userRoles = userRolesRepository.create(userIds.map((userId) => ({ userId, roleId: roles[0].id })));
-      await userRolesRepository.insert(userRoles);
-    });
+        zipCode: toNull(body.zipCode),
+        address: toNull(body.address),
+        addressDetail: toNull(body.addressDetail),
+        deliveryCompanySettings: deliveryCompanyId ? [{ deliveryCompany: { id: deliveryCompanyId }, isDefault: true }] : [],
+      },
+    );
   }
 
   async update(id: number, body: UpdateFulfillmentDTO) {

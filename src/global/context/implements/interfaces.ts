@@ -1,3 +1,5 @@
+import { UserType } from '@/domain/user/enums';
+
 export interface ContextUserPermission {
   id: number;
   target: string;
@@ -22,6 +24,7 @@ export interface ContextUserRelation {
 
 export interface ContextUser {
   id: number;
+  type: UserType;
   name: string;
   email: string;
   roles: ContextUserRoles[];
@@ -29,6 +32,4 @@ export interface ContextUser {
   partner?: ContextUserRelation;
   fulfillmentGroup?: ContextUserRelation;
   fulfillment?: ContextUserRelation;
-  systemAdmin?: boolean;
-  manager?: boolean;
 }

@@ -5,6 +5,7 @@ import { DataSource, DeepPartial, EntityManager } from 'typeorm';
 import { FulfillmentGroupEntity } from './fulfillment-group.entity';
 import { FulfillmentEntity } from '../fulfillment/fulfillment.entity';
 import { RoleDefaultPK } from '../role/enums';
+import { UserType } from '../user/enums';
 import { UserRolesEntity } from '../user/user-roles.entity';
 import { UserEntity } from '../user/user.entity';
 
@@ -36,16 +37,16 @@ export class FulfillmentGroupRepository extends EntityRepository<FulfillmentGrou
   }
 
   async insert(args: DeepPartial<FulfillmentGroupEntity>, em?: EntityManager) {
-    const password = await hash(args.manager.password);
-
     const transactional = async (em: EntityManager) => {
       const fulfillmentGroupRepository = em.getRepository(FulfillmentGroupEntity);
       const fulfillmentGroup = fulfillmentGroupRepository.create({ name: args.name });
       await fulfillmentGroupRepository.insert(fulfillmentGroup);
 
       if (args.manager) {
+        const password = await hash(args.manager.password);
+
         const userRepository = em.getRepository(UserEntity);
-        const user = userRepository.create({ ...args.manager, password, fulfillmentGroup });
+        const user = userRepository.create({ ...args.manager, type: UserType.FulfillmentGroupManager, password, fulfillmentGroup });
         await userRepository.insert(user);
 
         const userRolesRepository = em.getRepository(UserRolesEntity);

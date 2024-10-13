@@ -48,21 +48,12 @@ export class AuthController {
     return this.authService.updatePassword(body);
   }
 
-  @Post('convert/admin')
-  @Private(PermissionTarget.Admin)
-  @ApiOperation({ summary: '(시스템 관리자 전용) 소속 전환' })
-  @ApiCreatedResponse({ type: TokenMapDTO })
-  @ApiUnauthorizedResponse()
-  async convertAdmin(@Body() body: ConvertDTO) {
-    return this.authService.convert(body, true);
-  }
-
-  @Post('convert/manager')
+  @Post('convert')
   @Private(PermissionTarget.PartnerAll, PermissionTarget.FulfillmentAll)
-  @ApiOperation({ summary: '(파트너/풀필먼트 관리자 전용) 소속 전환' })
+  @ApiOperation({ summary: '소속 전환' })
   @ApiCreatedResponse({ type: TokenMapDTO })
   @ApiUnauthorizedResponse()
-  async convertManager(@Body() body: ConvertDTO) {
-    return this.authService.convert(body, false);
+  async convert(@Body() body: ConvertDTO) {
+    return this.authService.convert(body);
   }
 }
