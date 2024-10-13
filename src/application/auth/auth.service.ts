@@ -212,26 +212,12 @@ export class AuthService {
   async convert(body: ConvertDTO, isSystemAdmin: boolean) {
     const userContext = this.contextService.getUser();
 
-    switch (true) {
-      case !!body.partnerGroupId || !!body.partnerId:
-        userContext.partner = !!body.partnerId ? await this.partnerRepository.findContextById(body.partnerId) : null;
-        userContext.partnerGroup = !!body.partnerGroupId ? await this.partnerGroupRepository.findContextById(body.partnerGroupId) : null;
-        break;
-
-      case !!body.fulfillmentGroupId || !!body.fulfillmentId:
-        userContext.fulfillment = !!body.fulfillmentId ? await this.fulfillmentRepository.findContextById(body.fulfillmentId) : null;
-        userContext.fulfillmentGroup = !!body.fulfillmentGroupId
-          ? await this.fulfillmentGroupRepository.findContextById(body.fulfillmentGroupId)
-          : null;
-        break;
-    }
-
     return this.issueTokens({
       id: userContext.id,
-      partnerId: userContext.partner?.id,
-      partnerGroupId: userContext.partnerGroup?.id,
-      fulfillmentId: userContext.fulfillment?.id,
-      fulfillmentGroupId: userContext.fulfillmentGroup?.id,
+      partnerId: body.partnerId,
+      partnerGroupId: body.partnerGroupId,
+      fulfillmentId: body.fulfillmentId,
+      fulfillmentGroupId: body.fulfillmentGroupId,
       systemAdmin: isSystemAdmin,
       manager: !isSystemAdmin,
     });
