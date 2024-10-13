@@ -15,6 +15,7 @@ import {
 
 import { UserRolesEntity } from './user-roles.entity';
 import { FulfillmentGroupEntity } from '../fulfillment-group/fulfillment-group.entity';
+import { GridEntity } from '../grid/grid.entity';
 
 import { FulfillmentEntity } from '@/domain/fulfillment/fulfillment.entity';
 import { PartnerEntity } from '@/domain/partner/partner.entity';
@@ -67,12 +68,13 @@ export class UserEntity {
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'fulfillment', 'id') })
   fulfillment: FulfillmentEntity | null;
 
-  @Column({ type: 'int', unsigned: true, nullable: true })
-  roleId: number;
-
   @OneToMany(() => UserRolesEntity, (e) => e.user, { cascade: true })
   @JoinTable()
   roles: UserRolesEntity[];
+
+  @OneToMany(() => GridEntity, (e) => e.user, { cascade: true })
+  @JoinTable()
+  grids: GridEntity[];
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;
