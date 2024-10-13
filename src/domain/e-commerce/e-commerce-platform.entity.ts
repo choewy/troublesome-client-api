@@ -10,6 +10,9 @@ export class EcommercePlatformEntity {
   @Column({ type: 'varchar', length: 50, comment: 'e-커머스 플랫폼 이름' })
   name: string;
 
+  @Column({ type: 'boolean', default: true, comment: 'e-커머스 플랫폼 활성 여부' })
+  isActive: boolean;
+
   @OneToMany(() => EcommerceChannelEntity, (e) => e.ecommercePlatform, { cascade: ['remove'] })
   @JoinTable()
   ecommerceChannels: EcommerceChannelEntity[];

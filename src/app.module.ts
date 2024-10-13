@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './application/auth/auth.module';
 import { BootstrapModule } from './application/bootstrap/bootstrap.module';
 import { DeliveryCompanyModule } from './application/delivery-company/delivery-company.module';
+import { EcommerceModule } from './application/e-commerce/e-commerce.module';
 import { FulfillmentModule } from './application/fulfillment/fulfillment.module';
 import { FulfillmentGroupModule } from './application/fulfillment-group/fulfillment-group.module';
 import { GridModule } from './application/grid/grid.module';
@@ -32,6 +33,7 @@ import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from
     PartnerModule,
     InvitationModule,
     DeliveryCompanyModule,
+    EcommerceModule,
   ],
   providers: [SerializeInterceptor, ExceptionFilter, ValidationPipe],
 })
