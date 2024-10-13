@@ -132,6 +132,6 @@ export class FulfillmentService {
       throw new Exception(FulfillmentModuleErrorCode.CannotUpdateOrDelete, HttpStatus.FORBIDDEN);
     }
 
-    await this.fulfillmentRepository.getRepository().softDelete(id);
+    await this.fulfillmentRepository.delete(id);
   }
 }

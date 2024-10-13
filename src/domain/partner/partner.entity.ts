@@ -27,6 +27,15 @@ export class PartnerEntity {
   @Column({ type: 'varchar', length: 50, comment: '고객사 이름' })
   name: string;
 
+  @Column({ type: 'varchar', length: 6, default: null, comment: '우편번호' })
+  zipCode: string | null;
+
+  @Column({ type: 'varchar', length: 255, default: null, comment: '주소' })
+  address: string | null;
+
+  @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
+  addressDetail: string | null;
+
   @Column({ type: 'int', unsigned: true, nullable: true })
   partnerGroupId: number;
 

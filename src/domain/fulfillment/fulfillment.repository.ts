@@ -110,11 +110,11 @@ export class FulfillmentRepository extends EntityRepository<FulfillmentEntity> {
     return em ? transactional(em) : this.dataSource.transaction(transactional);
   }
 
-  async save(args: DeepPartial<FulfillmentEntity>, em?: EntityManager) {
-    return this.getRepository(em).save(args);
-  }
-
   async update(id: number, args: DeepPartial<FulfillmentEntity>, em?: EntityManager) {
     return this.getRepository(em).update(id, args);
+  }
+
+  async delete(id: number, em?: EntityManager) {
+    return this.getRepository(em).softDelete(id);
   }
 }

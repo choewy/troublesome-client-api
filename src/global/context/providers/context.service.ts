@@ -32,6 +32,16 @@ export class ContextService {
     return this.clsService.get(ContextKey.User) ?? null;
   }
 
+  canAccessPartner<T extends Pick<ContextUserRelation, 'id'> & { partnerGroupId: number }>(partner: T) {
+    const userContext = this.getUser();
+
+    return (
+      (userContext.partner === null && userContext.partnerGroup === null) ||
+      (userContext.partner && userContext.partner.id !== partner.id) ||
+      (userContext.partnerGroup && userContext.partnerGroup.id !== partner.partnerGroupId)
+    );
+  }
+
   canAccessFulfillment<T extends Pick<ContextUserRelation, 'id'> & { fulfillmentGroupId: number }>(fulfillment: T) {
     const userContext = this.getUser();
 

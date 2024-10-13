@@ -1,4 +1,4 @@
-export enum ParterModuleErrorCode {
+export enum PartnerModuleErrorCode {
   UserAlreadyExist = 'PARTNER_USER_ALREADY_EXIST',
   UserPasswordsMispatch = 'PARTNER_USER_PASSWORDS_MISMATCH',
   NotFoundPartner = 'PARTNER_NOT_FOUND',

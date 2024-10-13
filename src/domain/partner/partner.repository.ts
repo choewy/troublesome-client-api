@@ -85,4 +85,12 @@ export class PartnerRepository extends EntityRepository<PartnerEntity> {
 
     return em ? transactional(em) : this.dataSource.transaction(transactional);
   }
+
+  async update(id: number, args: DeepPartial<PartnerEntity>, em?: EntityManager) {
+    return this.getRepository(em).update(id, args);
+  }
+
+  async delete(id: number, em?: EntityManager) {
+    return this.getRepository(em).softDelete(id);
+  }
 }
