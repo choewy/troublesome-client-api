@@ -1,13 +1,13 @@
-name: newbox
+name: troublesome
 
 services:
   mysql:
     image: mysql:8.0
-    container_name: newbox-mysql
+    container_name: troublesome-mysql
     environment:
-      MYSQL_USER: newbox
-      MYSQL_PASSWORD: newbox
-      MYSQL_ROOT_PASSWORD: newbox
+      MYSQL_USER: troublesome
+      MYSQL_PASSWORD: troublesome
+      MYSQL_ROOT_PASSWORD: troublesome
       TZ: Asia/Seoul
     volumes:
       - .docker/mysql/initdb.d:/docker-entrypoint-initdb.d
@@ -17,11 +17,11 @@ services:
       - 33063:3306
     restart: unless-stopped
     networks:
-      - newbox
+      - troublesome
 
   redis:
     image: redis/redis-stack-server:7.2.0-v10
-    container_name: newbox-redis
+    container_name: troublesome-redis
     volumes:
       - .docker/redis/redis.conf/:/redis-stack.conf
       - .docker/redis/data/:/data
@@ -30,8 +30,8 @@ services:
       - 6383:6379
     restart: unless-stopped
     networks:
-      - newbox
+      - troublesome
 
 networks:
-  newbox:
+  troublesome:
     driver: bridge

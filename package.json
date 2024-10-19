@@ -1,7 +1,7 @@
 {
-  "name": "@choewy/troublesome-api",
+  "name": "@choewy/troublesome-client-api",
   "version": "0.0.1",
-  "description": "Troublesome API",
+  "description": "Troublesome Client API",
   "author": "choewy",
   "private": true,
   "license": "UNLICENSED",
