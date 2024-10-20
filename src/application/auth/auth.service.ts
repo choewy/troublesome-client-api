@@ -2,18 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { verify } from 'argon2';
 
-import { LoginDTO, SignUpDTO, TokensDTO } from './dtos';
+import { LoginDTO, SignUpDTO, TokensDTO, UpdatePasswordDTO } from './dtos';
 import {
   AlreadyExistUserException,
   InactivatedUserException,
   InvalidEmailOrPasswordException,
   InvalidInvitationException,
   InvalidUserException,
-  PasswordMismatchException,
+  WrongPasswordException,
 } from './exceptions';
 import { JwtCustomPayload, JwtVerifyResult } from './implements';
 import { InvitationService } from '../invitation';
-import { UserService } from '../user';
+import { PasswordMismatchException, UserService } from '../user';
 
 import { JwtConfigFactory } from '@/common';
 import { ContextService } from '@/core';
@@ -59,14 +59,28 @@ export class AuthService {
       throw new AlreadyExistUserException();
     }
 
-    if (body.password !== body.confirmPassword) {
-      throw new PasswordMismatchException();
-    }
-
-    const user = await this.userService.create(invitation, body.email, body.name, body.password);
+    const user = await this.userService.createWithInvitation(body, invitation);
     const tokens = this.issueTokens(user);
 
     return new TokensDTO(tokens.accessToken, tokens.refreshToken);
+  }
+
+  async updatePassword(body: UpdatePasswordDTO) {
+    const requestUser = this.contextService.getRequestUser();
+    const user = await this.userService.findById(requestUser.id);
+
+    if (await verify(user.password, body.currentPassword)) {
+      throw new WrongPasswordException();
+    }
+
+    if (body.newPassword !== body.currentPassword) {
+      throw new PasswordMismatchException();
+    }
+
+    await this.userService.updateById(user.id, {
+      password: body.newPassword,
+      confirmPassword: body.confirmPassword,
+    });
   }
 
   validateJwtPayload(payload: JwtCustomPayload) {
