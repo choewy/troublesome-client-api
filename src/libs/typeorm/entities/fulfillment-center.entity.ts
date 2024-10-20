@@ -32,11 +32,14 @@ export class FulfillmentCenterEntity {
   @Column({ type: 'varchar', length: 5, comment: '풀필먼트 센터 플랜트 코드' })
   plantCode: string;
 
-  @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })
-  tel: string | null;
+  @Column({ type: 'varchar', length: 50, default: null, comment: '발송인명' })
+  consignerName: string | null;
 
-  @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })
-  phone: string | null;
+  @Column({ type: 'varchar', length: 20, default: null, comment: '발송인 연락처' })
+  consignerTel: string | null;
+
+  @Column({ type: 'varchar', length: 20, default: null, comment: '발송인 휴대폰' })
+  consignerPhone: string | null;
 
   @Column({ type: 'varchar', length: 6, default: null, comment: '우편번호' })
   zipCode: string | null;
@@ -52,7 +55,7 @@ export class FulfillmentCenterEntity {
 
   @ManyToOne(() => FulfillmentCompanyEntity, (e) => e.fulfillmentCenters, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('fulfillment_center', 'fulfillment_company', 'id') })
-  fulfillmentCompany: FulfillmentCenterEntity | null;
+  fulfillmentCompany: FulfillmentCompanyEntity | null;
 
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillmentCenter, { cascade: true })
   @JoinTable()
