@@ -60,7 +60,7 @@ export class UserService {
         name: body.name,
         password: await hash(body.password),
         partnerId: invitation.partnerId,
-        fulfillmentId: invitation.fulfillmentId,
+        fulfillmentCenterId: invitation.fulfillmentCenterId,
       });
 
       await userRepository.insert(user);
