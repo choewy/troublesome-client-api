@@ -1,1 +1,1 @@
-export * from './list-dto.builder';
+export * from './list-response-builder';

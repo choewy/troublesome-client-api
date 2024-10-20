@@ -1,40 +1,26 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthModule } from './application/auth/auth.module';
-import { BootstrapModule } from './application/bootstrap/bootstrap.module';
-import { DeliveryCompanyModule } from './application/delivery-company/delivery-company.module';
-import { EcommerceModule } from './application/e-commerce/e-commerce.module';
-import { FulfillmentModule } from './application/fulfillment/fulfillment.module';
-import { FulfillmentGroupModule } from './application/fulfillment-group/fulfillment-group.module';
-import { GridModule } from './application/grid/grid.module';
-import { InvitationModule } from './application/invitation/invitation.module';
-import { PartnerModule } from './application/partner/partner.module';
-import { PartnerGroupModule } from './application/partner-group/partner-group.module';
-import { PermissionModule } from './application/permission/permission.module';
-import { VersionModule } from './application/version/version.module';
-
-import { SerializeInterceptor, ValidationPipe, ExceptionFilter } from '@/core';
-import { ConfigFactoryModule, ContextModule, DatabaseModule, LoggerModule } from '@/global';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ApplicationModule } from './application';
+import { ConfigFactoryModule, TypeOrmConfigFactory } from './common';
+import { ContextModule, ContextQueryLogger, LoggerModule } from './core';
 
 @Module({
   imports: [
-    ConfigFactoryModule,
-    ContextModule,
-    LoggerModule,
-    DatabaseModule,
-    VersionModule,
-    BootstrapModule,
-    PermissionModule,
-    AuthModule,
-    GridModule,
-    FulfillmentGroupModule,
-    FulfillmentModule,
-    PartnerGroupModule,
-    PartnerModule,
-    InvitationModule,
-    DeliveryCompanyModule,
-    EcommerceModule,
+    ConfigFactoryModule.forRoot(),
+    ContextModule.forRoot(),
+    LoggerModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      inject: [TypeOrmConfigFactory, ContextQueryLogger],
+      useFactory(configFactory: TypeOrmConfigFactory, contextQueryLogger: ContextQueryLogger) {
+        return configFactory.createTypeOrmModuleOptions(contextQueryLogger);
+      },
+    }),
+    ApplicationModule,
   ],
-  providers: [SerializeInterceptor, ExceptionFilter, ValidationPipe],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
