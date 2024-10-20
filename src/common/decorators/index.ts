@@ -1,1 +1,2 @@
-export * from './set-metadata.decorators';
+export * from './private';
+export * from './public';

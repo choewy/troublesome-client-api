@@ -1,44 +1,36 @@
-import { NestFactory } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import { NestFactory, Reflector } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { AuthGuard } from './application/auth/auth.guard';
-import { PermissionGuard } from './application/permission/permission.guard';
+import { JwtGuard } from './application/auth';
+import { ExceptionFilter, SerializeInterceptor, Swagger, SwaggerDocumentOptions, ValidationPipe } from './bootstrap';
+import { AppConfigFactory, isLocal } from './common';
+import { ContextInterceptor } from './core';
 
-import { ExceptionFilter, SerializeInterceptor, ValidationPipe } from '@/core';
-import { Swagger, SwaggerDocumentOptions } from '@/document';
-import { AppConfigService, ContextInterceptor, JwtConfigService } from '@/global';
-
-async function bootstrap() {
+const bootstrap = async () => {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  const appConfigService = app.get(AppConfigService);
-  const jwtConfigService = app.get(JwtConfigService);
-  const jwtService = app.get(JwtService);
+  const appConfigFactory = app.get(AppConfigFactory);
+  const packageProfile = appConfigFactory.packageProfile;
 
-  if (appConfigService.isProduction === false) {
+  if (isLocal()) {
     const swaggerOptions: SwaggerDocumentOptions = {
-      title: appConfigService.name,
-      version: appConfigService.version,
-      server: { url: appConfigService.httpUrl },
+      title: packageProfile.name,
+      version: packageProfile.version,
     };
-
-    if (appConfigService.isLocal) {
-      swaggerOptions.authOption = {
-        accessToken: jwtService.sign({ id: 1 }, jwtConfigService.accessTokenSignOptions),
-        refreshToken: jwtService.sign({ id: 1 }, jwtConfigService.refreshTokenSignOptions),
-      };
-    }
 
     Swagger.setup(app, swaggerOptions);
   }
 
-  app.enableShutdownHooks();
-  app.enableCors(appConfigService.corsOptions);
-  app.useGlobalInterceptors(app.get(SerializeInterceptor), app.get(ContextInterceptor));
-  app.useGlobalPipes(app.get(ValidationPipe));
-  app.useGlobalFilters(app.get(ExceptionFilter));
-  app.useGlobalGuards(app.get(AuthGuard), app.get(PermissionGuard));
+  const corsOptions = appConfigFactory.corsOptions;
+  const { port, host } = appConfigFactory.listenOptions;
 
-  await app.listen(appConfigService.port, appConfigService.host);
-}
+  app.enableShutdownHooks();
+  app.enableCors(corsOptions);
+  app.useGlobalInterceptors(new SerializeInterceptor(app.get(Reflector)), app.get(ContextInterceptor));
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new ExceptionFilter());
+  app.useGlobalGuards(app.get(JwtGuard));
+
+  await app.listen(port, host);
+};
+
 bootstrap();

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { InvitationController } from './invitation.controller';
-import { InvitationUseCase } from './invitation.service';
+import { InvitationService } from './invitation.service';
 
-import { InvitationRepository } from '@/domain/invitation/invitation.repository';
-import { UserRepository } from '@/domain/user/user.repository';
+import { InvitationEntity } from '@/libs';
 
 @Module({
-  controllers: [InvitationController],
-  providers: [InvitationUseCase, InvitationRepository, UserRepository],
+  imports: [TypeOrmModule.forFeature([InvitationEntity])],
+  providers: [InvitationService],
+  exports: [InvitationService],
 })
 export class InvitationModule {}
