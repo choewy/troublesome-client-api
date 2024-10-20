@@ -4,7 +4,9 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
   JoinTable,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -12,10 +14,11 @@ import {
 
 import { BoxEntity } from './box.entity';
 import { DeliveryCompanySettingEntity } from './delivery-company-setting.entity';
+import { FulfillmentCompanyEntity } from './fulfillment-company.entity';
 import { LocationEntity } from './location.entity';
 import { RoleEntity } from './role.entity';
 import { UserEntity } from './user.entity';
-import { createIndexConstraintName } from '../helpers';
+import { createForeignKeyConstraintName, createIndexConstraintName } from '../helpers';
 
 @Index(createIndexConstraintName('fulfillment_center', 'plant_code'), ['plantCode'])
 @Entity({ name: 'fulfillment_center', comment: '풀필먼트 센터' })
@@ -43,6 +46,13 @@ export class FulfillmentCenterEntity {
 
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
+
+  @Column({ type: 'int', unsigned: true, nullable: true })
+  fulfillmentCompanyId: number | null;
+
+  @ManyToOne(() => FulfillmentCompanyEntity, (e) => e.fulfillmentCenters, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('fulfillment_center', 'fulfillment_company', 'id') })
+  fulfillmentCompany: FulfillmentCenterEntity | null;
 
   @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillmentCenter, { cascade: true })
   @JoinTable()

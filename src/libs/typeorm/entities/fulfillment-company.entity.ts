@@ -1,4 +1,15 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinTable,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+import { FulfillmentCenterEntity } from './fulfillment-center.entity';
 
 @Entity({ name: 'fulfillment_company', comment: '풀필먼트 업체' })
 export class FulfillmentCompanyEntity {
@@ -31,6 +42,10 @@ export class FulfillmentCompanyEntity {
 
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
+
+  @OneToMany(() => FulfillmentCenterEntity, (e) => e.fulfillmentCompany, { cascade: true })
+  @JoinTable()
+  fulfillmentCenters: FulfillmentCenterEntity[];
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;
