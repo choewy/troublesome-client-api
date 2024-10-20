@@ -1,6 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { JwtGuard } from './application/auth';
 import { ExceptionFilter, SerializeInterceptor, Swagger, SwaggerDocumentOptions, ValidationPipe } from './bootstrap';
 import { AppConfigFactory, isLocal } from './common';
 import { ContextInterceptor } from './core';
@@ -27,7 +28,7 @@ const bootstrap = async () => {
   app.useGlobalInterceptors(new SerializeInterceptor(app.get(Reflector)), app.get(ContextInterceptor));
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new ExceptionFilter());
-  // app.useGlobalGuards(app.get(JwtGuard), app.get(RootGuard));
+  app.useGlobalGuards(app.get(JwtGuard));
 
   await app.listen(port, host);
 };
