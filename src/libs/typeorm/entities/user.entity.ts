@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { FulfillmentEntity } from './fulfillment.entity';
+import { FulfillmentCenterEntity } from './fulfillment-center.entity';
 import { GridEntity } from './grid.entity';
 import { PartnerEntity } from './partner.entity';
 import { UserRolesEntity } from './user-roles.entity';
@@ -42,11 +42,11 @@ export class UserEntity {
   partner: PartnerEntity | null;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
-  fulfillmentId: number;
+  fulfillmentCenterId: number;
 
-  @ManyToOne(() => FulfillmentEntity, (e) => e.users, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'fulfillment', 'id') })
-  fulfillment: FulfillmentEntity | null;
+  @ManyToOne(() => FulfillmentCenterEntity, (e) => e.users, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('user', 'fulfillment_center', 'id') })
+  fulfillmentCenter: FulfillmentCenterEntity | null;
 
   @OneToMany(() => UserRolesEntity, (e) => e.user, { cascade: true })
   @JoinTable()

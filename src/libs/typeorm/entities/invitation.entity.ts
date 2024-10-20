@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { FulfillmentEntity } from './fulfillment.entity';
+import { FulfillmentCenterEntity } from './fulfillment-center.entity';
 import { PartnerEntity } from './partner.entity';
 import { UserEntity } from './user.entity';
 import { createForeignKeyConstraintName } from '../helpers';
@@ -44,11 +44,11 @@ export class InvitationEntity {
   partner: PartnerEntity | null;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
-  fulfillmentId: number | null;
+  fulfillmentCenterId: number | null;
 
-  @ManyToOne(() => FulfillmentEntity, { nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('invitation', 'fulfillment', 'id') })
-  fulfillment: FulfillmentEntity | null;
+  @ManyToOne(() => FulfillmentCenterEntity, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('invitation', 'fulfillment_center', 'id') })
+  fulfillmentCenter: FulfillmentCenterEntity | null;
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;

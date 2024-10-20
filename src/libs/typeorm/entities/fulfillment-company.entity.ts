@@ -9,18 +9,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { EcommerceChannelEntity } from './e-commerce-channel.entity';
-import { ProductEntity } from './product.entity';
-import { PurchaserEntity } from './purchaser.entity';
-import { RoleEntity } from './role.entity';
-import { UserEntity } from './user.entity';
+import { FulfillmentCenterEntity } from './fulfillment-center.entity';
 
-@Entity({ name: 'partner', comment: '고객사' })
-export class PartnerEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '고객사 PK' })
+@Entity({ name: 'fulfillment_company', comment: '풀필먼트 업체' })
+export class FulfillmentCompanyEntity {
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '풀필먼트 업체 PK' })
   readonly id: number;
 
-  @Column({ type: 'varchar', length: 50, comment: '고객사명' })
+  @Column({ type: 'varchar', length: 50, comment: '풀필먼트 업체명' })
   name: string;
 
   @Column({ type: 'varchar', length: 50, default: null, comment: '대표자 이름' })
@@ -47,25 +43,9 @@ export class PartnerEntity {
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
 
-  @OneToMany(() => UserEntity, (e) => e.partner, { cascade: true })
+  @OneToMany(() => FulfillmentCenterEntity, (e) => e.fulfillmentCompany, { cascade: true })
   @JoinTable()
-  users: UserEntity[];
-
-  @OneToMany(() => RoleEntity, (e) => e.partner, { cascade: true })
-  @JoinTable()
-  roles: RoleEntity[];
-
-  @OneToMany(() => ProductEntity, (e) => e.partner, { cascade: true })
-  @JoinTable()
-  products: ProductEntity[];
-
-  @OneToMany(() => PurchaserEntity, (e) => e.partner, { cascade: true })
-  @JoinTable()
-  purchasers: PurchaserEntity[];
-
-  @OneToMany(() => EcommerceChannelEntity, (e) => e.partner, { cascade: true })
-  @JoinTable()
-  ecommerceChannels: EcommerceChannelEntity[];
+  fulfillmentCenters: FulfillmentCenterEntity[];
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;

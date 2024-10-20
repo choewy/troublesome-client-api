@@ -9,7 +9,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { FulfillmentEntity } from './fulfillment.entity';
+import { FulfillmentCenterEntity } from './fulfillment-center.entity';
+import { LocationEntity } from './location.entity';
+import { ProductEntity } from './product.entity';
 import { InventoryStatus } from '../enums';
 import { createForeignKeyConstraintName } from '../helpers';
 
@@ -27,23 +29,23 @@ export class InventoryEntity {
   @Column({ type: 'int', unsigned: true, nullable: true })
   productId: number;
 
-  // @ManyToOne(() => ProductEntity, { onDelete: 'CASCADE' })
-  // @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'product', 'id') })
-  // product: ProductEntity;
+  @ManyToOne(() => ProductEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'product', 'id') })
+  product: ProductEntity;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
-  fulfillmentId: number;
+  fulfillmentCenterId: number;
 
-  @ManyToOne(() => FulfillmentEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'fulfillment', 'id') })
-  fulfillment: FulfillmentEntity;
+  @ManyToOne(() => FulfillmentCenterEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'fulfillment_center', 'id') })
+  fulfillmentCenter: FulfillmentCenterEntity;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   locationId: number;
 
-  // @ManyToOne(() => LocationEntity, { onDelete: 'CASCADE' })
-  // @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'location', 'id') })
-  // location: LocationEntity;
+  @ManyToOne(() => LocationEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'location', 'id') })
+  location: LocationEntity;
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;
