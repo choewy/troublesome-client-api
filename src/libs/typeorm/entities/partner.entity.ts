@@ -20,8 +20,23 @@ export class PartnerEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '고객사 PK' })
   readonly id: number;
 
-  @Column({ type: 'varchar', length: 50, comment: '고객사 이름' })
+  @Column({ type: 'varchar', length: 50, comment: '고객사명' })
   name: string;
+
+  @Column({ type: 'varchar', length: 50, default: null, comment: '대표자 이름' })
+  president: string | null;
+
+  @Column({ type: 'varchar', length: 20, default: null, comment: '연락처' })
+  contact: string | null;
+
+  @Column({ type: 'varchar', length: 20, default: null, comment: 'FAX' })
+  fax: string | null;
+
+  @Column({ type: 'varchar', length: 320, default: null, comment: '이메일' })
+  email: string | null;
+
+  @Column({ type: 'varchar', length: 1024, default: null, comment: '홈페이지 URL' })
+  url: string | null;
 
   @Column({ type: 'varchar', length: 6, default: null, comment: '우편번호' })
   zipCode: string | null;

@@ -2,7 +2,7 @@ import { Type } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
 export const ListResponsBuilder = <Entity, D = any>(DTO: Type<D>) => {
-  class ListDTO {
+  class ListResponseDTO {
     @ApiProperty({ type: Number })
     total: number;
 
@@ -15,5 +15,5 @@ export const ListResponsBuilder = <Entity, D = any>(DTO: Type<D>) => {
     }
   }
 
-  return ListDTO;
+  return ListResponseDTO;
 };

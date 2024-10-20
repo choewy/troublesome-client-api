@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { FulfillmentEntity } from './fulfillment.entity';
+import { FulfillmentCenterEntity } from './fulfillment-center.entity';
 import { PartnerEntity } from './partner.entity';
 import { BoxType } from '../enums';
 import { createForeignKeyConstraintName } from '../helpers';
@@ -55,11 +55,11 @@ export class BoxEntity {
   laborCost: number;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
-  fulfillmentId: number;
+  fulfillmentCenterId: number;
 
-  @ManyToOne(() => FulfillmentEntity, (e) => e.boxes, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('box', 'fulfillment', 'id') })
-  fulfillment: FulfillmentEntity | null;
+  @ManyToOne(() => FulfillmentCenterEntity, (e) => e.boxes, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('box', 'fulfillment_center', 'id') })
+  fulfillmentCenter: FulfillmentCenterEntity | null;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   partnerId: number;
