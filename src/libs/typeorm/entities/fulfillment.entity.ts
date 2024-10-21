@@ -20,16 +20,16 @@ import { RoleEntity } from './role.entity';
 import { UserEntity } from './user.entity';
 import { createForeignKeyConstraintName, createIndexConstraintName } from '../helpers';
 
-@Index(createIndexConstraintName('fulfillment_center', 'plant_code'), ['plantCode'])
-@Entity({ name: 'fulfillment_center', comment: '풀필먼트 센터' })
-export class FulfillmentCenterEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '풀필먼트 센터 PK' })
+@Index(createIndexConstraintName('fulfillment', 'plant_code'), ['plantCode'])
+@Entity({ name: 'fulfillment', comment: '풀필먼트 센터' })
+export class FulfillmentEntity {
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '풀필먼트 PK' })
   readonly id: number;
 
-  @Column({ type: 'varchar', length: 50, comment: '풀필먼트센 터 이름' })
+  @Column({ type: 'varchar', length: 50, comment: '풀필먼트 이름' })
   name: string;
 
-  @Column({ type: 'varchar', length: 5, comment: '풀필먼트 센터 플랜트 코드' })
+  @Column({ type: 'varchar', length: 5, comment: '풀필먼트 플랜트 코드' })
   plantCode: string;
 
   @Column({ type: 'varchar', length: 50, default: null, comment: '발송인명' })
@@ -53,27 +53,27 @@ export class FulfillmentCenterEntity {
   @Column({ type: 'int', unsigned: true, nullable: true })
   fulfillmentCompanyId: number | null;
 
-  @ManyToOne(() => FulfillmentCompanyEntity, (e) => e.fulfillmentCenters, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('fulfillment_center', 'fulfillment_company', 'id') })
+  @ManyToOne(() => FulfillmentCompanyEntity, (e) => e.fulfillments, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('fulfillment', 'fulfillment_company', 'id') })
   fulfillmentCompany: FulfillmentCompanyEntity | null;
 
-  @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillmentCenter, { cascade: true })
+  @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   deliveryCompanySettings: DeliveryCompanySettingEntity[];
 
-  @OneToMany(() => UserEntity, (e) => e.fulfillmentCenter, { cascade: true })
+  @OneToMany(() => UserEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   users: UserEntity[];
 
-  @OneToMany(() => RoleEntity, (e) => e.fulfillmentCenter, { cascade: true })
+  @OneToMany(() => RoleEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   roles: RoleEntity[];
 
-  @OneToMany(() => LocationEntity, (e) => e.fulfillmentCenter, { cascade: true })
+  @OneToMany(() => LocationEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   locations: LocationEntity[];
 
-  @OneToMany(() => BoxEntity, (e) => e.fulfillmentCenter, { cascade: true })
+  @OneToMany(() => BoxEntity, (e) => e.fulfillment, { cascade: true })
   @JoinTable()
   boxes: BoxEntity[];
 

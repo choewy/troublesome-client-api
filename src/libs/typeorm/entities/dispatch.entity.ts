@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 import { DeliveryCompanyEntity } from './delivery-company.entity';
-import { FulfillmentCenterEntity } from './fulfillment-center.entity';
+import { FulfillmentEntity } from './fulfillment.entity';
 import { createForeignKeyConstraintName } from '../helpers';
 
 @Entity({ name: 'dispatch', comment: '출고' })
@@ -19,11 +19,11 @@ export class DispatchEntity {
   readonly id: number;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
-  fulfillmentCenterId: number;
+  fulfillmentId: number;
 
   @ManyToOne(() => DeliveryCompanyEntity, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('dispatch', 'fulfillment_center', 'id') })
-  fulfillmentCenter: FulfillmentCenterEntity | null;
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('dispatch', 'fulfillment', 'id') })
+  fulfillment: FulfillmentEntity | null;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   deliveryCompanyId: number;

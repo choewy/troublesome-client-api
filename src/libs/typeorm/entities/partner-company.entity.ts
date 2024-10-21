@@ -9,14 +9,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { FulfillmentEntity } from './fulfillment.entity';
+import { PartnerEntity } from './partner.entity';
 
-@Entity({ name: 'fulfillment_company', comment: '풀필먼트 업체' })
-export class FulfillmentCompanyEntity {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '풀필먼트 업체 PK' })
+@Entity({ name: 'partner_company', comment: '고객사 업체' })
+export class PartnerCompanyEntity {
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true, comment: '고객사 업체 PK' })
   readonly id: number;
 
-  @Column({ type: 'varchar', length: 50, comment: '풀필먼트 업체명' })
+  @Column({ type: 'varchar', length: 50, comment: '고객사 업체명' })
   name: string;
 
   @Column({ type: 'varchar', length: 50, default: null, comment: '대표자 이름' })
@@ -43,9 +43,9 @@ export class FulfillmentCompanyEntity {
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
 
-  @OneToMany(() => FulfillmentEntity, (e) => e.fulfillmentCompany, { cascade: true })
+  @OneToMany(() => PartnerEntity, (e) => e.partnerCompany, { cascade: true })
   @JoinTable()
-  fulfillments: FulfillmentEntity[];
+  partners: PartnerEntity[];
 
   @CreateDateColumn({ type: 'timestamp', comment: '생성일시' })
   readonly createdAt: Date;

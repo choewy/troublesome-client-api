@@ -3,17 +3,21 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { EcommerceChannelEntity } from './e-commerce-channel.entity';
+import { PartnerCompanyEntity } from './partner-company.entity';
 import { ProductEntity } from './product.entity';
 import { PurchaserEntity } from './purchaser.entity';
 import { RoleEntity } from './role.entity';
 import { UserEntity } from './user.entity';
+import { createForeignKeyConstraintName } from '../helpers';
 
 @Entity({ name: 'partner', comment: '고객사' })
 export class PartnerEntity {
@@ -46,6 +50,13 @@ export class PartnerEntity {
 
   @Column({ type: 'varchar', length: 100, default: null, comment: '상세주소' })
   addressDetail: string | null;
+
+  @Column({ type: 'int', unsigned: true, nullable: true })
+  partnerCompanyId: number | null;
+
+  @ManyToOne(() => PartnerCompanyEntity, (e) => e.partners, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('partner', 'partner_company', 'id') })
+  partnerCompany: PartnerCompanyEntity | null;
 
   @OneToMany(() => UserEntity, (e) => e.partner, { cascade: true })
   @JoinTable()

@@ -25,7 +25,10 @@ export class DeliveryCompanyEntity {
   @Column({ type: 'varchar', length: 20, comment: '택배사 별칭' })
   alias: string;
 
-  @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.deliveryCompany, { cascade: ['remove'] })
+  @Column({ type: 'boolean', default: false, comment: '사용여부' })
+  isActive: boolean;
+
+  @OneToMany(() => DeliveryCompanySettingEntity, (e) => e.deliveryCompany, { cascade: true })
   @JoinTable()
   deliveryCompanySettings: DeliveryCompanySettingEntity[];
 

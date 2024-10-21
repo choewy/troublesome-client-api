@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { FulfillmentCenterEntity } from './fulfillment-center.entity';
+import { FulfillmentEntity } from './fulfillment.entity';
 import { LocationEntity } from './location.entity';
 import { ProductEntity } from './product.entity';
 import { InventoryStatus } from '../enums';
@@ -34,11 +34,11 @@ export class InventoryEntity {
   product: ProductEntity;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
-  fulfillmentCenterId: number;
+  fulfillmentId: number;
 
-  @ManyToOne(() => FulfillmentCenterEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'fulfillment_center', 'id') })
-  fulfillmentCenter: FulfillmentCenterEntity;
+  @ManyToOne(() => FulfillmentEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ foreignKeyConstraintName: createForeignKeyConstraintName('inventory', 'fulfillment', 'id') })
+  fulfillment: FulfillmentEntity;
 
   @Column({ type: 'int', unsigned: true, nullable: true })
   locationId: number;
