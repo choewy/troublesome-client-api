@@ -1,0 +1,13 @@
+{
+  "printWidth": 160,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "semi": true,
+  "ignoreComments": true,
+  "ignoreTrailingComments": true,
+  "ignoreUrls": true,
+  "ignoreStrings": true,
+  "ignoreTemplateLiterals": true,
+  "ignoreRegExpLiterals": true,
+  "trailingComma": "all"
+}
