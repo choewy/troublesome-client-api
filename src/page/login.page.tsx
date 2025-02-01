@@ -7,9 +7,10 @@ export function LoginPage() {
   const navigate = useNavigate();
 
   const handleKakaoLoginButton = useCallback(async () => {
-    const { data, error } = await kakaoApiService.getKakaoLoginPageURI();
+    const { data, error } = await kakaoApiService.getLoginPageURI();
 
     if (error) {
+      // TODO 예외처리
       return console.log(error);
     }
 
