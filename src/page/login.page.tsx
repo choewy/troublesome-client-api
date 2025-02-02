@@ -1,21 +1,17 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { kakaoApiService } from '@/service/kakao-api.service';
 
 export function LoginPage() {
-  const navigate = useNavigate();
-
   const handleKakaoLoginButton = useCallback(async () => {
     const { data, error } = await kakaoApiService.getLoginPageURI();
 
     if (error) {
-      // TODO 예외처리
       return console.log(error);
     }
 
-    navigate(data.uri, { replace: true });
-  }, [navigate]);
+    window.location.href = data.uri;
+  }, [location]);
 
   return (
     <div>

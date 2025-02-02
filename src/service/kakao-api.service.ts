@@ -1,6 +1,7 @@
 import { config } from '@/persistaence/config';
 import { valueFromHttp } from '@/persistaence/helpers';
-import { HttpService } from '@/persistaence/http.service';
+import { HttpService } from '@/persistaence/http-service';
+import { KakaoApiLoginPageURIRequestParam, KakaoApiLoginPageURIResponseType, KakaoApiLoginRequestBody, KakaoApiLoginResponseType } from '@/persistaence/types';
 
 export class KakaoApiService {
   private readonly httpService = new HttpService(config.API_URL, 'api/kakao');
@@ -10,11 +11,22 @@ export class KakaoApiService {
   }
 
   async getLoginPageURI() {
-    return valueFromHttp(this.httpService.get('login', { params: { redirectUri: this.kakaoLoginCallbackPageUri } }));
+    return valueFromHttp(
+      this.httpService.get<KakaoApiLoginPageURIResponseType>('login', {
+        params: {
+          redirectUri: this.kakaoLoginCallbackPageUri,
+        } as KakaoApiLoginPageURIRequestParam,
+      }),
+    );
   }
 
   async loginWithKakao(code: string) {
-    return valueFromHttp(this.httpService.post('login', { redirectUri: this.kakaoLoginCallbackPageUri, code }));
+    return valueFromHttp(
+      this.httpService.post<KakaoApiLoginResponseType>('login', {
+        redirectUri: this.kakaoLoginCallbackPageUri,
+        code,
+      } as KakaoApiLoginRequestBody),
+    );
   }
 }
 
