@@ -1,25 +1,27 @@
 import Cookies from 'universal-cookie';
 
+import { CookieKey } from './enums';
+
 export class Cookie extends Cookies {
   public get accessToken(): string | null {
-    return this.get('access_token') ?? null;
+    return this.get(CookieKey.AccessToken) ?? null;
   }
 
   public set accessToken(accessToken: string) {
-    this.set('access_token', accessToken);
+    this.set(CookieKey.AccessToken, accessToken, { path: '/' });
   }
 
   public get refreshToken(): string | null {
-    return this.get('refresh_token') ?? null;
+    return this.get(CookieKey.RefreshToken) ?? null;
   }
 
   public set refreshToken(refreshToken: string) {
-    this.set('refresh_token', refreshToken);
+    this.set(CookieKey.RefreshToken, refreshToken, { path: '/' });
   }
 
   public removeTokens() {
-    this.remove('access_token');
-    this.remove('refresh_token');
+    this.remove(CookieKey.AccessToken);
+    this.remove(CookieKey.RefreshToken);
   }
 }
 

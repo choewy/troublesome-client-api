@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 import { cookie } from './cookie';
+import { RequestHeader, ResponseHeader } from './enums';
 
 export class HttpService {
   private readonly api: AxiosInstance;
@@ -10,10 +11,22 @@ export class HttpService {
 
     this.api = axios.create({ baseURL });
     this.api.interceptors.request.use((config) => {
-      config.headers.Authorization = `Bearer ${cookie.accessToken}`;
-      config.headers['x-refresh-token'] = cookie.refreshToken;
+      config.headers[RequestHeader.Authorization] = `Bearer ${cookie.accessToken}`;
+      config.headers[RequestHeader.RefreshToken] = cookie.refreshToken;
 
       return config;
+    });
+
+    this.api.interceptors.response.use((response) => {
+      const accessToken = response.headers[ResponseHeader.AccessToken];
+      const refreshToken = response.headers[ResponseHeader.RefreshToken];
+
+      if (accessToken && refreshToken) {
+        cookie.accessToken = accessToken;
+        cookie.refreshToken = refreshToken;
+      }
+
+      return response;
     });
   }
 
