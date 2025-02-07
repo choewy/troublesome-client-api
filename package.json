@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prepare": "if npm ls husky > /dev/null 2>&1; then husky; fi",
+    "prepare": "sh scripts/prepare.sh",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "start": "craco start",
