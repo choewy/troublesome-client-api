@@ -1,6 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import { InGameHeader } from '@/component/in-game.header';
+import { OutGameHeader } from '@/component/out-game.header';
 import { cookie } from '@/persistaence/cookie';
 import { authApiService } from '@/service/auth-api.service';
 import { authStore } from '@/store/auth.store';
@@ -47,5 +49,15 @@ export function AuthGuard() {
     checkAuth();
   }, [checkAuth]);
 
-  return authState.ok === null ? <></> : <Outlet />;
+  if (authState.ok === null) {
+    return <></>;
+  }
+
+  return (
+    <>
+      {authState.ok && authState.auth.gameId && <InGameHeader />}
+      {authState.ok && !authState.auth?.gameId && <OutGameHeader />}
+      <Outlet />
+    </>
+  );
 }

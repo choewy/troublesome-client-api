@@ -1,10 +1,13 @@
 import { useCallback } from 'react';
 
-import { KAKAO_LOGIN_BUTTON_IMAGE_PATH, TITLE_IMAGE_PATH } from '@/persistaence/constants';
+import { BACKGROUND_IMAGE_PATH, KAKAO_LOGIN_BUTTON_IMAGE_PATH, TITLE_IMAGE_PATH } from '@/persistaence/constants';
 import { kakaoApiService } from '@/service/kakao-api.service';
+import { appStore } from '@/store/app.store';
 
 export function LoginPage() {
-  const handleKakaoLoginButton = useCallback(async () => {
+  appStore.useChangeBackground(BACKGROUND_IMAGE_PATH);
+
+  const handleKakaoLoginButtonClick = useCallback(async () => {
     const { data, error } = await kakaoApiService.getLoginPageURI();
 
     if (error) {
@@ -44,7 +47,7 @@ export function LoginPage() {
           height: '40px',
           cursor: 'pointer',
         }}
-        onClick={handleKakaoLoginButton}
+        onClick={handleKakaoLoginButtonClick}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 
 import { AuthGuard } from './guard/auth.guard';
 import { GamePage } from './page/game.page';
@@ -25,7 +25,7 @@ export const ROUTER = createBrowserRouter([
         element: <KakaoLoginPage />,
       },
       {
-        element: <>게임 참여 상태 확인 후 이동하는 GUARD</>,
+        element: <Outlet />,
         children: [
           {
             path: '/lobby',

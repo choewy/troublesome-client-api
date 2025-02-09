@@ -16,3 +16,12 @@ export enum ResponseHeader {
 export enum OAuthPlatform {
   Kakao = 'kakao',
 }
+
+export enum TokenName {
+  Ruby = 'ruby',
+  Shappire = 'shappire',
+  Emerald = 'emerald',
+  Diamond = 'diamond',
+  Onyx = 'onyx',
+  Gold = 'gold',
+}

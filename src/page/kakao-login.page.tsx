@@ -1,10 +1,14 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { BACKGROUND_IMAGE_PATH } from '@/persistaence/constants';
 import { cookie } from '@/persistaence/cookie';
 import { kakaoApiService } from '@/service/kakao-api.service';
+import { appStore } from '@/store/app.store';
 
 export function KakaoLoginPage() {
+  appStore.useChangeBackground(BACKGROUND_IMAGE_PATH);
+
   const navigate = useNavigate();
 
   const loginWithKakao = useCallback(async () => {
